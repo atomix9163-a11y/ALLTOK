@@ -1,0 +1,310 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-lg-4 col-sm-6">
+                        <div class="search-box mb-2 me-2 d-none">
+                            <div class="position-relative">
+                                <input type="text" class="form-control bg-light border-light rounded" placeholder="Search...">
+                                <i class="search-icon" data-eva="search-outline" data-eva-height="26" data-eva-width="26"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8 col-sm-6">
+                        <div class="mt-4 mt-sm-0 d-flex align-items-center justify-content-sm-end">
+
+                            <div class="mb-2 me-2">
+                                <div class="dropdown">
+                                    <button id="btn-addUser" class="btn btn-primary dropdown-toggle" type="button" onclick="openNewModal()">
+                                        <i class="mdi mdi-plus me-1"></i> 새 사용자 추가
+                                    </button>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="font-size-16 me-3 mb-0">사용자 목록</h5>
+                    <hr class="mt-2">
+                    <div class="table-responsive mb-5">
+                        <table class="table align-middle table-nowrap table-hover mb-0">
+                            <thead class="">
+                                <tr>
+                                  <th scope="col">로그인 아이디</th>
+                                  <th scope="col">사용자 이름</th>
+                                  <th scope="col">관리 등급</th>
+                                  <th scope="col">계정 상태</th>
+                                  <th scope="col">등록일</th>
+                                  <th scope="col"></th>
+                                </tr>
+                              </thead>
+                            <tbody id="user-list">
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center" id="user-pager"></ul>
+                    </nav>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modal-userView" tabindex="-1"aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_userView_Label"> 사용자 관리</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="user-seq">
+                <div class="text-center mb-4">
+                    <h5>사용자 추가/변경</h5>
+                    <p class="card-title-desc">아래 내용을 입력하여 주세요</p>
+                </div>
+                <div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="user-loginId" class="form-label">로그인 아이디 :</label>
+                                <input type="text" class="form-control" placeholder="아이디를 입력하세요" id="user-loginId" name="user-loginId">
+                            </div>
+                            
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="user-name" class="form-label">이름 :</label>
+                                <input type="text" class="form-control" placeholder="이름을 입력하세요" id="user-name" name="user-name">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    <label for="user-password" class="form-label">암호 :</label>
+                                    <input type="password" class="form-control" placeholder="암호를 입력하세요" id="user-password" name="user-password">
+                                </div>
+                                
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    <label for="user-password-confirm" class="form-label">암호 확인 :</label>
+                                    <input type="password" class="form-control" placeholder="정확한 입력을 위해 암호를 한 번 더 입력하세요" id="user-password-confirm" name="user-password-confirm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    <label class="form-label">관리자 등급 :</label>
+                                    <select class="form-select" id="user-admin-type">
+                                        <option value="" selected>관리자 등급을 선택하세요</option>
+                                        <option value="S">관리자</option>
+                                        <option value="A">대행사</option>
+                                    </select>
+                                </div>                                   
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="mb-3">
+                                    <label class="form-label">상태 :</label>
+                                    <select class="form-select" id="user-active">
+                                        <option value="A">정상</option>
+                                        <option value="W">대기</option>
+                                        <option value="D">이용중지</option>
+                                    </select>
+                                </div>                                   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary waves-effect waves-light" onclick="updateUser()">저장하기</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal -->
+
+<%- contentFor('script') %>
+<script>
+    let currentPage = 1;
+    const rowPerPage = 20;
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        await showList();
+    })
+
+    // 사용자 리스트 뷰
+    const showList = () => {
+        let callApi = `/api/user/list`;
+        const result = axios.post(callApi, {
+            page: currentPage,
+            rowCount: rowPerPage
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(response => {  
+            console.log(response)
+            let html = "";
+            if (response.data.result && response.data.data) {
+                for (let item of response.data.data.rows) {
+                    html += `<tr>
+                                    <td><a href="javascript:void(0);" onclick="showUser('${item.seq}')">${item.login_id}</a></td>
+                                    <td>${item.name}</td>
+                                    <td>${(item.admin_type == "S") ? "관리자" : "대행사"}</td>
+                                    <td>
+                                        ${(item.active == 'A') ? 
+                                        '<span class="badge bg-success rounded-pill"> 정상 </span>' : 
+                                        (item.active == 'W') ? '<span class="badge bg-warning rounded-pill"> 대기 </span>' : 
+                                        '<span class="badge bg-danger rounded-pill"> 정지 </span>' }
+                                    </td>
+                                    <td>${moment(item.C_TIME).format("YYYY-MM-DD")}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm font-20 btn-primary" onclick="showUser('${item.seq}')">수정</button>
+                                    </td>
+                                </tr>`;                                
+                }
+                let pagerHTML = createPagerHTML(response.data.data.count, rowPerPage, currentPage, 5, "changePage");
+                document.getElementById("user-pager").innerHTML = pagerHTML;
+            } else {
+                document.getElementById("user-pager").innerHTML = "";
+            }
+            document.getElementById("user-list").innerHTML = html;
+
+
+        }).catch(error => {
+
+        })
+    }
+
+    const changePage = async (page, rowPerPage) => {
+        currentPage = page;
+        await showList()
+        // self.location.href = "/user/list?page=" + page;
+    }
+
+    // 새로 등록            
+    const openNewModal = () => {
+        document.getElementById("user-seq").value = "";
+        document.getElementById("user-loginId").value = "";
+        document.getElementById("user-loginId").removeAttribute ("disabled", "")
+        document.getElementById("user-password").value = "";
+        document.getElementById("user-password-confirm").value = "";
+        document.getElementById("user-name").value = "";
+        document.getElementById("user-admin-type").value = "";
+        document.getElementById("user-active").value = "A";
+
+        const modal = new bootstrap.Modal(document.getElementById('modal-userView'));
+        modal.show();
+    }
+
+    const showUser = async (seq) => {
+        // 정보를 얻어온다        
+        await postData(`/api/user/get`, {
+            seq: seq
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {            
+            if (response.result && response.data) {
+                document.getElementById("user-seq").value = response.data.seq;
+                document.getElementById("user-loginId").value = response.data.login_id;
+                document.getElementById("user-loginId").setAttribute("disabled", "")
+                document.getElementById("user-password").value = "";
+                document.getElementById("user-password-confirm").value = "";
+                document.getElementById("user-name").value = response.data.name;
+                document.getElementById("user-admin-type").value = response.data.admin_type;
+                document.getElementById("user-active").value = response.data.active;
+
+                const modal = new bootstrap.Modal(document.getElementById('modal-userView'));
+                modal.show();
+            } else {
+                alert("사용자 정보를 읽지 못했습니다.");
+            }
+        })
+        .catch(error => { console.log(error); alert("사용자 정보를 읽지 못했습니다.");});
+    }
+
+    const validation = (seq, loginId, password, passwordConfirm, name, adminType) => {
+        if (loginId.length == 0) {
+            alert("아이디를 입력해야만 합니다.");
+            return false;
+        }
+        if (name.length == 0) {
+            alert("이름을 입력해야만 합니다.");
+            return false;
+        }
+        if (seq == "" && password.length == 0) {
+            alert("암호를 입력해야만 합니다.");
+            return false;
+        }
+        if (seq == "" &&  password != passwordConfirm) {
+            alert("암호와 확인 암호가 다릅니다.");
+            return false;
+        }
+        if (adminType.length == 0) {
+            alert("관리자 등급을 선택해야만 합니다.");
+            return false;
+        }
+        return true;
+    }
+
+    const updateUser = async () => {
+        let seq = document.getElementById("user-seq").value;
+        let loginId = document.getElementById("user-loginId").value.trim();
+        let password = document.getElementById("user-password").value;
+        let passwordConfirm = document.getElementById("user-password-confirm").value;
+        let name = document.getElementById("user-name").value.trim();
+        let adminType = document.getElementById("user-admin-type").value;
+        let active = document.getElementById("user-active").value;
+
+        if (!validation(seq, loginId, password, passwordConfirm, name, adminType)) return;
+
+        // if (!confirm(`사용자 정보가 ${(seq == "") ? "추가" : "변경"}됩니다. 계속하시겠습니까?`)) return;
+
+        let callApi = ((seq == "") ? "/api/user/create" : "/api/user/update");
+        // 정보를 업데이트        
+        await postData(callApi, {
+            seq: seq,
+            loginId: loginId,
+            password: password,
+            name: name,
+            adminType: adminType,
+            active: active
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(async response => {
+            if (response.result) {
+                let modal = bootstrap.Modal.getInstance(document.getElementById('modal-userView'));
+                modal.hide();
+
+                await showList();
+            } else {
+                alert(`사용자 정보를 ${(seq == "") ? "추가" : "변경"}하지 못했습니다.`);
+            }
+        })
+        .catch(error => { console.log(error); alert(`사용자 정보를 ${(seq == "") ? "추가" : "변경"}하지 못했습니다.`);});
+    }
+</script>

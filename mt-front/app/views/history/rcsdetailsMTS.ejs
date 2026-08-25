@@ -1,0 +1,209 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-sm-2">
+                        <div class="input-group input-group-sm">
+                            <label for="send-status" class="input-group-text">종류</label>
+                            <select class="form-select form-select-sm" id="send-type">
+                                <option value="ATALK">알림톡</option>
+                                <option value="SMS">SMS</option>
+                                <option value="LMS">LMS</option>                                
+                            </select> 
+                            </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="input-group input-group-sm">
+                            <label for="send-result" class="input-group-text">결과</label>
+                            <select class="form-select form-select-sm" id="send-result">
+                                <option value="" selected>전체</option>
+                                <option value="0">성공</option>
+                                <option value="1">실패</option>
+                            </select>   
+                            </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button id="search" class="fc-today-button btn btn-sm btn-primary" type="button" onclick="search()">검색</button>
+                    </div>
+                </div>
+                <div class="row table-responsive">
+                    <table class="table table-sm table-hover fs-7">
+                        <colgroup>
+                            <col width="50px">
+                            <col width="100px">
+                            <col width="70px">
+                            <col width="150px">
+                            <col width="150px">
+                            <col width="50px">
+                            <col width="50px">
+                            <col width="*">
+                        </colgroup>
+                        <thead class="">
+                            <tr class="text-center">
+                                <th scope="col">#</th>
+                                <th scope="col">전화번호</th>
+                                <th scope="col">통신사</th>
+                                <th scope="col">발송날짜</th>
+                                <th scope="col">결과날짜</th>
+                                <th scope="col">상태</th>
+                                <th scope="col">차감(원)</th>
+                                <th scope="col">결과</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-details">
+                        </tbody>
+                    </table>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center" id="history-details-pager"></ul>
+                    </nav>
+            </div>
+
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->
+
+<!-- Modal -->
+<div class="modal fade" id="modal-waitProcess" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title" id="staticBackdropLabel">기록을 가져오는 중</h5>
+            </div>
+            <div class="modal-body text-center">
+                <p>발송 내역을 가져오는 중입니다.</p>
+                <p><img src="/assets/img/alltok/snail.gif" style="width: 50%"></p>
+                <p>내역 조회가 완료되면 자동으로 닫히므로 잠시 기다려 주십시오.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal -->
+
+<%- contentFor('script') %>
+<script src="/assets/js/xlsx/xlsx.full.min.js"></script>
+<script src="/assets/js/fileSaver/fileSaver.min.js"></script>
+<script src="/assets/js/message-helper.js"></script>
+
+<script>
+    const rowCount = 20;
+    const storeCode = '<%=user.storeCode %>';
+    const martCode = null;  // message-helper 이용시 로딩 오류 없애기 위함
+    const reserveCode = '<%=reserveCode %>';
+    const msgType = '<%=type %>';
+    const yearMonth = '<%=yearMonth %>';
+    let currentPage = 1;
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        document.getElementById("send-type").value = msgType == "AT" ? "ATALK" : msgType;
+        showHistoryDetailsList(currentPage);
+
+        window.addEventListener("copy", (e) => {
+            alert("보안 정책에 의해 복사를 허용하지 않습니다.");
+            e.preventDefault();
+            e.clipboardData.clearData("Text"); // 클립보드에 저장된 컨텐츠 삭제
+        });
+    })
+
+    function search() {
+        currentPage = 1;
+        showHistoryDetailsList(currentPage);
+    }
+
+    async function showHistoryDetailsList(page) {
+        let sendType = document.getElementById("send-type").value;
+        let sendResult = document.getElementById("send-result").value;
+                
+        const modal = new bootstrap.Modal(document.getElementById('modal-waitProcess'));
+        modal.show();
+
+        let callApi = `${apiServer}/history/apiListDetailsMTS`;
+        try {
+            await axios.post(callApi, {
+                storeCode: storeCode,
+                reserveCode: reserveCode,
+                sendType: sendType == "LMS" ? "MMS" : sendType,
+                sendResult: sendResult,
+                yearMonth: yearMonth,
+                page: page,
+                rowCount : rowCount
+            }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+            })
+            .then(response => {
+                console.log(response)
+                if (response.data.result && response.data.data.rows) {
+                    let historyHTML = "";
+                    let num = response.data.data.count - (page - 1) * rowCount;
+                    for (let history of response.data.data.rows) {                        
+                        historyHTML += `
+                        <tr class="text-center">
+                                <th scope="row">${num--}</th>
+                                <td>${history.TRAN_PHONE}</td>
+                                <td>${(history.TRAN_END_TELCO) ? history.TRAN_END_TELCO : ""}</td>                                
+                                <td>${(history.TRAN_SENDDATE) ? moment(history.TRAN_SENDDATE).format('YYYY-MM-DD HH:mm:ss') : ""}</td>
+                                <td>${(history.TRAN_RSLTDATE) ? moment(history.TRAN_RSLTDATE).format('YYYY-MM-DD HH:mm:ss') : ""}</td>
+                                <td>${(history.TRAN_RSLT == "1000" || history.TRAN_RSLT == "00") ? "정상" : "실패"}</td>
+                                <td>${(history.TRAN_RSLT == "1000" || history.TRAN_RSLT == "00") ? history.TRAN_ETC4 : ""}</td>
+                                <td class="text-start">${
+                                    (sendType == "SMS") ? getSMSResultMTS(history.TRAN_RSLT) : 
+                                    (sendType == "MMS" || sendType == "LMS") ? getLMSResultMTS(history.TRAN_RSLT) : 
+                                    getATResultMTS(history.TRAN_RSLT)
+                                }</td>
+                            </tr>`;
+                    }
+                    document.getElementById("history-details").innerHTML = historyHTML;
+
+                    let pagerHTML = createPagerHTML(response.data.data.count, rowCount, page, 5, "changePageDetails");
+                    document.getElementById("history-details-pager").innerHTML = pagerHTML;
+
+                } else {
+                    document.getElementById("history-details").innerHTML = "";
+                    document.getElementById("history-details-pager").innerHTML = "";
+                }
+            })
+            .catch(error => { 
+                console.log(error); 
+                throw new Error(`발송 내역을 가져오지 못했습니다: ${error.message}`);
+            });
+        } catch (e) {
+            console.error(e);
+            alert(e.message);
+        } finally {
+            setTimeout(function() {
+                let modal = bootstrap.Modal.getInstance(document.getElementById('modal-waitProcess'));
+                modal.hide();
+            }, 500);
+        }
+
+    }
+
+    function changePageDetails(page, rowPerPage) {
+        // self.location.href = "/history/list?page=" + page;
+        document.getElementById("history-details").innerHTML = "";
+        document.getElementById("history-details-pager").innerHTML = "";
+
+        currentPage = page;
+        showHistoryDetailsList(page);
+    }
+    
+    function string2arrayBuffer(s) {
+        let buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+        let view = new Uint8Array(buf);  //create uint8array as viewer
+        for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+        return buf;
+    }
+
+    
+</script>

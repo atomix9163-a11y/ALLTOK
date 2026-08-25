@@ -1,0 +1,374 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col">
+                        <h6>* 발송이 진행 중인 경우 실제 발송 수와 성공률은 변동이 됩니다.</h6>
+                        <h6>* 조회일로부터 2개월 이전의 기록은 <a href="/history/rcslistyearmonthMTS">이전 발송 내역</a>에서 확인하실 수 있습니다.</h6>
+                    </div>
+                </div>                
+                <div class="row mb-4">
+                    <div class="col-sm-3">
+                        <input type="date" class="form-control form-control-sm" id="start-date" name="start-date" value="2018-07-22" min="2022-01-01" max="2050-12-31" />
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="date" class="form-control form-control-sm" id="end-date" name="end-date" value="2018-07-22" min="2022-01-01" max="2050-12-31" />
+                    </div>
+                    <div class="col-sm">
+                        <button id="search" class="fc-today-button btn btn-sm btn-primary" type="button" onclick="search()">검색</button>
+                    </div>
+                    <div class="col-sm text-end">
+                        <button id="download" class="fc-today-button btn btn-sm btn-outline-primary" type="button" onclick="downloadExcel()">다운로드</button>
+                    </div>
+                </div>
+                <div class="row table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead class="">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">발송코드</th>
+                                <th scope="col">구분</th>
+                                <th scope="col">요청날짜</th>
+                                <th scope="col">예약날짜</th>
+                                <th scope="col">예상발송수</th>
+                                <th scope="col">알림톡</th>
+                                <th scope="col">긴문자</th>
+                                <th scope="col">짧은문자</th>
+                                <th scope="col">성공률</th>
+                                <th scope="col">사용금액</th>
+                                <th scope="col">상태</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-main">
+                        </tbody>
+                        <tfoot id="history-main-summary">
+                        </tfoot>
+                    </table>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center" id="history-main-pager"></ul>
+                    </nav>
+            </div>
+
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->
+
+<div id="sendProcess" class="d-none">
+    <div class="dialog">
+        <p class="mt-3"><h4 id="loading-message">작업이 진행 중입니다.</h4></p>
+        <div class="spinner-border mt-3 mb-5" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mb-3">데이터 수신이 완료되면 자동으로 닫히므로 잠시 기다려 주십시오.</p>        
+    </div>
+</div>
+
+<%- contentFor('script') %>
+<script lang="javascript" src="/assets/js/xlsx/xlsx.full.min.js"></script>
+<script lang="javascript" src="/assets/js/fileSaver/fileSaver.min.js"></script>
+
+<script>
+    const rowCount = 60;
+    const storeCode = '<%=user.storeCode %>';
+    let currentPage = 1;
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        let d = new Date();
+        let lastMonthDate = new Date(moment().add(-1, 'month').format("YYYY-MM-DD"));
+        document.getElementById("start-date").value = [lastMonthDate.getFullYear(), (lastMonthDate.getMonth() + 1).AddZero(), lastMonthDate.getDate().AddZero()].join('-');
+        document.getElementById("end-date").value = [d.getFullYear(), (d.getMonth() + 1).AddZero(), d.getDate().AddZero()].join('-');
+
+        showHistoryMainList(currentPage);
+    })
+
+    const showProcess = () => {
+        document.getElementById("sendProcess").classList.remove("d-none");
+    }
+
+    const hideProcess = () => {
+        console.log("hide")
+        document.getElementById("sendProcess").classList.add("d-none");
+    }
+
+    function search() {
+        currentPage = 1;
+        showHistoryMainList(currentPage);
+    }
+
+    async function showHistoryMainList(page) {
+        let startDate = document.getElementById("start-date").value;
+        let endDate = document.getElementById("end-date").value;
+        
+        showProcess();
+
+        let callApi = `${apiServer}/history/apiListMTS`;
+        await axios.post(callApi, {
+            storeCode: storeCode,
+            startDate: startDate,
+            endDate: endDate,
+            page: page,
+            rowCount : rowCount
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {            
+            // console.log(response.data)
+            const summary = {
+                totalSend: 0,
+                totalSend_AT: 0,
+                totalSend_LMS: 0,
+                totalSend_SMS: 0,
+                totalRate: 0.00,
+                totalAmount: 0,
+                count: 0
+            }
+            if (response.data.result && response.data.data.count > 0) {
+                let historyHTML = "";
+                let num = response.data.data.count - (page - 1) * rowCount;                
+                for (let history of response.data.data.rows) {
+                    const realSendCount = (history.msg_type == 'AT') ? history.real_send_count_at :
+                                    (history.msg_type == 'SMS') ? history.real_send_count_sms :
+                                    (history.msg_type == 'LMS') ? history.real_send_count_mms : 
+                                    0;
+                    const realSendCount_R = (history.msg_type == 'AT') ? history.real_send_count_sms + history.real_send_count_mms + history.real_send_count_rcs :
+                                    (history.msg_type == 'SMS') ? history.real_send_count_at + history.real_send_count_mms + history.real_send_count_rcs:
+                                    (history.msg_type == 'LMS') ? history.real_send_count_at + history.real_send_count_sms + history.real_send_count_rcs :                                    
+                                    0;
+                    historyHTML += `                    
+                        <tr>
+                            <th scope="row">${num--}</th>
+                            <td><a href="/history/rcsdetailsMTS?rcode=${history.reserve_code}&type=${history.msg_type}&page=${currentPage}">${history.reserve_code}</a></td>
+                            <td><a href="/history/rcsdetailsMTS?rcode=${history.reserve_code}&type=${history.msg_type}&page=${currentPage}">${history.msg_type}</a></td>
+                            <td>${moment(history.request_time).format('YYYY-MM-DD HH:mm:ss')}</td>
+                            <td>${(history.status == "R" || history.status == "S" || history.status == "C") ? moment(history.reserve_time).format('YYYY-MM-DD HH:mm:ss') : ""}</td>
+                            <td>${numeral(history.send_count).format("0,0")}</td>
+                            <td>${numeral(history.at_send_count).format("0,0")}</td>
+                            <td>${numeral(history.mms_send_count).format("0,0")}</td>
+                            <td>${numeral(history.sms_send_count).format("0,0")}</td>
+                            <td>${numeral(history.send_rate * 100).format("0,0.0")}%</td>
+                            <td>${numeral(history.total_use_amount).format("0,0.0")}</td>
+                            <td>${(history.status == "I") ? "즉시발송" : 
+                                (history.status == "R") ? "발송예약" : 
+                                (history.status == "S") ? "예약발송(취소불가)" :
+                                (history.status == "C") ? "<span class='text-danger'>예약취소</span>" :
+                                "<span class='text-danger'>취소</span>"}
+                                ${(history.status == "R") ? 
+                                `<button type="button" class="btn btn-xs btn-danger waves-effect waves-light" onClick="cancelReserve('${history.reserve_code}')">취소</button>` : ''}
+                            </td>
+                        </tr>`;                    
+                    if (history.status == "I" || history.status == "R" || history.status == "S") {
+                        summary.totalSend += history.send_count;
+                        summary.totalSend_AT += history.at_send_count;
+                        summary.totalSend_LMS += history.mms_send_count;
+                        summary.totalSend_SMS += history.sms_send_count;
+                        summary.totalAmount += history.total_use_amount;
+                        summary.count++;
+                    }
+                }
+                document.getElementById("history-main").innerHTML = historyHTML;
+                const summaryHTML = `<tr>
+                            <th colspan="5" class="text-center">합계</th>
+                            <td>${numeral(summary.totalSend).format("0,0")}</td>
+                            <td>${numeral(summary.totalSend_AT).format("0,0")}</td>
+                            <td>${numeral(summary.totalSend_LMS).format("0,0")}</td>
+                            <td>${numeral(summary.totalSend_SMS).format("0,0")}</td>
+                            <td>${numeral((summary.totalSend_AT + summary.totalSend_LMS + summary.totalSend_SMS)/ summary.totalSend * 100).format("0,0.0")}%</td>
+                            <td>${numeral(summary.totalAmount).format("0,0.0")}</td>
+                            <td>(취소건은 제외)</td>
+                        </tr>`
+                document.getElementById("history-main-summary").innerHTML = summaryHTML;
+                let pagerHTML = createPagerHTML(response.data.data.count, rowCount, page, 5, "changePageMain");
+                document.getElementById("history-main-pager").innerHTML = pagerHTML;                
+            } else {
+                document.getElementById("history-main").innerHTML = "";
+                document.getElementById("history-main-summary").innerHTML = "";
+                
+            }
+            hideProcess();
+        })
+        .catch(error => { hideProcess(); console.log(error); alert(`발송 내역을 가져오지 못했습니다.`);;});
+    }
+
+    function changePageMain(page, rowPerPage) {
+        document.getElementById("history-main").innerHTML = "";
+        document.getElementById("history-main-pager").innerHTML = "";
+
+        currentPage = page;
+        showHistoryMainList(page);
+    }
+
+    async function cancelReserve(reserveCode) {
+        if (!confirm("발송 예약을 취소하겠습니까? 되돌릴 수 없습니다.")) { return; }
+
+        let callApi = `${apiServer}/history/apiCancelReserveMTS`;
+        await axios.post(callApi, {
+            storeCode: storeCode,
+            reserveCode: reserveCode
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {            
+            if (response.data.result && response.data.data.cancelSendData == "OK" && response.data.data.cancelPushData == "") {
+                showHistoryMainList(currentPage);
+            } else {
+                if (response.data.data.cancelPushData != "") {
+                    alert(`올톡의 예약은 취소되었으나, 큐마켓의 푸시는 이미 전송예약되어, 전송완료 후 삭제가능합니다.`)
+                } else {
+                    alert(`발송 예약 취소가 실패했습니다.`)
+                }
+            }
+        })
+        .catch(error => { console.log(error); alert(`발송 예약 취소가 실패했습니다.`);});
+    }
+
+    async function downloadExcel() {
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
+
+        const eventName = `${martName}`;
+
+        var xlsx_workBook = XLSX.utils.book_new();
+        xlsx_workBook.Props = {
+            Title: `${eventName}_발송통계`,
+            Subject: `${eventName}_발송통계`,
+            Author: "올톡",
+            Manager: "올톡",
+            Company: "올톡",
+            Keywords: "올톡",
+            Comments: `${eventName} 발송통계`,
+            LastAuthor: "올톡",
+            CreatedDate: new Date(),
+        };
+        xlsx_workBook.SheetNames.push(`${startDate.replaceAll("-", "")}-${endDate.replaceAll("-", "")}`);
+        var workSheet_Data = await getWorksheetStructure();
+        
+        var workSheet = XLSX.utils.aoa_to_sheet(workSheet_Data);
+        xlsx_workBook.Sheets[`${startDate.replaceAll("-", "")}-${endDate.replaceAll("-", "")}`] = workSheet;
+        var workbook = XLSX.write(xlsx_workBook, {
+            bookType: "xlsx",
+            type: "binary",
+        });
+        saveAs(
+            new Blob([string2arrayBuffer(workbook)], {
+                type: "application/octet-stream",
+            }),
+            `${eventName}_발송통계_${moment(new Date()).format("YYYYMMDD")}.xlsx`
+        );
+        return;
+    }
+
+    function string2arrayBuffer(s) {
+        let buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+        let view = new Uint8Array(buf); //create uint8array as viewer
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff; //convert to octet
+        return buf;
+    }
+
+    async function getWorksheetStructure() {
+        let dataArray = [];
+        dataArray.push(
+            new Array("#", "발송종류", "요청일", "예약일", "예상발송수", "알림톡발송수", "긴문자발송수", "짧은문자발송수", "성공률", "사용금액", "발송상태")
+        );
+        const startDate = document.getElementById("start-date").value;
+        const endDate = document.getElementById("end-date").value;
+        
+        showProcess();
+
+        let callApi = `${apiServer}/history/apiListMTS`;
+        await axios.post(callApi, {
+            storeCode: storeCode,
+            startDate: startDate,
+            endDate: endDate,
+            page: 0,
+            rowCount : 0
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then((response) => {
+            if (response.data.result && response.data.data.rows.length > 0) {
+                
+                let num = response.data.data.count;
+                let totalSend = 0;
+                let totalSend_AT = 0;
+                let totalSend_LMS = 0;
+                let totalSend_SMS = 0;
+                let totalSend_price = 0;
+
+                for (let history of response.data.data.rows) {
+                    const realSendCount = (history.msg_type == 'AT') ? history.real_send_count_at :
+                        (history.msg_type == 'SMS') ? history.real_send_count_sms :
+                        (history.msg_type == 'LMS') ? history.real_send_count_mms :
+                        0;
+                    const realSendCount_R = (history.msg_type == 'AT') ? history.real_send_count_sms + history.real_send_count_mms + history.real_send_count_rcs :
+                        (history.msg_type == 'SMS') ? history.real_send_count_at + history.real_send_count_mms + history.real_send_count_rcs:
+                        (history.msg_type == 'LMS') ? history.real_send_count_at + history.real_send_count_sms + history.real_send_count_rcs :
+                        0;
+
+                    let rowArray = [];
+                    rowArray.push(num--);
+                    rowArray.push(history.msg_type);
+                    rowArray.push(moment(history.request_time).format('YYYY-MM-DD HH:mm:ss'));
+                    rowArray.push((history.status == "R" || history.status == "S" || history.status == "C") ? moment(history.reserve_time).format('YYYY-MM-DD HH:mm:ss') : "");
+                    rowArray.push(history.send_count);
+                    rowArray.push(history.at_send_count);
+                    rowArray.push(history.mms_send_count);
+                    rowArray.push(history.sms_send_count);
+                    rowArray.push(numeral(history.send_rate * 100).format("0,0.00"));
+                    rowArray.push(history.total_use_amount);
+                    rowArray.push(history.status == "I" ? "즉시발송" : 
+                        (history.status == "R") ? "발송예약" : 
+                        (history.status == "S") ? "예약발송(취소불가)" :
+                        (history.status == "C") ? "예약취소" : "");
+
+                    totalSend += history.send_count;
+                    totalSend_AT += history.at_send_count;
+                    totalSend_LMS += history.mms_send_count;
+                    totalSend_SMS += history.sms_send_count;
+                    totalSend_price += history.total_use_amount;
+
+                    dataArray.push(rowArray);
+                }
+
+                // 합계
+                let rowArray = [];
+                rowArray.push("합계");
+                rowArray.push("");
+                rowArray.push("");
+                rowArray.push("");
+                rowArray.push(totalSend);
+                rowArray.push(totalSend_AT);
+                rowArray.push(totalSend_LMS);
+                rowArray.push(totalSend_SMS);
+                // rowArray.push("");
+                rowArray.push(totalSend_price);
+                
+                dataArray.push(rowArray);
+            }
+            hideProcess();
+        }).catch((error) => {
+            hideProcess();
+            console.log(error);
+            alert(`내역을 가져오지 못했습니다.`);
+        });
+        return dataArray;
+    }
+</script>
+
+
+

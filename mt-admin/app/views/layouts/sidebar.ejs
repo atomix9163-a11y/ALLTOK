@@ -1,0 +1,78 @@
+<!-- Navigation Category -->
+<div class="mainnav__categoriy py-3">
+    <h6 class="mainnav__caption mt-0 px-3 fw-bold"></h6>
+    <ul class="mainnav__menu nav flex-column">
+
+        <li class="nav-item">
+            <a href="/store/list" class="nav-link mininav-toggle  <%=active == 'store' ? 'active' : ''%>">
+                <i class="pli-home fs-5 me-2"></i>
+
+                <span class="nav-label mininav-content ms-1">가맹점 관리</span>
+            </a>
+        </li>
+        <li class="nav-item has-sub">
+            <a href="#" class="mininav-toggle nav-link collapsed <%=(active == 'cash' || active == 'account' || active == 'accountmanage') ? 'active' : ''%>"><i class="pli-coins fs-5 me-2"></i>
+                <span class="nav-label ms-1">충전 관리</span>
+            </a>
+            <ul class="mininav-content nav collapse">
+                <li class="nav-item">
+                    <a href="/store/charge" class="nav-link <%=active == 'cash' ? 'active' : ''%>">충전 내역/관리</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/store/account" class="nav-link <%=active == 'account' ? 'active' : ''%>">가상계좌연결</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/store/accountManage" class="nav-link <%=active == 'accountmanage' ? 'active' : ''%>">가상계좌결산</a>
+                </li>
+
+            </ul>
+        </li>        
+
+        <li class="nav-item has-sub">
+            <a href="#" class="mininav-toggle nav-link collapsed <%=(active == 'profile' || active == 'template') ? 'active' : ''%>"><i class="pli-speech-bubble fs-5 me-2"></i>
+                <span class="nav-label ms-1">카카오 알림톡</span>
+            </a>
+            <ul class="mininav-content nav collapse">
+                <li class="nav-item">
+                    <a href="/kakao/profile" class="nav-link <%=active == 'profile' ? 'active' : ''%>">프로필 관리</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/kakao/template" class="nav-link <%=active == 'template' ? 'active' : ''%>">템플릿 관리</a>
+                </li>
+            </ul>
+        </li>        
+        <li class="nav-item">
+            <a href="/phone/list" class="nav-link mininav-toggle <%=active == 'phone' ? 'active' : ''%>">
+                <i class="pli-telephone fs-5 me-2"></i>
+                <span class="nav-label mininav-content ms-1">발신번호 등록관리</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/image/list" class="nav-link mininav-toggle <%=active == 'image' ? 'active' : ''%>">
+                <i class="pli-photo fs-5 me-2"></i>
+                <span class="nav-label mininav-content ms-1">이미지 관리</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/users/list" class="nav-link mininav-toggle <%=active == 'user' ? 'active' : ''%>">
+                <i class="pli-lock-user fs-5 me-2"></i>
+                <span class="nav-label mininav-content ms-1">사용자 관리</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/refuse/list" class="nav-link mininav-toggle <%=active == 'refuse' ? 'active' : ''%>">
+                <i class="pli-old-telephone fs-5 me-2"></i>
+                <span class="nav-label mininav-content ms-1">080 수신거부 관리</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="/system/service" class="nav-link mininav-toggle <%=active == 'service' ? 'active' : ''%>">
+                <i class="pli-gear fs-5 me-2"></i>
+
+                <span class="nav-label mininav-content ms-1">서비스 사용 관리</span>
+            </a>
+        </li>
+        
+    </ul>
+</div>
+

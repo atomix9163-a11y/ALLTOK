@@ -1,0 +1,741 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row mb-5">
+    <div class="col-xxl-8 col-md-8 col-sm-6 mb-5">
+        <div class="card">
+            <div class="card-body">
+                <div class="row justify-content-end">
+                    <label for="kakao-template" class="col-sm-2 col-form-label">카카오 템플릿</label>
+                    <div class="col-sm-10">
+                        <select class="form-select form-select-sm" id="kakao-template" onchange="changeTemplate(this)">
+                        </select>                        
+                    </div>
+                </div>
+                <div id="app-push-status" class="d-none">
+                    <div class="row justify-content-end">
+                        <label for="use-app-push" class="col-sm-2 col-form-label">앱푸시 (순차발송)</label>
+                        <div class="col-md-7">
+                            <select class="form-select form-select-sm" id="use-app-push" onchange="changeUseAppPush(this)">
+                                <option value="Y">사용 함</option>
+                                <option value="N">사용 안 함</option>                            
+                            </select>                        
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-sm btn-primary w-100 d-none" id="btn-show-appPushReview" onclick="showAppPushReview()">앱 푸시 미리보기</button>
+                        </div>
+                    </div>
+                    <div class="row justify-content-end" id="push-title-area">
+                        <label for="push-title" class="col-sm-2 col-form-label">푸시 제목</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control form-control-sm" id="app-push-title">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="use-app-push" class="col-sm-2 col-form-label">대체문자 발송</label>
+                    <div class="col-md-10 pt-2">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="use-alternative-send" checked onclick="useInsteadSend()">
+                            <label class="form-check-label" for="use-alternative-send">발송함</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row pt-1" id="text-area">
+                    <label class="col-sm-2 col-form-label">발송 내용</label>
+                    <div class="col-md-10">
+                        <div class="row">
+                            <div class="col-md-12">대체 문자: <span class="fs-7" id="use-alternative-send-extra">[Web발신]</span> : 내용이 없어도 기본 내용이 발송됩니다. 미리보기를 참고하세요.</div>
+                        </div>                        
+                        <textarea class="form-control form-control-sm text-area-editorable" id="sms-text" rows="5"></textarea>
+                        <div class="badge rounded-pill bg-dark" role="alert" id="text-count">대체문자 0 byte</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="kakao-template" class="col-sm-2 col-form-label">발송 대상</label>
+                    <div class="col-sm-10">
+                        <select class="form-select form-select-sm" id="target-group">
+                        </select>                        
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="kakao-template" class="col-sm-2 col-form-label">발송 시간</label>
+                    <div class="col-sm-10">
+                        <div class="row">
+                            <div class="col-md-6">                        
+                                <input type="radio" class="" name="send-type" id="send-type-I" autocomplete="off" checked onclick="changeSendTime(this)">
+                                <label class="btn btn-sm btn-outline-shuket-purple" for="send-type-I">즉시발송</label>
+        
+                                <input type="radio" class="" name="send-type" id="send-type-R" autocomplete="off"  onclick="changeSendTime(this)">
+                                <label class="btn btn-sm btn-outline-shuket-purple" for="send-type-R">예약발송</label>
+                            </div>
+                            <div class="col-md-3"><input class="form-control form-control-sm d-none" id="send-reserve-date" type="date" onchange="changeReserveDate()"></div>
+                            <div class="col-md-3"><input class="form-control form-control-sm d-none" id="send-reserve-time" type="time"></div>                    
+                        </div>
+                        <div class="row text-danger text-large">
+                            * 예약 발송은 반드시 발송하기 버튼을 누르는 시간보다 10분 이후로 설정해야만 합니다.
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">                    
+                    <div class="col-md-12 text-center">
+                        <button class="btn btn-lg btn-danger w-50" type="button" onclick="sendMessage()" id="btn-send"><i class="demo-psi-heart-2 fs-5 me-2"></i> 발송하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 발송 미리 보기 -->
+    <div class="col-xxl-4 col-md-4" id="tab-review">
+        <div class="tab-base">
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#_dm-tabskko" type="button" role="tab" aria-controls="kko" aria-selected="true">카카오 미리보기</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#_dm-tabsSMS" type="button" role="tab" aria-controls="sms" aria-selected="false">SMS 대체문자 미리보기</button>
+                </li>
+            </ul>
+
+            <!-- Tabs content -->
+            <div class="tab-content">
+                <div id="_dm-tabskko" class="tab-pane fade show active" role="tabpanel" aria-labelledby="kko-tab">
+                    <div class="phone-l phone-kakao mb-3">
+                        <div class="review" id="review"></div>
+                    </div>        
+                </div>
+                <div id="_dm-tabsSMS" class="tab-pane fade" role="tabpanel" aria-labelledby="sms-tab">
+                    <div class="phone-l mb-3">
+                        <div class="review" id="review-text"></div>
+                    </div>
+                </div>
+            </div>
+            <em class="text-danger">* 핸드폰마다 보여지는 모습이 다를 수 있습니다.</em>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 앱푸시 미리보기 -->
+<div class="modal fade modal-center" id="modal-app-push-review" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-center">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title" id="staticBackdropLabel">앱 푸시 미리 보기</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="appPush-review">
+                    <div class="phone-l phone-app mb-3">
+                        <div class="review-app-title" id="appPush-review-title"></div>
+                        <div class="review" id="appPush-review-text"></div>
+                    </div>
+                </div>        
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal 앱푸시 미리보기 -->
+
+<!-- Modal -->
+<div class="modal fade" id="modal-sendProcess" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title" id="staticBackdropLabel">메시지 발송 중</h5>
+            </div>
+            <div class="modal-body text-center">
+                <p>메시지가 발송 중입니다. </p>
+                <p><img src="/assets/img/alltok/mail-send.gif"></p>
+                <p>발송이 완료되면 자동으로 닫히므로 잠시 기다려 주십시오.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal -->
+
+<div id="sendProcess" class="d-none">
+    <div class="dialog">
+        <p class="mt-3"><h4 id="loading-message">메시지가 발송 중입니다.</h4></p>
+        <p><img src="/assets/img/alltok/mail-send.gif"></p>
+        <p class="mb-3">발송이 완료되면 자동으로 닫히므로 잠시 기다려 주십시오.</p>        
+    </div>
+</div>
+
+<%- contentFor('script') %>
+<script src="/assets/js/message-helper.js"></script>
+
+<script>
+    const storeCode = '<%=user.storeCode %>';
+    const mCode = '<%=storeInfo.M_MOA_CODE %>';
+    const martCode = '<%=storeInfo.app_mart_code %>';
+    const storeName = '<%=storeInfo.name %>';
+    let baseShopUri = "<%=(storeInfo.shop_type == 'Q') ? storeInfo.service.shopShortUrl : (storeInfo.shop_type == 'U' || storeInfo.shop_type == 'QU') ? 'https://shop.alltok.co.kr' : 'https://m.shuket.co.kr' %>";
+    const shopType = "<%=storeInfo.shop_type %>";
+    const useMobileShop = "<%=storeInfo.use_mobile_shop %>";
+    const reject = "<%=process.env.REJECT %>";
+    let service = {
+        useShop: '<%=(storeInfo.service.useShop) ? storeInfo.service.useShop : "N" %>',
+        shortUri: '<%=(storeInfo.service.shopShortUrl) ? storeInfo.service.shopShortUrl : "" %>',
+        allowAppPush: '<%=(storeInfo.service.allowAppPush) ? storeInfo.service.allowAppPush : "N" %>',
+        useAT: '<%=storeInfo.service.AT %>',
+        defaultTemplate: '<%=storeInfo.service.kakaoDefaultTemplate %>',
+        unitPriceAT: '<%=storeInfo.service.UP_AT %>',
+        useRCSSMS: '<%=storeInfo.service.RCSSMS %>',
+        unitPriceRCSSMS: '<%=storeInfo.service.UP_RCSSMS %>',
+        useRCSLMS: '<%=storeInfo.service.RCSLMS %>',
+        unitPriceRCSLMS: '<%=storeInfo.service.UP_RCSLMS %>',
+        useSMS: '<%=storeInfo.service.SMS %>',
+        unitPriceSMS: '<%=storeInfo.service.UP_SMS %>',
+        useLMS: '<%=storeInfo.service.LMS %>',
+        unitPriceLMS: '<%=storeInfo.service.UP_LMS %>',
+        MTS_use: '<%=(storeInfo.service.MTS_use) ? storeInfo.service.MTS_use : "N" %>',
+    }
+
+    let template = null;
+    const lmsmax = 1800;
+    const smsmax = 90;
+    const smsDefaultText = "(광고) " + storeName;
+
+    const AT_key = {
+        customerName : '',
+        customerlevel: '행사알림회원',
+        membership: '<%=storeInfo.name %> ',
+        company: '<%=storeInfo.name %> ',
+        service: '<%=storeInfo.name %> '
+    }
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        baseShopUri = (service.shortUri) ? service.shortUri : baseShopUri + `?c=` + ((shopType == "U" || shopType == "QU") ? storeCode : martCode);
+        document.getElementById("sms-text").value = smsDefaultText;
+        
+        if (service.useSMS == 'N') {
+            // SMS를 사용하지 못하므로, 대체 문자 불가
+            document.getElementById("use-alternative-send").checked = false;
+            document.getElementById("use-alternative-send").setAttribute("disabled", "")
+            useInsteadSend();
+        } else {
+            document.getElementById("sms-text").addEventListener("keyup", updateCountReview);        
+        }        
+        // 알림톡 템플릿 목록 가져오기
+        // 카카오 비즈니스일 때와 MTS 컴퍼니일 때를 구분해서 처리한다
+        let kakaoTemplateCode = (service.MTS_use == 'N') ? await getKakaoTemplateSelect(storeCode) : await getKakaoTemplateSelect_MTS(storeCode);
+        if (kakaoTemplateCode != "") {
+            template = (service.MTS_use == 'N') ? await getKakaoTemplate(kakaoTemplateCode) : await getKakaoTemplate_MTS(kakaoTemplateCode);
+            updateCountReview();
+            await getTargetGroupList();
+        }
+
+        // console.log(martCode, service)
+        // 푸시 허용 여부
+        if (service.allowAppPush == 'Y' && martCode != "") {
+            // 푸시 연동
+            // 푸시 기본 타이틀 세팅            
+            document.getElementById("app-push-title").value = `${storeName} ${moment().format("YYYY.MM.DD")} (${getWeek(moment())})`;
+            document.getElementById("app-push-status").classList.remove("d-none");
+            if (shopType == "L") {
+                document.getElementById("btn-show-appPushReview").classList.remove("d-none");
+            }
+        } else {
+            // 비 슈켓 고객이거나 푸시 허용 안 함
+            document.getElementById("app-push-status").classList.add("d-none");
+        }
+
+    })
+
+    // 카카오 비즈니스 버전 *****************
+    const getKakaoTemplateSelect = async (storeCode) => {
+        let kakaoTemplate = document.getElementById("kakao-template");
+        let callApi = `${apiServer}/message/apiGetKakaoTemplateList`;
+        await axios.post(callApi, {
+            storeCode: storeCode,
+            kepStatus: 'O'
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(response => {            
+            if (response.data.data.length == 0) {
+                alert("카카오 비즈니스 연결이 되지 않았습니다. 알림톡을 발송할 수 없습니다.");
+                document.getElementById("btn-send").setAttribute("disabled", "true")
+                return null;
+            }
+            
+            let html = "";
+            if (response.data.result && response.data.data) {
+                for (let template of response.data.data.data) {
+                    html += `<option value='${template.templateCode}' ${(service.defaultTemplate == template.templateCode ? 'selected' : '' )}>${template.templateName}</option>`;
+                }
+                if (response.data.data.length <= 1) {
+                    kakaoTemplate.setAttribute("Disabled", "true");
+                }
+            }
+            kakaoTemplate.innerHTML = html;
+        }).catch(error => { 
+            console.log(error); 
+            alert(`카카오 발송 템플릿 목록을 가져오는 중 오류가 발생했습니다. 잠시 후 다시 시도하거나 문의하여 주십시오.`);
+            document.getElementById("btn-send").setAttribute("disabled", "true")
+        });
+
+        return kakaoTemplate.value;
+    }
+
+    const getKakaoTemplate = async (templateCode) => {
+        let callApi = `${apiServer}/message/apiGetKakaoTemplate`;
+        let template = await axios.post(callApi, {
+            storeCode: storeCode,
+            templateCode: templateCode
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {            
+            if (response.data.result && response.data.data) {
+                return response.data.data;
+            }
+            return null;
+        })
+        .catch(error => { 
+            console.log(error); 
+            alert(`카카오 발송 템플릿 목록을 가져오는 중 오류가 발생했습니다. 잠시 후 다시 시도하거나 문의하여 주십시오.`);
+            document.getElementById("btn-send").setAttribute("disabled", "true")
+            return null;
+        });
+
+        return template;
+    }
+
+    // 카카오 비즈니스 버전 끝*****************
+
+    // MTS 컴퍼니 버전 *****************
+    const getKakaoTemplateSelect_MTS = async (storeCode) => {
+        let kakaoTemplate = document.getElementById("kakao-template");
+        let callApi = `${apiServer}/kakao/apiTemplateList`;
+        await axios.post(callApi, {
+            storeCode: storeCode
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(response => {            
+            // console.log(response.data.data)
+            if (response.data.data.count == 0) {
+                alert("등록되어 있는 템플릿이 없습니다. 알림톡을 발송할 수 없습니다.");
+                document.getElementById("btn-send").setAttribute("disabled", "true")
+                return null;
+            }
+            
+            let html = "";
+            if (response.data.data.rows) {
+                for (let template of response.data.data.rows) {
+                    html += `<option value='${template.template_code}' ${(service.defaultTemplate == template.template_code ? 'selected' : '' )}>${template.template_name}</option>`;
+                }
+            }
+            kakaoTemplate.innerHTML = html;
+        }).catch(error => { 
+            console.log(error); 
+            alert(`카카오 발송 템플릿 목록을 가져오는 중 오류가 발생했습니다. 잠시 후 다시 시도하거나 문의하여 주십시오.`);
+            document.getElementById("btn-send").setAttribute("disabled", "true")
+        });
+
+        return kakaoTemplate.value;
+    }
+
+    const getKakaoTemplate_MTS = async (templateCode) => {
+        let callApi = `${apiServer}/kakao/apiGetTemplate`;
+        let template = await axios.post(callApi, {
+            storeCode: storeCode,
+            templateCode: templateCode
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {
+            // console.log(response.data.data);
+
+            if (response.data.data) {
+                return response.data.data;
+            }
+            return null;
+        })
+        .catch(error => { 
+            console.log(error); 
+            alert(`카카오 발송 템플릿 목록을 가져오는 중 오류가 발생했습니다. 잠시 후 다시 시도하거나 문의하여 주십시오.`);
+            document.getElementById("btn-send").setAttribute("disabled", "true")
+            return null;
+        });
+
+        return template;
+    }
+    // MTS 컴퍼니 버전 끝 *****************
+
+    const getTargetGroupList = async () => {        
+        let callApi = `${apiServer}/customer/apiGroupList`;
+        await axios.post(callApi, {
+            storeCode: storeCode
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(response => {            
+            // console.log(response)
+            if (response.data.data.length == 0) {
+                alert("발송 대상이 없습니다. 주소록에서 먼저 발송 그룹을 만드세요.");
+                document.getElementById("btn-send").setAttribute("disabled", "true")
+                return null;
+            }
+            
+            let html = "";
+            if (response.data.result && response.data.data) {
+                for (let group of response.data.data) {
+                    html += `<option value='${group.group_code}'>${group.name}</option>`;
+                }
+            }
+            document.getElementById("target-group") .innerHTML = html;
+        }).catch(error => { 
+            console.log(error); 
+            alert(`발송 목록을 가져올 때 오류가 발생했습니다. 잠시 후 다시 시도하거나 문의하여 주십시오.`);
+        });
+
+    }
+
+    const changeUseAppPush = (obj) => {
+        if (obj.value == 'N') {
+            document.getElementById("push-title-area").classList.add("d-none");
+            if (shopType == 'L') document.getElementById("btn-show-appPushReview").classList.add("d-none");
+        } else {
+            document.getElementById("push-title-area").classList.remove("d-none");
+            if (shopType == 'L') document.getElementById("btn-show-appPushReview").classList.remove("d-none");
+        }
+    }
+
+    const useInsteadSend = () => {
+        const useAlternativeSend = document.getElementById("use-alternative-send").checked;
+        setInsteadSend(useAlternativeSend);
+    } 
+
+    const setInsteadSend = (useFlag) => {
+        if (useFlag) {
+            // 대체 문자 사용.
+            // sms tab 보임
+            document.querySelector("#tab-review .nav-tabs .nav-item:last-child").classList.remove("d-none");
+
+            document.getElementById("text-area").classList.remove("d-none");
+        } else {
+            // 대체 문자 사용 안 함.
+            // rcs review tab 활성화
+            // sms tab 숨김
+            document.querySelector("#tab-review .nav-item [data-bs-target='#_dm-tabskko']").classList.add("active");
+            document.querySelector("#tab-review .nav-item [data-bs-target='#_dm-tabsSMS']").classList.remove("active");
+            document.querySelector("#tab-review #_dm-tabskko").classList.add("active");
+            document.querySelector("#tab-review #_dm-tabskko").classList.add("show");
+            document.querySelector("#tab-review #_dm-tabsSMS").classList.remove("active");
+            document.querySelector("#tab-review #_dm-tabsSMS").classList.remove("show");
+            document.querySelector("#tab-review .nav-tabs .nav-item:last-child").classList.add("d-none");
+
+            document.getElementById("text-area").classList.add("d-none");
+        }
+    }
+
+    const changeSendTime = (obj) => {
+        let id = obj.id;
+        if (id == "send-type-R") {
+            var d = new Date();
+            var r = new Date(d.getTime() + 10*60000);
+            document.getElementById("send-reserve-date").value = [d.getFullYear(), (d.getMonth() + 1).AddZero(), d.getDate().AddZero()].join('-');
+            document.getElementById("send-reserve-time").value = [r.getHours().AddZero(),(r.getMinutes()).AddZero()].join(':')
+            document.getElementById("send-reserve-date").classList.remove("d-none");
+            document.getElementById("send-reserve-time").classList.remove("d-none");
+        } else {
+            document.getElementById("send-reserve-date").classList.add("d-none");
+            document.getElementById("send-reserve-time").classList.add("d-none");
+
+            document.getElementById("app-push-title").value = `${storeName} ${moment().format("YYYY.MM.DD")} (${getWeek(moment())})`;
+        }
+    }
+        
+    const validation = (templateCode, targetGroups, sendType, reserveTime, useAlternativeSend, SMScontent) => {
+        if (!checkSendLength(useAlternativeSend, SMScontent)) return false;
+        if (templateCode.length == 0) {
+            alert("알림톡 템플릿이 선택되지 않았습니다.");
+            return false;
+        }
+
+        if (targetGroups.length == 0) {
+            alert("발송할 대상이 선택되지 않았습니다.");
+            return false;
+        }
+        let today = new Date();
+        let reserveDate = new Date(reserveTime);
+        var diffTime = (reserveDate.getTime() - today.getTime()) / (1000*60);
+        if (sendType == "R" && diffTime < 9) {
+            alert("예약 발송이 선택되었지만 10분 이내 발송하도록 선택되었습니다.");
+            return false;
+        }
+        return true;
+    }
+
+    const checkSendLength = (useAlternativeSend, SMScontent) => {
+        // 길이 체크
+        if (useAlternativeSend) {
+            // 대체문자 사용시
+            if (SMScontent.length == 0) {
+                alert("대체 문자 사용이 선택되었으나, 대체 문자의 내용이 없습니다.");
+                return false;
+            }
+            
+            let smscheck = fn_checkByteString(SMScontent) > smsmax;        
+            if (smscheck) {
+                alert(`SMS 메시지가 ${smsmax}자를 넘습니다. 내용을 줄여 주시기 바랍니다.`);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    const processTemplateContent = (messageText) => {
+        if (template) {
+            messageText = messageText.replaceAll('#{고객명}', AT_key.customerName);
+            messageText = messageText.replaceAll('#{회원등급}', AT_key.customerlevel);
+            messageText = messageText.replaceAll('#{멤버십}', AT_key.membership);
+            messageText = messageText.replaceAll('#{서비스명}', AT_key.company);
+        }
+        return messageText;
+    }
+
+    // 카운트 및 미리보기
+    const updateCountReview = () => {
+        let sendText = {
+            at: "",            
+            sms: "",
+            smsCount: 0,
+        }
+        // 기본 입력 내용
+        let messageText = (template) ? template.templateContent : '';
+        messageText = processTemplateContent(messageText);
+        sendText.at = messageText;
+
+        document.getElementById("review").innerHTML = messageText.replaceAll("\n", "<br />");
+        // document.getElementById("kakao-text").value = messageText;
+
+        messageText = document.getElementById("sms-text").value;
+        messageText = "" + messageText;
+        let review_text = messageText;
+        let review_text_count = messageText;
+
+        // 대체 문자 발송 문구는 웹주문과 수신거부번호가 붙는다
+        if (useMobileShop == 'Y') {
+            review_text = `${review_text}\n\n행사보기\n<a href='javascript:void(0)' onclick='showReviewOnRCS("${baseShopUri}")'>${baseShopUri}</a>`;
+            review_text_count = `${review_text_count}\n\n행사보기\n${baseShopUri}`;
+        }
+
+        review_text += "\n\n무료거부 " + reject;
+        review_text_count += "\n\n무료거부 " + reject;
+        
+        let reviewTextCount = fn_checkByteString(review_text_count); // 8 바이트는 [Web발신]
+        document.getElementById("text-count").innerHTML = `대체문자 ${reviewTextCount} / ${smsmax}`;
+        if (reviewTextCount > smsmax) {
+            document.getElementById("text-count").classList.remove("bg-dark");
+            document.getElementById("text-count").classList.add("bg-danger");
+        } else {
+            document.getElementById("text-count").classList.add("bg-dark");
+            document.getElementById("text-count").classList.remove("bg-danger");
+        }
+
+        sendText.sms = review_text_count;
+        sendText.smsCount = reviewTextCount;
+
+        review_text = review_text.replaceAll("\n", "<br />");
+        document.getElementById("review-text").innerHTML = review_text;
+
+        if (template == null) {
+            document.getElementById("btn-send").setAttribute("disabled", "true")
+        } else {
+            document.getElementById("btn-send").removeAttribute("disabled", "")
+        }
+        return sendText;       
+    }
+
+    const changeReserveDate = () => {
+        document.getElementById("app-push-title").value = `${storeName} ${moment(document.getElementById("send-reserve-date").value).format("YYYY.MM.DD")} (${getWeek(moment(document.getElementById("send-reserve-date").value))})`;
+    }
+
+    const changeTemplate = async (obj) => {
+        let kakaoTemplateCode = obj.value;
+        template = (service.MTS_use == 'N') ? await getKakaoTemplate(kakaoTemplateCode) :  await getKakaoTemplate_MTS(kakaoTemplateCode);
+        
+        updateCountReview();
+    }
+
+    const showSendProcess = () => {
+        document.getElementById("sendProcess").classList.remove("d-none");
+    }
+
+    const hideSendProcess = () => {
+        console.log("hide")
+        document.getElementById("sendProcess").classList.add("d-none");
+    }
+
+    // 여러 번 클릭하는 것을 방지
+    let sendProcess = false;
+    const sendMessage = async () => {       
+        if (sendProcess) return;
+
+        // 푸시 발송일 경우
+        const appPushYN = (martCode != "" && service.allowAppPush == "Y") ? document.getElementById("use-app-push").value : 'N';        
+        let callResult = {
+            code: '',
+            result: true
+        }
+
+        const pushSendType = (document.getElementById("send-type-I").checked) ? "I" : "S"; // i 즉시 S 예약
+        const sendType = (document.getElementById("send-type-I").checked) ? "I" : "R"; // i 즉시 R 예약
+        const reserveTime = document.getElementById("send-reserve-date").value + " " + document.getElementById("send-reserve-time").value;
+        const templateCode = document.getElementById("kakao-template").value;
+        if (templateCode == "") {
+            alert("카카오 알림톡을 발송할 수 없습니다.");
+            sendProcess = false;
+            return;
+        }
+
+        // 발송 가능 시간 체크
+        if (!checkAllowTime(sendType, reserveTime)) {
+            alert(`메시지는 ${sendAllowTime.start}시 부터 ${sendAllowTime.end}시까지만 발송이 가능합니다.` );
+            return;
+        }
+
+        const targetGroups = document.getElementById("target-group").value;
+        // 발송 내용을 얻는다
+        const sendText = updateCountReview();
+        const useAlternativeSend = document.getElementById("use-alternative-send").checked;
+
+        // only 알림톡
+        let mpCode = getMessagePolicyCode(true, false, false, false, (useAlternativeSend) ? true : false, false);
+
+        let msgData = {
+            pushSendType: pushSendType,
+            sendType: sendType,
+            reserveTime: reserveTime,
+            mpCode: mpCode,
+            pushData: null,
+            useWebLink: false,
+            webLink: baseShopUri,
+            usePush: true,    // app push 복합 발송
+            kakaoTemplate: templateCode,
+            kakaoText: sendText.at,
+            RCSText: "",
+            SMSText: sendText.sms,
+            shopType: shopType,
+            pushCode: ""
+        }
+        const msgType = "AT";
+
+        if (!validation(msgData.kakaoTemplate, targetGroups, msgData.sendType, msgData.reserveTime, useAlternativeSend, msgData.SMSText)) return;
+
+        sendProcess = true;
+        showSendProcess();
+        if (appPushYN == "Y") {
+            // 푸시 발송            
+            let pushTitle = document.getElementById("app-push-title").value;
+            if (pushTitle.length == 0) pushTitle = `${storeName} ${moment(document.getElementById("send-reserve-date").value).format("YYYY.MM.DD")} (${getWeek(moment(document.getElementById("send-reserve-date").value))})`;
+            // 푸시를 발송한다            
+            let callApi = `${apiServer}/message/apiSendAppPush`;
+            callResult = await axios.post(callApi, {
+                shopType: shopType,
+                mCode: mCode,
+                martCode: martCode,
+                appPushLogo: appPush.appPushIcon,
+                pushTarget: appPush.pushTarget,
+                pushTargetScreenCode: appPush.pushTargetScreenCode,
+                pushTitle: pushTitle,
+                pushContent: appPush.appPushText,
+                pushTime: reserveTime,
+                pushOption: pushSendType,
+                webUrl: baseShopUri + "&webview=true"
+            }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+            })
+            .then(response => {
+                
+                console.log(response)
+
+                if (response.data.data.code == 200 || response.data.data.code == '') {
+                    return {
+                        code : (shopType == "L") ? '' : response.data.data.data,
+                        result : true
+                    };
+                } else {
+                    return {
+                        code: '',
+                        result: false
+                    };
+                }
+            })
+            .catch(error => { 
+                console.log(error); 
+                // alert(`푸시가 발송되지 않았습니다.`); 
+                return {
+                    code: '',
+                    result: false
+                }; 
+            });
+            if (callResult.result) {
+                msgData.usePush = callResult.result;
+                msgData.pushCode = callResult.code;
+            } else {
+                msgData.usePush = false;
+            }
+        } else {
+            msgData.usePush = false;
+        }
+
+        // 카카오톡 발송.
+        await sendAT(pushSendType, sendType, reserveTime, targetGroups, templateCode, msgType, msgData);
+        sendProcess = false;
+    }
+
+    const sendAT = async (pushSendType, sendType, reserveTime, targetGroups, templateCode, msgType, msgData) => {
+        // appPushYN == 'Y' 이면 app 고객 목록을 가져와서(appMartCode 필요) 발송 대상에서 제외하는 작업을 한다
+        let callApi = `${apiServer}/message/apiSendMessage`;
+        await axios.post(callApi, {
+            storeCode: storeCode,
+            msgType: msgType,
+            msgData: JSON.stringify(msgData),
+            targetGroups: targetGroups
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(response => {
+            if (response.data.result && response.data.data.returnCode == 0) {
+                if (msgData.sendType == "I") {
+                    alert(`카카오 알림톡 및 푸시 발송이 발송되었습니다.`);
+                } else {
+                    alert(`카카오 알림톡 발송 및 푸시 발송이 예약되었습니다.`);
+                }
+            } else if (response.data.result && response.data.data.returnCode == -4) {
+                alert("앱 푸시 발송이 완료되었습니다. 발송 후 카카오톡 발송 수는 0 입니다.");
+            } else {
+                alert(`카카오 알림톡 발송이 실패했습니다: ${response.data.data.returnMessage}`);
+            }
+        })
+        .catch(error => { 
+            console.log(error); 
+            alert(`카카오 알림톡 발송에 실패했습니다.`);
+        });
+
+        hideSendProcess();
+        // let modal = bootstrap.Modal.getInstance(document.getElementById('modal-sendProcess'));
+        // modal.hide();
+        sendProcess = false;
+    }
+
+</script>

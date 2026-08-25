@@ -1,0 +1,225 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-sm-1">
+                        <input type="text" class="form-control form-control-sm" id="phone" />
+                    </div>
+                    <div class="col-sm">
+                        <button id="search" class="btn btn-sm btn-outline-primary" type="button" onclick="search()">검색</button>
+                    </div>
+                </div>
+                <div class="row table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead class="">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">번호</th>
+                                <th scope="col">구분</th>
+                                <th scope="col">등록날짜</th>
+                                <th scope="col">작업</th>
+                            </tr>
+                        </thead>
+                        <tbody id="refuse-main">
+                        </tbody>
+                    </table>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center" id="refuse-main-pager"></ul>
+                    </nav>
+            </div>
+
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->
+
+<%- contentFor('script') %>
+<script>
+    const apiServer = '<%=apiServer %>';
+    const rowCount = 20;
+    const storeCode = '';
+    let currentPage = 1;
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        showRefuseMainList(currentPage);
+    })
+
+    function search() {
+        currentPage = 1;
+        showRefuseMainList(currentPage);
+    }
+
+    async function showRefuseMainList(page) {
+        let phone = document.getElementById("phone").value;
+        
+        let callApi = `${apiServer}/refuse/apiList`;
+        await axios.post(callApi, {
+            storeCode: '',
+            phone: phone,
+            page: page,
+            rowCount : rowCount
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(returnResult => {
+            console.log(returnResult);
+
+            if (returnResult && returnResult.data.data.rows) {
+                let HTML = "";
+                let num = returnResult.data.data.count - (page - 1) * rowCount;                
+                for (let refuse of returnResult.data.data.rows) {
+                    HTML += `                    
+                        <tr>
+                            <th scope="row">${num--}</th>
+                            <td>${refuse.phone}</td>
+                            <td>${(refuse.store_code) ? "직접 등록" : "080 등록"}</td>
+                            <td>${moment(refuse.C_TIME).format('YYYY-MM-DD HH:mm:ss')}</td>
+                            <td><button type="button" class="btn btn-xs btn-danger waves-effect waves-light" onClick="remove(${refuse.SEQ})">삭제</button></td>
+                        </tr>`;
+                }
+                document.getElementById("refuse-main").innerHTML = HTML;
+
+                let pagerHTML = createPagerHTML(returnResult.data.data.count, rowCount, page, 5, "changePageMain");
+                document.getElementById("refuse-main-pager").innerHTML = pagerHTML;
+
+            }
+        })
+        .catch(error => { console.log(error); alert(`발송 내역을 가져오지 못했습니다.`);;});
+    }
+
+    function changePageMain(page, rowPerPage) {
+        // self.location.href = "/history/list?page=" + page;
+        document.getElementById("refuse-main").innerHTML = "";
+        document.getElementById("refuse-main-pager").innerHTML = "";
+
+        currentPage = page;
+        showRefuseMainList(page);
+    }
+
+    async function remove(seq) {
+        if (!confirm("수신 거부 항목을 삭제하겠습니까? 되돌릴 수 없습니다.")) { return; }
+
+        let callApi = `${apiServer}/refuse/apiRemove`;
+        try {
+            await axios.post(callApi, {
+                seq: seq
+            }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+            })
+            .then(returnResult => {
+                if (returnResult.data.data) {
+                    showRefuseMainList(currentPage);
+                } else {
+                    alert(`수신 거부 번호 삭제가 실패했습니다.`)
+                }
+            })
+            .catch(error => { 
+                console.log(error); 
+                throw(error);
+            });
+        } catch {
+            alert(`수신 거부 번호 삭제가 실패했습니다.`);
+        }
+    }
+
+    const add = () => {
+        document.getElementById("addPhone").value = "";
+
+        const modal_phone = new bootstrap.Modal(document.getElementById('modal-phone'));
+        modal_phone.show();
+    }
+
+    const addPhone = async () => {
+        const phone = document.getElementById("addPhone").value;
+
+
+        if (phone.length < 11) {
+            alert(`정상적인 핸드폰 번호를 입력하세요.`);
+            return;
+        }
+
+        let modal_phone = bootstrap.Modal.getInstance(document.getElementById('modal-phone'));
+        modal_phone.hide();
+
+        let callApi = `${apiServer}/refuse/apiAdd`;
+        await axios.post(callApi, {
+            storeCode: storeCode,
+            phone: phone
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {
+            console.log(response)
+            if (response.data.data) {
+                showRefuseMainList(currentPage);
+            } else {
+                alert(`수신 거부 번호 추가에 실패했습니다.`)
+            }
+        })
+        .catch(error => { 
+            console.log(error); 
+            alert(`수신 거부 번호 추가에 실패했습니다.`);
+            throw(error);
+        });
+    }
+
+    const addExcelView  = () => {
+        document.getElementById("uploadFile").value = null;
+        const modal = new bootstrap.Modal(document.getElementById('modal-excelUpload'));
+        modal.show();
+    }
+
+    const uploadRefuseExcel = async () => {
+        let uploadFile = document.getElementById("uploadFile");
+        const formData = new FormData();
+        formData.append("uploadFile", uploadFile.files[0]);        
+
+        let uploadResult = await axios.post(`${apiServer}/upload/uploadSingle`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "location": `store/${storeCode}/refuse`
+            },
+        }).then(async response => {
+            console.log(response)
+            if (response.data.result == "success") {
+                console.log("등록 시작")
+                await axios.post(`${apiServer}/refuse/apiUploadExcel`, {
+                    storeCode: storeCode,
+                    file: response.data.data.filename,
+                    path: response.data.data.path
+                }, {
+                    headers: {
+                        xtoken: getCookie("xToken")
+                    }
+                }).then(async response => {
+                    await showRefuseMainList(currentPage);
+
+                    let modal = bootstrap.Modal.getInstance(document.getElementById('modal-excelUpload'));
+                    modal.hide();
+                }).catch(error => {
+                    console.log(error)
+                })
+            } else {
+                return null;          
+            }
+        }).catch(error => {
+            return null;
+        });
+        return uploadResult;
+    }
+</script>

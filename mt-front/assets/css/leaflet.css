@@ -1,0 +1,75 @@
+#alltok-leaflet {
+    position: relative;
+}
+
+#alltok-leaflet img {
+    width: 100%;
+}
+
+#alltok-leaflet .top-notice,
+#alltok-leaflet .bottom-info {
+    font-size: 12px;
+}
+
+#alltok-leaflet .top-notice p,
+#alltok-leaflet .bottom-info p {
+    margin-bottom: 0rem !important;
+}
+
+#alltok-leaflet p strong {
+    color: unset !important;
+    font-size: unset !important;
+    font-weight: bolder !important;
+}
+
+#alltok-leaflet .text-tiny {
+    font-size: .7em;
+}
+
+#alltok-leaflet .text-small {
+    font-size: .85em;
+}
+
+#alltok-leaflet .text-big {
+    font-size: 1.4em;
+}
+
+#alltok-leaflet .text-huge {
+    font-size: 1.8em;
+}
+
+#alltok-leaflet .list-block-product-cate .c-orange b {
+    color: #ED5606;
+}
+
+.category-title.color-orange b {
+    color: #ED5606
+}
+
+.category-title.color-green b {
+    color: #6BA43A
+}
+
+.category-title.color-wine b {
+    color: #9B103B
+}
+
+.category-title.color-yelow b {
+    color: #E0951E
+}
+
+.category-title.color-blue b {
+    color: #E0951E
+}
+
+.category-title.color-brown b {
+    color: #A5760D
+}
+
+.select-taxfree {
+    color: black;
+}
+
+.select-tax {
+    color: #df5645;
+}

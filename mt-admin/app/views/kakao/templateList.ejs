@@ -1,0 +1,289 @@
+<%- contentFor('style') %>
+<link href="/assets/vendors/nice-select2/dist/css/nice-select2.css" rel="stylesheet" />
+
+<%- contentFor('content') %>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-lg-4 col-sm-6">
+                        <div class="search-box mb-2 me-2 d-none">
+                            <div class="position-relative">
+                                <input type="text" class="form-control bg-light border-light rounded" placeholder="Search...">
+                                <i class="search-icon" data-eva="search-outline" data-eva-height="26" data-eva-width="26"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8 col-sm-6">
+                        <div class="mt-4 mt-sm-0 d-flex align-items-center justify-content-sm-end">
+
+                            <div class="mb-2 me-2">
+                                <div class="dropdown">
+                                    <button id="btn-addUser" class="btn btn-primary dropdown-toggle" type="button" onclick="openNewModal()">
+                                        <i class="mdi mdi-plus me-1"></i> 새 템플릿 추가
+                                    </button>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="font-size-16 me-3 mb-0">프로파일 목록</h5>
+                    <hr class="mt-2">
+                    <div class="table-responsive mb-5">
+                        <table class="table align-middle table-nowrap table-hover mb-0">
+                            <thead class="">
+                                <tr>
+                                  <th scope="col">가맹점코드</th>
+                                  <th scope="col">가맹점명</th>
+                                  <th scope="col">채널아이디</th>
+                                  <th scope="col">채널명</th>
+                                  <th scope="col">템플릿코드</th>
+                                  <th scope="col">템플릿이름</th>
+                                  <th scope="col">상태</th>
+                                  <th scope="col">등록일</th>
+                                  <th scope="col">변경일</th>
+                                  <th scope="col">작업</th>
+                                </tr>
+                              </thead>
+                            <tbody id="template-list">
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-center" id="template-pager"></ul>
+                    </nav>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modal-template" tabindex="-1"aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_userView_Label"> 카카오 템플릿 관리</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="template-seq">
+                <div class="text-center mb-4">
+                    <h5>카카오 템플릿 등록 관리</h5>
+                    <p class="card-title-desc">MTS 관리 사이트에서 등록 완료된 템플릿을 여기에 등록해야만 합니다.</p>
+                </div>
+                <div>
+                    <div class="row mb-3">
+                        <label for="store-code" class="col-sm-2 col-form-label col-form-label">가맹점</label>
+                        <div class="col-sm-4">
+                            <select class="" name="store-code" id="store-code">
+                            </select>      
+                        </div>  
+                    </div>
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label col-form-label" for="template-code">템플릿 코드</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control mb-2" placeholder="템플릿 코드 최대 30자" id="template-code" name="template-code">
+                        </div>
+                        <label class="col-sm-2 col-form-label col-form-label" for="template-name">템플릿 이름</label>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control mb-2" placeholder="템플릿 이름 최대 100자" id="template-name" name="template-name">
+                        </div>
+                    </div>                    
+                    <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label col-form-label" for="template-status">상태</label>
+                        <div class="col-sm-3">
+                            <select class="" name="template-status" id="template-status">
+                                <option value="A">정상</option>
+                                <option value="W">대기</option>
+                                <option value="D">삭제</option>
+                            </select> 
+                        </div>
+                    </div>   
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary waves-effect waves-light" onclick="saveTemplate()">저장하기</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal -->
+
+<%- contentFor('script') %>
+
+<script src="/assets/vendors/nice-select2/dist/js/nice-select2.js"></script>
+<script>
+    let currentPage = 1;
+    const rowPerPage = 20;
+    let category = null;
+    let selectStore;
+    let selectStatus;
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        await showList();
+        // 신규 등록용 마트 목록 얻기
+        getMartList();
+        selectStatus = NiceSelect.bind(document.getElementById("template-status"), {})
+    })
+
+    const getMartList = () => {
+        let callApi = `/api/store/list`;
+        const result = axios.post(callApi, {
+            page: 1,
+            rowCount: 200
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(response => { 
+            // console.log(response.data)
+            let optionHTML = "<option value=''>선택하세요</option>";
+            if (response.data.data.count > 0) {
+                for (let storeInfo of response.data.data.rows) {
+                    optionHTML += `<option value="${storeInfo.store_code}">${storeInfo.store_code} ${storeInfo.name}</option>`;
+                    // console.log(storeInfo)
+                }
+            }
+            document.getElementById("store-code").innerHTML = optionHTML;
+            selectStore = NiceSelect.bind(document.getElementById("store-code"), {searchable: true})
+        })
+    }
+    
+    // 템플릿 리스트 뷰
+    const showList = () => {
+        let callApi = `/api/template/list`;
+        const result = axios.post(callApi, {
+            page: currentPage,
+            rowCount: rowPerPage
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(response => {  
+            console.log(response)
+            let html = "";
+            if (response.data.result && response.data.data) {
+                for (let item of response.data.data.rows) {
+                    html += `<tr>
+                                <td>${item.store_code}</td>
+                                <td>${item.name}</td>
+                                <td>@${item.channel_id}</td>
+                                <td>${item.channel_name}</td>
+                                <td>${item.template_code}</td>
+                                <td>${item.template_name}</td>
+                                <td>
+                                    ${(item.status == 'A') ? 
+                                    '<span class="badge bg-success rounded-pill"> 정상 </span>' : 
+                                    (item.status == 'W') ? '<span class="badge bg-warning rounded-pill"> 일시 중지 </span>' : 
+                                    '<span class="badge bg-danger rounded-pill"> 삭제됨 </span>' }
+                                </td>                                
+                                <td>${moment(item.C_TIME).format("YYYY/MM/DD HH:mm:ss")}</td>
+                                <td>${item.M_TIME ? moment(item.M_TIME).format("YYYY/MM/DD HH:mm:ss") : ''}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm font-20 btn-primary" onclick="updateTemplate('${item.seq}', '${item.store_code}', '${item.template_code}', '${item.template_name}', '${item.status}')">변경</button>
+                                </td>
+                            </tr>`;                                
+                }
+                let pagerHTML = createPagerHTML(response.data.data.count, rowPerPage, currentPage, 5, "changePage");
+                document.getElementById("template-pager").innerHTML = pagerHTML;
+            } else {
+                document.getElementById("template-pager").innerHTML = "";
+            }
+            document.getElementById("template-list").innerHTML = html;
+
+
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+
+    const changePage = async (page, rowPerPage) => {
+        currentPage = page;
+        await showList()
+    }
+
+    // 새로 등록            
+    const openNewModal = () => {
+        document.getElementById("store-code").value = "";
+        selectStore.update();
+        document.getElementById("template-code").value = "";
+        document.getElementById("template-name").value = "기본";
+        document.getElementById("template-status").value = "A";
+        selectStatus.update();
+
+        const modal = new bootstrap.Modal(document.getElementById('modal-template'));
+        modal.show();
+    }
+
+    const updateTemplate = (seq, storeCode, templateCode, templateName, status) => {
+        document.getElementById("template-seq").value = seq;
+        document.getElementById("store-code").value = storeCode;
+        selectStore.update();
+        document.getElementById("template-code").value = templateCode;
+        document.getElementById("template-name").value = templateName;
+        document.getElementById("template-status").value = status;
+        selectStatus.update();
+
+        const modal = new bootstrap.Modal(document.getElementById('modal-template'));
+        modal.show();
+    }
+
+    const validation = (storeCode, templateCode) => {
+        if (storeCode.length == 0) {
+            alert("가맹점을 선택해야만 합니다.");
+            return false;
+        }
+        if (templateCode.length == 0) {
+            alert("템플릿 중복되지 않은 실제 사용 코드를 입력해야만 합니다.");
+            return false;
+        }
+        return true;
+    }
+
+    const saveTemplate = async () => {
+        let templateSeq = document.getElementById("template-seq").value;
+        let storeCode = document.getElementById("store-code").value;
+        let templateCode = document.getElementById("template-code").value.trim();
+        let templateName = document.getElementById("template-name").value.trim();
+        let templateStatus = document.getElementById("template-status").value.trim();
+
+        if (!validation(storeCode, templateCode)) return;
+
+        // if (!confirm(`사용자 정보가 ${(seq == "") ? "추가" : "변경"}됩니다. 계속하시겠습니까?`)) return;
+
+        let callApi = (templateSeq == "") ? "/api/template/add" : "/api/template/update";
+        // 정보를 업데이트        
+        await postData(callApi, {
+            templateSeq: templateSeq,
+            storeCode: storeCode,
+            templateCode: templateCode,
+            templateName: templateName,
+            templateStatus: templateStatus
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(async response => {
+            console.log(response)
+            if (response.data) {
+                let modal = bootstrap.Modal.getInstance(document.getElementById('modal-template'));
+                modal.hide();
+
+                alert(`템플릿이 ${(templateSeq == "") ? "등록" : "변경"}되었습니다.`);
+                await showList();
+            } else {
+                alert(`템플릿을 ${(templateSeq == "") ? "등록" : "변경"}하지 못했습니다. ${(templateSeq == "") ? ' 템플릿 코드가 중복되었습니다.' : ''}`);
+            }
+        })
+        .catch(error => { console.log(error); alert(`템플릿을 ${(templateSeq == "") ? "등록" : "변경"}하지 못했습니다.`);});
+    }
+
+</script>

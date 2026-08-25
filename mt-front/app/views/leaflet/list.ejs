@@ -1,0 +1,706 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row leaflet">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-sm text-end">
+                        <button id="search" class="fc-today-button btn btn-sm btn-primary" type="button" onclick="createNewLeaflet_openModal()">새로운 상품 세트 추가</button>
+                    </div>
+                </div>
+                <div class="row table-responsive">
+                    <table class="table table-striped table-hover template-list">
+                        <colgroup>
+                            <col width="10%" />
+                            <col width="5%" />
+                            <col width="10%" />
+                            <col width="15%" />
+                            <col width="25%" />
+                            <col width="5%" />
+                            <col width="*" />
+                    </colgroup>
+                        <thead class="">
+                            <tr class="text-center">
+                                <th scope="col">위치</th>
+                                <th scope="col">No</th>
+                                <th scope="col">코드</th>
+                                <th scope="col">등록날짜</th>
+                                <th scope="col">표시기간</th>
+                                <th scope="col">표시</th>
+                                <th scope="col">작업</th>
+                            </tr>
+                        </thead>
+                        <tbody id="template-main">
+                        </tbody>
+                    </table>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center" id="template-main-pager"></ul>
+                    </nav>
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->
+
+<!-- 썸네일 크게 보기 모달 -->
+<div class="modal fade" id="modal-thumbnail" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_userView_Label">썸네일 크게 보기</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div id="leaflet-thumbnail-view"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal -->
+
+<!-- 미리 보기 모달 -->
+<div class="modal fade" id="modal-review" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"> 전단 미리 보기 및 발행하기</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>                
+            </div>
+            <div class="modal-body">
+                <div id="leaflet-review"></div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 템플릿 선택 모달 -->
+<div class="modal fade" id="modal-template-select" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_userView_Label">템플릿 선택</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row" id="template-select-list"></div>
+                        <div class="row pt-4">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center" id="template-select-list-pager"></ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <!-- end card body -->
+                </div>
+            </div>
+            <div class="p-4 text-center">
+                <button type="button" class="btn btn-primary" onclick="createLeaflet()">새로운 상품 세트 만들기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal -->
+
+<!-- end modal -->
+
+<%- contentFor('script') %>
+<script src="/assets/js/product-helper.js"></script>
+<script src="/assets/js/leaflet.js"></script>
+
+<script>
+    let listPage = 1;
+    const rowCount = 20;
+    const storeCode = '<%=user.storeCode %>';
+    const useShop = '<%=storeInfo.use_mobile_order %>';
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        showLeafletMainList(1);
+    })
+
+    const createSearchCondition = (job, page, rowCount) => {
+        const searchJSON = {
+            "pageNumber": page,
+            "pageSize": 6,
+            "cateCode": "",
+            "mainProduct": [
+                {
+                    "option": "0",
+                    "value": "전체",
+                    "isCheck": false
+                },
+                {
+                    "option": "1",
+                    "value": "0",
+                    "isCheck": true
+                },
+                {
+                    "option": "2",
+                    "value": "1",
+                    "isCheck": false
+                },
+                {
+                    "option": "3",
+                    "value": "2",
+                    "isCheck": false
+                },
+                {
+                    "option": "4",
+                    "value": "3",
+                    "isCheck": false
+                },
+                {
+                    "option": "5",
+                    "value": "4",
+                    "isCheck": false
+                },
+                {
+                    "option": "6",
+                    "value": "5",
+                    "isCheck": false
+                },
+                {
+                    "option": "7",
+                    "value": "6",
+                    "isCheck": false
+                },
+                {
+                    "option": "8",
+                    "value": "7",
+                    "isCheck": false
+                },
+                {
+                    "option": "9",
+                    "value": "8",
+                    "isCheck": false
+                },
+                {
+                    "option": "10",
+                    "value": "9",
+                    "isCheck": false
+                },
+                {
+                    "option": "11",
+                    "value": "10",
+                    "isCheck": false
+                }
+            ],
+            "subProduct": [
+                {
+                    "option": "0",
+                    "value": "전체",
+                    "isCheck": true
+                },
+                {
+                    "option": "1",
+                    "value": "0개상품/1줄",
+                    "isCheck": false
+                },
+                {
+                    "option": "2",
+                    "value": "1개상품/1줄",
+                    "isCheck": false
+                },
+                {
+                    "option": "3",
+                    "value": "2개상품/1줄",
+                    "isCheck": false
+                },
+                {
+                    "option": "4",
+                    "value": "3개상품/1줄",
+                    "isCheck": false
+                },
+                {
+                    "option": "5",
+                    "value": "4개상품/1줄",
+                    "isCheck": false
+                }
+            ],
+            "cateSection": "Y",
+            "keyword": ""
+        }
+        return searchJSON;
+    }
+
+    const showLeafletMainList = async (page) => {
+        const searchJSON = createSearchCondition('list', page, rowCount);
+        // console.log(searchJSON)
+
+        listPage = page;
+        let callApi = `${apiServer}/leaflet/apiList`;
+        await axios.post(callApi, {
+            storeCode: storeCode,
+            searchJSON: JSON.stringify(searchJSON),
+            page: page,
+            rowCount : rowCount
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(response => {
+            let HTML = "";
+            console.log(response.data.data)
+            if (response.data.data.rows) {
+                let num = response.data.data.count - (page - 1) * rowCount;
+                for (let leaftlet of response.data.data.rows) {
+                    HTML += `<tr class="text-center">
+                        <td>
+                            <div class="btn-group">
+                                ${(leaftlet.ORD > 1) ? `<button type="button" class="btn btn-sm btn-primary" onclick="moveUp('${leaftlet.LEAFLET_CODE}', ${leaftlet.ORD})"><i class="psi-up"></i></button>` : '<button type="button" class="btn btn-sm btn-secondary" disabled><i class="psi-up"></i></button>'}
+                                ${(leaftlet.ORD < response.data.data.count) ? `<button type="button" class="btn btn-sm btn-primary" onclick="moveDown('${leaftlet.LEAFLET_CODE}', ${leaftlet.ORD})"><i class="psi-down"></i></button>` : '<button type="button" class="btn btn-sm btn-secondary" disabled><i class="psi-down"></i></button>'}
+                            </div>
+                        </td>
+                        <td>${num--}</td>
+                        <td>${leaftlet.LEAFLET_CODE}</td>
+                        <td>${moment(leaftlet.C_TIME).format("YYYY-MM-DD")} ${moment(leaftlet.C_TIME).format("HH:mm:ss")}</td>
+                        <td>${leaftlet.USE_TIME == 'Y' ? `${moment(leaftlet.START_DATE).format("YYYY-MM-DD HH:mm:00")}<br>~${moment(leaftlet.END_DATE).format("YYYY-MM-DD HH:mm:00")}` : '사용 안 함'}</td>
+                        <td class="text-center">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault" ${leaftlet.STATUS == 'A' ? "checked" : ""} onclick="toggleLeaflet('${leaftlet.LEAFLET_CODE}')">
+                            </div>
+                        </td>
+                        <td>
+                                <button type="button" class="btn btn-xs btn-primary waves-effect waves-light " onclick="modifyLeaflet('${leaftlet.LEAFLET_CODE}')">내용 관리</button>                                
+                                <button type="button" class="btn btn-xs btn-success waves-effect waves-light" onclick="showReview('${leaftlet.LEAFLET_CODE}')">미리보기</button>
+                                <button type="button" class="btn btn-xs btn-secondary waves-effect waves-light" onclick="copyLeaflet('${leaftlet.LEAFLET_CODE}')">복사하기</button>
+                                <button type="button" class="btn btn-xs btn-danger waves-effect waves-light" onclick="removeLeaflet('${leaftlet.LEAFLET_CODE}')">삭제하기</button>
+                            </p>
+                        </td>
+                    </tr>`
+                }
+                document.getElementById("template-main").innerHTML = HTML;
+                let pagerHTML = createPagerHTML(response.data.data.count, rowCount, page, 5, "changePageMain");
+                document.getElementById("template-main-pager").innerHTML = pagerHTML;
+            } else {
+                document.getElementById("template-main").innerHTML = "";
+                document.getElementById("template-main-pager").innerHTML = "";
+
+            }
+        })
+        .catch(error => { console.log(error); alert(`발송 내역을 가져오지 못했습니다.`);;});
+    }
+
+    const changePageMain = (page, rowPerPage) => {
+        document.getElementById("template-main").innerHTML = "";
+        document.getElementById("template-main-pager").innerHTML = "";
+
+        listPage = page;
+        showRefuseMainList(page);
+    }
+
+    /* 새 리플렛 생성 프로세스 */
+
+    // 카테고리 선택 모달 오픈
+    const createNewLeaflet_openModal = async () => {
+        // await initTemplateCondition();
+        await searchTemplate(1);
+        
+        const modal = new bootstrap.Modal(document.getElementById('modal-template-select'));
+        modal.show();        
+    }
+
+    const searchTemplate = async (page = 1) => {
+        const rowCount = 6;
+
+        // const searchJSON = createSearchCondition("select", page, rowCount);
+        // console.log(searchJSON)
+        const callApi = `${apiServer}/template/apiList`
+        await axios.post(callApi, {
+            page: page,
+            rowCount: rowCount
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(response => {
+            // console.log(response)
+            if (response.data.data) {
+                let HTML = "";
+                for (let template of response.data.data) {
+                    HTML += `
+                        <div class="col-md-2">
+                            <div class="text-center mb-1">
+                                <input class="form-check-input" type="radio" name="rd-select-template" id="rd-select-template-${template.TEMPLATE_CODE}" value='${template.TEMPLATE_CODE}'>
+                            </div>
+                            <label for="rd-select-template-${template.TEMPLATE_CODE}"><img class="img-fluid" src="${template.THUMBNAIL_URI}"></label>
+                        </div>`;
+                }
+                document.getElementById("template-select-list").innerHTML = HTML;
+
+                // let pagerHTML = createPagerHTML(response.data.data.count, rowCount, page, 5, "changePageSelectTemplate");
+                // document.getElementById("template-select-list-pager").innerHTML = pagerHTML;
+            }
+        })
+        .catch(error => { 
+            console.log(error); alert(`템플릿 내역을 가져오지 못했습니다.`);
+        })       
+    }
+
+    const changePageSelectTemplate = (page, rowPerPage) => {
+        document.getElementById("template-select-list").innerHTML = "";
+        document.getElementById("template-select-list-pager").innerHTML = "";
+
+        searchTemplate(page);
+    }
+
+    const createLeaflet = async () => {
+        // 템플릿이 선택되었는지 확인
+        // 템플릿이 선택되지 않고 눌렀으면 메시지 출력하고 종료, 
+        // 선택되었으면 광고를 생성하고, 기간 설정 및 상품 선택 화면으로 이동한다
+        const selectedTemplateRadio = document.querySelector("[name='rd-select-template']:checked");
+        if (selectedTemplateRadio) {
+            let templateCode = selectedTemplateRadio.value;
+            // console.log("templateCode", templateCode)
+            // 템플릿을 생성합니다
+            const callApi = `${apiServer}/leaflet/apiCreate`
+            await axios.post(callApi, {
+                storeCode: storeCode,
+                templateCode: templateCode
+            }, {
+                    headers: {
+                        xtoken: getCookie("xToken")
+                    }
+            })
+            .then(response => {
+                const leafletCode = response.data.data;
+                if (leafletCode) {
+                    modifyLeaflet(leafletCode)
+                } else {
+                    console.log(error); alert(`전단 생성에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);    
+                }
+                // 창 닫기
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modal-template-select'));
+                modal.hide();
+            })
+            .catch(error => { 
+                console.log(error); alert(`전단 생성에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);
+            })       
+        } else {
+            alert("템플릿이 선택되지 않았습니다.");
+        }
+    }
+
+    const toggleLeaflet = async (leafletCode) => {
+        const callApi = `${apiServer}/leaflet/apiToggleActive`
+        await axios.post(callApi, {
+            leafletCode: leafletCode
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(response => {
+            if (!response.data.data) {
+                console.log(error); alert(`상태 변경에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);    
+            }
+        })
+        .catch(error => { 
+            console.log(error); alert(`상태 변경에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);
+        })       
+    } 
+
+    const modifyLeaflet = (leafletCode) => {
+        self.location = "/leaflet/edit?leafletCode=" + leafletCode;
+    }
+
+    /* == 새 리플렛 생성 프로세스 종료*/
+
+    const removeLeaflet = async (leafletCode) => {
+        if (!confirm("삭제한 전단은 되살릴 수 없습니다. 정말로 삭제하시겠습니까?")) return;
+
+        const callApi = `${apiServer}/leaflet/apiRemove`
+        await axios.post(callApi, {
+            storeCode: storeCode,
+            leafletCode: leafletCode
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(response => {
+            if (response.data.data) {
+                showLeafletMainList(listPage);
+            } else {
+                console.log(error); alert(`삭제에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);    
+            }
+        })
+        .catch(error => { 
+            console.log(error); alert(`삭제에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);
+        })  
+    }
+
+    const moveUp = async (leafletCode, order) => {
+        const callApi = `${apiServer}/leaflet/apiMoveUp`
+        await axios.post(callApi, {
+            leafletCode: leafletCode,
+            storeCode: storeCode,
+            order: order
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(response => {
+            if (response.data.data) {
+                showLeafletMainList(listPage);
+            } else {
+                console.log(error); alert(`순서 변경에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);    
+            }
+        })
+        .catch(error => { 
+            console.log(error); alert(`순서 변경에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);
+        })  
+    }
+
+    const moveDown = async (leafletCode, order) => {
+        const callApi = `${apiServer}/leaflet/apiMoveDown`
+        await axios.post(callApi, {
+            leafletCode: leafletCode,
+            storeCode: storeCode,
+            order: order
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(response => {
+            if (response.data.data) {
+                showLeafletMainList(listPage);
+            } else {
+                console.log(error); alert(`순서 변경에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);    
+            }
+        })
+        .catch(error => { 
+            console.log(error); alert(`순서 변경에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);
+        })  
+    }
+    
+    // 템플릿 정보와 상품 정보를 합쳐서 미리 보기 표시
+    const showReview = async (leafletCode) => {   
+        // 템플릿 코드로부터 상세 정보를 얻는다
+
+        const callApi = `${apiServer}/leaflet/apiGet`
+        await axios.post(callApi, {
+            leafletCode: leafletCode
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(response => {
+            if (response.data.data) {
+                let dataJSON = response.data.data;
+                if (dataJSON) {
+                    dataJSON.data = (dataJSON.DATA) ? JSON.parse(dataJSON.DATA) : null;
+                    // review 표시
+                    showLeafletReview(dataJSON);
+                }
+                // let mainCount = parseInt(response.data.data.TEMPLATE_MAIN);
+                // let useSection = response.data.data.TEMPLATE_USE_SECTION;
+                // let dataJSON = JSON.parse(response.data.data.DATA);
+                // let templateHTML = JSON.parse(response.data.data.TEMPLATE_HTML);
+                
+                // const HTML_leaflet = buildLeaflet(mainCount, useSection, dataJSON, templateHTML);
+                // document.getElementById("leaflet-review").innerHTML = HTML_leaflet;
+
+                
+                const modal = new bootstrap.Modal(document.getElementById('modal-review'));
+                modal.show();
+        
+            } else {
+                alert(`전단 정보 데이터를 얻지 못했습니다. 잠시 후 다시 시도해 주십시오.`);    
+            }
+        })
+        .catch(error => { 
+            console.log(error); 
+            alert(`전단 정보 데이터를 얻지 못했습니다. 잠시 후 다시 시도해 주십시오.`);    
+        })        
+
+
+    }
+
+    const korean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+
+    const showLeafletReview = (leafletJSON) => {
+        console.log("leafletJSON--", leafletJSON)
+        let leafletData = leafletJSON.data;
+        // console.log(leafletData)
+        document.getElementById("leaflet-review").classList.add("d-none");
+
+        let martLogo = '<%=storeInfo.logo_image %>';
+        martLogo = (martLogo != "") ? (martLogo.indexOf("http") >= 0) ? martLogo : `${s3Server}${martLogo}` : "";
+        let HTML = `<div class='text-center mb-2'>${martLogo != "" ? `<img src="${martLogo}" style="max-height:25px">` : '<%=storeInfo.name %>'}</div>`
+
+        HTML += "<div id='alltok-leaflet'>";
+        // 상단 공지 표시
+        HTML += "<div class='top-notice mb-2'>" + leafletData.topNotice + "</div>";
+
+        HTML += "<div class='mb-2'>";
+        // 전단지 표시
+        if (leafletData.leaflet.leaflet1 != "") {
+            HTML += `<div class='leaflet-uploaded'><img class="img-fluid" src='${s3Server}${leafletData.leaflet.leaflet1}'></div>`;
+        }
+        if (leafletData.leaflet.leaflet2 != "") {
+            HTML += `<div class='leaflet-uploaded'><img class="img-fluid" src='${s3Server}${leafletData.leaflet.leaflet2}'></div>`;
+        }
+        if (leafletData.leaflet.leaflet3 != "") {
+            HTML += `<div class='leaflet-uploaded'><img class="img-fluid" src='${s3Server}${leafletData.leaflet.leaflet3}'></div>`;
+        }
+        if (leafletData.leaflet.leaflet4 != "") {
+            HTML += `<div class='leaflet-uploaded'><img class="img-fluid" src='${s3Server}${leafletData.leaflet.leaflet4}'></div>`;
+        }
+        HTML += "</div>";
+        // 전단지 생성
+
+        HTML += buildLeafletFromHTML(leafletJSON.TEMPLATE_HTML, leafletData.section)        
+
+        // 하단 공지 표시
+        HTML += "<div class='bottom-info mt-5'>" + leafletData.bottomInfo + "</div>";
+        HTML += "</div>";
+        document.getElementById("leaflet-review").innerHTML = HTML;
+        
+        if (useShop == 'N') {
+            let carts = document.querySelectorAll(".s-product-cart-content");
+            if (carts.length > 0) {
+                for (let cart of carts)
+                 {
+                    cart.classList.add("d-none")
+                 }
+            }
+            
+        }
+        document.getElementById("leaflet-review").classList.remove("d-none");
+    }
+
+    // const blankImage = 'https://s3.ap-northeast-2.amazonaws.com/moa.images/product/cover/600x600_%EC%9D%B4%EB%AF%B8%EC%A7%80%EC%A4%80%EB%B9%84%EC%A4%91%20%EB%AA%A8%EB%B0%94%EC%9D%BC%20no%20text.png';
+    const blankImage = 'https://s3.ap-northeast-2.amazonaws.com/moa.images/product/cover/600x600_빈이미지-모바일-no-text.jpg';
+    const buildLeafletFromHTML = (leafletHTML, sectionData) => {
+        let tempHTML = leafletHTML;
+
+        // 서브 섹션 HTML 분리. tempHTML에 섹션 리스트가 들어갈 위치에 $category{}$category 가 남는다
+        let sectionHTML = tempHTML.substring(tempHTML.indexOf("$category{") + 10, tempHTML.indexOf("}$category"));
+        tempHTML = tempHTML.replace(sectionHTML, "");
+
+        // 상품 HTML 분리, sectionHTML에 상품이 들어갈 위치에 $sub{}$sub가 남는다
+        let sectionProductHTML = sectionHTML.substring(sectionHTML.indexOf("$sub{") + 5, sectionHTML.indexOf("}$sub"));
+        sectionHTML = sectionHTML.replace(sectionProductHTML, "");
+
+        const sectionProductHTMLContainer = sectionProductHTML;
+        let sectionProductTableHTML = "";
+        if (sectionProductHTMLContainer.indexOf("$table$") >= 0) {
+            const sectionProductHTMLContainerArray = sectionProductHTMLContainer.split("$table$");
+            sectionProductHTML = sectionProductHTMLContainerArray[0];
+            sectionProductTableHTML = sectionProductHTMLContainerArray[1];
+        } else {
+            sectionProductHTML = sectionProductHTMLContainer;
+            sectionProductTableHTML = `
+            <div class='row s-product-table'>
+                <div class='col-8 s-product-title'>\${product_name} \${product_unit}</div>
+                <div class='col-3 s-product-price text-end'>\${product_sale_price}원</div>
+                <div class='col-1'>
+                    <div class='s-product-cart-content'>
+                        <img onclick="\${product_cart_action}" alt="CartIcon" class="s-product-cart-icon" src="https://s3.ap-northeast-2.amazonaws.com/moa.images/catalogs/cart_icon_36_36.png">
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+        // 섹션 처리
+        let sectionHTML_row = "";
+        if (sectionData) {
+            for (let section of sectionData) {
+                let tempSectionHTML = sectionHTML;
+
+                tempSectionHTML = tempSectionHTML.replaceAll('${category_name}', section.title);
+                tempSectionHTML = tempSectionHTML.replaceAll('#${category_color}', (section.bgcolor != "") ? section.bgcolor : "transparent");
+                tempSectionHTML = tempSectionHTML.replaceAll('class="category-title', `class="category-title color-${getCategoryRandomColor()}`);
+
+                // 섹션 이미지 처리
+                // 임시 컨테이너 생성해서 섹션 html을 넣는다
+                const divContainer = document.createElement("div");
+                divContainer.innerHTML = tempSectionHTML;
+
+                // 섹션 이미지 엘리먼트
+                let imageElement = divContainer.querySelector("img");
+                // 섹션 타이틀 엘리먼트
+                let titleElement = divContainer.querySelector("div.banner-cate");
+                tempSectionHTML = divContainer.innerHTML;
+
+                let sectionProductHTML_row = "";
+                if (section.product.length > 0) {
+                    // 페이징 처리. 1페이지
+                    const page = 1;
+                    const rowPerPage = 9;
+                    const targetProducts = (section.product.length <= rowPerPage) ? section.product.slice() : section.product.slice(0, 9);
+                    const viewMoreFlag = (section.product.length <= rowPerPage) ? false : true;
+
+                    for (let product of targetProducts) {                        
+                        const listPrice = product.tmpl_dt_list_price;
+                        const salePrice = product.tmpl_dt_sale_price;
+
+                        let tempProductHTML = (section.useTable) ? sectionProductTableHTML : sectionProductHTML;
+
+                        tempProductHTML = tempProductHTML.replaceAll('${product_name}', product.tmpl_dt_tl);
+                        tempProductHTML = tempProductHTML.replaceAll('${product_unit}', product.tmpl_dt_unit);
+                        tempProductHTML = tempProductHTML.replaceAll('${product_sale_price}', numeral(salePrice).format("0,0"));
+                        if (product.tmpl_dt_img != "") {
+                            tempProductHTML = tempProductHTML.replaceAll('${product_imageUri}', imageUrilFromProdcut(product));
+                        } else {
+                            tempProductHTML = tempProductHTML.replaceAll('${product_imageUri}', blankImage);
+                        }
+                        tempProductHTML = tempProductHTML.replaceAll('${product_action}', `addToCart('${product.tmpl_dt_cd}', '${salePrice}')`);
+
+                        let tempElement = document.createElement("div");
+                        tempElement.innerHTML = tempProductHTML;
+                        sectionProductHTML_row += tempElement.innerHTML;
+                    }
+                    sectionProductHTML_row += (viewMoreFlag) ? `<button class='btn btn-light w-100' onclick="javascript:alert('모바일에서 확인하세요')">더보기</button>` : '';
+                    tempSectionHTML = tempSectionHTML.replace("$sub{}$sub", sectionProductHTML_row);
+                } else {
+                    tempSectionHTML = tempSectionHTML.replace("$sub{}$sub", "");
+                }
+                sectionHTML_row += tempSectionHTML;
+            }
+        }
+        tempHTML = tempHTML.replace("$category{}$category", sectionHTML_row);
+        return tempHTML;
+    }
+
+
+    // 동일한 템플릿을 하나 더 만든다
+    const copyLeaflet = async (leafletCode) => {
+        const callApi = `${apiServer}/leaflet/apiCopy`
+        await axios.post(callApi, {
+            storeCode: storeCode,
+            leafletCode: leafletCode
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(response => {
+            // console.log(response)
+            if (response.data.data) {
+                showLeafletMainList(1)
+        
+            } else {
+                alert(`전단을 복사하지 못했습니다. 잠시 후 다시 시도해 주십시오.`);    
+            }
+        })
+        .catch(error => { 
+            console.log(error); 
+            alert(`전단을 복사하지 못했습니다. 잠시 후 다시 시도해 주십시오.`);    
+        })        
+    }
+</script>

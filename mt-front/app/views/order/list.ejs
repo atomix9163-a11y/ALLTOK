@@ -1,0 +1,312 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">주문 찾기</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-5 ms-lg-auto">
+                        <div class="mt-5 mt-lg-4 mt-xl-0">
+                            <div class="row mb-4">
+                                <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">구분</label>
+                                <div class="col-sm-3">
+                                    <select class="form-select" id="search-type">
+                                        <option value="o_number" selected>주문번호</option>
+                                        <option value="o_customer">주문자</option>
+                                        <option value="o_phone">휴대폰번호</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control" placeholder="검색어를 입력하세요" id="seach-value">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-5 mt-lg-4 mt-xl-0">
+                            <div class="row mb-4">
+                                <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">주문일</label>
+                                <div class="col-sm-4">
+                                    <input type="date" class="form-control" id="start-date" name="start-date" value="2018-07-22" min="2025-01-01" max="2050-12-31" />
+                                </div>
+                                <div class="col-sm-5">
+                                    <input type="date" class="form-control" id="end-date" name="end-date" value="2018-07-22" min="2025-01-01" max="2050-12-31" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-5 mt-lg-4 mt-xl-0">
+                            <div class="row mb-4">
+                                <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">상태</label>
+                                <div class="col-sm-9">
+                                    <select class="form-select" id="o-status">
+                                        <option value="">모두</option>
+                                        <option value="60">주문확인중</option>
+                                        <option value="61">주문취소</option>
+                                        <option value="70">주문완료</option>
+                                        <option value="71">결제확인중</option>
+                                        <option value="72">주문접수</option>
+                                        <option value="80">배송준비중</option>
+                                        <option value="81">배송중</option>
+                                        <option value="82">배송완료</option>
+                                        <option value="83">배송취소</option>
+                                        <option value="90">픽업준비중</option>
+                                        <option value="91">픽업준비완료</option>
+                                        <option value="92">픽업완료</option>
+                                        <option value="93">픽업취소</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 ms-lg-auto">
+                        <div class="mt-5 mt-lg-4 mt-xl-0">
+                            <div class="row mb-4">
+                                <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">결제방법</label>
+                                <div class="col-sm-9">
+                                    <select class="form-select" id="o-payMethod">
+                                        <option value="">모두</option>                                        
+                                        <option value="CCOD">현장카드결제</option>
+                                        <option value="COD">현장현금결제</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <label for="horizontal-firstname-input" class="col-sm-3 col-form-label">주문타입</label>
+                                <div class="col-sm-9">
+                                    <select class="form-select" id="o-platform">
+                                        <option value="">모두</option>
+                                        <option value="W">웹주문</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-sm-9">
+                                    <button type="button" class="btn btn-sm btn-primary btn-lg waves-effect waves-light" onclick="search()">찾기</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <!-- <div class="row mb-4">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-primary waves-effect waves-light">
+                            <i class="bx bx-smile font-size-16 align-middle me-2"></i> 모두 인쇄
+                        </button>
+                        <button type="button" class="btn btn-success waves-effect waves-light">
+                            <i class="bx bx-check-double font-size-16 align-middle me-2"></i> 엑셀 다운로드
+                        </button>
+                        <button type="button" class="btn btn-warning waves-effect waves-light">
+                            <i class="bx bx-error font-size-16 align-middle me-2"></i> 상품명 포함 엑셀 다운로드
+                        </button>
+                    </div>
+                </div> -->
+                <div class="row table-responsive">
+                    <table class="table table-striped">
+                        <thead class="">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">주문번호</th>
+                                <th scope="col">주문일</th>
+                                <th scope="col">주문자</th>
+                                <th scope="col">주소</th>
+                                <th scope="col">상품수량</th>
+                                <th scope="col">총가격</th>
+                                <th scope="col">결제방법</th>
+                                <th scope="col">상태</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-main">
+                            
+                        </tbody>
+                    </table>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center" id="orders-main-pager"></ul>
+                    </nav>
+            </div>
+
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->
+
+<%- contentFor('script') %>
+<script src="/assets/js/order-helper.js"></script>
+
+<script>
+    const rowCount = 10;
+    const storeCode = '<%=storeInfo.store_code %>';
+    const searchType = '<%=searchType %>';
+    const searchValue = '<%=searchValue %>';
+    const startDate = '<%=startDate %>';
+    const endDate = '<%=endDate %>';
+    const o_status = '<%=o_status %>';
+    const o_payMethod = '<%=o_payMethod %>';
+    const o_platform = '<%=o_platform %>';
+    let currentPage = '<%=page %>';
+    let storeInfo = null;
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        storeInfo = await getStoreInfo(storeCode);
+        if (storeInfo.use_time_limit) storeInfo.use_time_limit = JSON.parse(storeInfo.use_time_limit);
+        
+        let today = (endDate == "") ? moment() : moment(endDate);
+        let yesterday;
+        if (storeInfo.use_time_limit && storeInfo.use_time_limit.use == 'Y') {
+            yesterday = moment();
+        } else {
+            yesterday = (startDate == "") ? moment().add(-1, 'd') : moment();
+        }
+
+        document.getElementById("start-date").value = yesterday.format("YYYY-MM-DD")
+        document.getElementById("end-date").value = today.format("YYYY-MM-DD")
+
+        await showOrderMainList(currentPage);
+
+    })
+
+    const getStoreInfo = async (storeCode) => {
+        let callApi = `${apiServer}/store/apiGet`;
+        const storeInfo = await axios.post(callApi, {
+            storeCode: storeCode
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {
+            console.log(response.data.data)
+            return response.data.data;
+        })
+        .catch(error => { console.log(error); return null;});
+        return storeInfo;
+    }
+
+    function search() {
+        currentPage = 1;
+        showOrderMainList(currentPage);
+    }
+
+    const showOrderMainList = async (page) => {
+        let searchType = document.getElementById("search-type").value;
+        let searchValue = document.getElementById("seach-value").value;        
+        let startDate = document.getElementById("start-date").value;
+        let endDate = document.getElementById("end-date").value;
+        let o_status = document.getElementById("o-status").value;
+        let o_payMethod = document.getElementById("o-payMethod").value;
+        let o_platform = document.getElementById("o-platform").value;
+                
+        let callApi = `${apiServer}/order/apiList`;
+        await axios.post(callApi, {
+            storeCode: storeCode,
+            searchType: searchType,
+            searchValue: searchValue,
+            startDate: startDate,
+            endDate: endDate,
+            o_status: o_status,
+            o_payMethod: o_payMethod,
+            o_platform: o_platform,
+            page: page,
+            rowCount : rowCount
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {
+            let ordersHTML = "";
+            if (response.data.data.count > 0) {
+                let num = response.data.data.count - (page - 1) * rowCount;
+                for (let orders of response.data.data.rows) {      
+                    // console.log(orders)
+                    ordersHTML += `
+                        <tr>
+                            <th>${num--}</th>
+                            <td>${orders.O_CODE}</td>
+                            <td>${moment(orders.C_TIME).format('YYYY-MM-DD HH:mm:ss')}</td>
+                            <td>${orders.U_ADDR_RECI}</td>
+                            <td>${orders.U_ADDR_RA}<br>${orders.U_ADDR_DETAIL}</td>
+                            <td>${orders.O_QTY}</td>
+                            <td>${orders.O_PAY_AMOUNT.format()}</td>                            
+                            <td>${(orders.O_PAY_METHOD == "CCOD") ? "현장카드결제" : 
+                                (orders.O_PAY_METHOD == "CCD") ?"현장현금결제" : "계좌이체"}</td>
+                            <td><span class='${orders.O_STATUS == 82 ? "text-danger" : orders.O_STATUS == 61 ? "" : "text-info"}'>${getOrderSatatus(orders.O_STATUS)}</span></td>
+                            <td>
+                                <div class="btn-group btn-group-sm mt-2" role="group" aria-label="Basic example">
+                                    <button type="button" class="btn btn-primary" onclick="showDetails('${orders.O_CODE}')">상세</button>
+                                    <button type="button" id="btn_print_${orders.O_CODE}" class="btn ${orders.IS_PRINT == 'N' ? "btn-danger" : "btn-secondary"}" onclick="print('${orders.O_CODE}', '${orders.IS_PRINT}')">인쇄</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `
+                }
+                document.getElementById("orders-main").innerHTML = ordersHTML;
+
+                let pagerHTML = createPagerHTML(response.data.data.count, rowCount, page, 5, "changePageMain");
+                document.getElementById("orders-main-pager").innerHTML = pagerHTML;
+            } else {
+                document.getElementById("orders-main").innerHTML = "";
+                document.getElementById("orders-main-pager").innerHTML = "";
+            }
+        })
+        .catch(error => { console.log(error); alert(`주문 내역을 가져오지 못했습니다.`);;});
+    }
+
+    function changePageMain(page, rowPerPage) {
+        currentPage = page;
+        showOrderMainList(currentPage);
+    }
+
+    function showDetails(O_CODE) {
+        let searchType = document.getElementById("search-type").value;
+        let searchValue = document.getElementById("seach-value").value;        
+        let start_date = document.getElementById("start-date").value;
+        let end_date = document.getElementById("end-date").value;
+        let o_status = document.getElementById("o-status").value;
+        let o_payMethod = document.getElementById("o-payMethod").value;
+        let o_platform = document.getElementById("o-platform").value;
+        
+        self.location = `/order/details?O_CODE=${O_CODE}&searchType=${searchType}&searchValue=${searchValue}&start_date=${start_date}&end_date=${end_date}&o_status=${o_status}&o_payMethod=${o_payMethod}&o_platform=${o_platform}&page=${currentPage}`;
+    }
+
+    async function print(O_CODE, IS_PRINT) {
+        if (IS_PRINT == "N") {
+            let callApi = `${apiServer}/order/apiSetPrint`;
+            await axios.post(callApi, {
+                O_CODE: O_CODE,
+                IS_PRINT: 'Y'
+            }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+            }).then(response => {
+                // console.log(response)
+                if (response.data.result) {
+                    showOrderMainList(currentPage)
+                    let button_print = document.getElementById("btn_print_" + O_CODE);
+                    button_print.classList.remove("btn-danger");
+                    button_print.classList.add("btn-secondary");
+                }
+            })
+            .catch(error => { console.log(error); alert(`프린트 화면을 불러오지 못했습니다`); return;});
+        }
+        openWindow("/order/print?O_CODE=" + O_CODE, 1200, 800, true);
+    }
+
+</script>

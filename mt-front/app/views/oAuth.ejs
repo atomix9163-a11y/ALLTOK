@@ -1,0 +1,14 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+
+<%- contentFor('script') %>
+<script>
+    const loginId = '<%=loginId%>';
+    const xToken = '<%=xToken%>';
+
+    let saveCookie = `xToken=${xToken};path=/;`
+    document.cookie = saveCookie;
+
+    self.location = "/";
+</script>

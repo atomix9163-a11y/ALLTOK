@@ -1,0 +1,144 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row">
+    <div class="col-lg-4 ">
+        <div class="card card-body">
+            <h4 class="card-title">일반 문자 서비스</h4>
+            <div class="card-text mt-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="service_SMS" onchange="updateService()">
+                    <label class="form-check-label" for="flexSwitchCheckChecked">SMS</label>
+                </div>
+            </div>
+            <div class="card-text mt-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="service_LMS" onchange="updateService()">
+                    <label class="form-check-label" for="flexSwitchCheckChecked">LMS</label>
+                </div>
+            </div>
+            <div class="card-text mt-4 mb-4 d-none">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="service_MMS" onchange="updateService()">
+                    <label class="form-check-label" for="flexSwitchCheckChecked">MMS</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card card-body">
+            <h4 class="card-title">RCS 서비스</h4>
+            <div class="card-text mt-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="service_RCS_SMS" onchange="updateService()">
+                    <label class="form-check-label" for="flexSwitchCheckChecked">RCS SMS</label>
+                </div>
+            </div>
+            <div class="card-text mt-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="service_RCS_LMS" onchange="updateService()">
+                    <label class="form-check-label" for="flexSwitchCheckChecked">RCS LMS</label>
+                </div>
+            </div>
+            <div class="card-text mt-4 mb-4 d-none">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="service_RCS_MMS" onchange="updateService()">
+                    <label class="form-check-label" for="flexSwitchCheckChecked">RCS MMS</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card card-body">
+            <h4 class="card-title">카카오톡 서비스</h4>
+            <div class="card-text mt-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="service_AT" onchange="updateService()">
+                    <label class="form-check-label" for="flexSwitchCheckChecked">알림톡</label>
+                </div>
+            </div>
+            <div class="card-text mt-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="service_FT" onchange="updateService()">
+                    <label class="form-check-label" for="flexSwitchCheckChecked">친구톡 (채널톡)</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- contentFor('script') %>
+<script>
+const apiServer = '<%=apiServer %>';
+const userID = '<%=user.loginId %>';
+
+// <!-- 페이지 로드 완료 시 실행 -->
+document.addEventListener("DOMContentLoaded", async function(){
+    await loadSavedService();
+})
+
+// functions
+const loadSavedService = async () => {
+    await axios.post(`/api/systemGet`, {
+        keyword: "SERVICE"
+    }, {
+        headers: {
+            xtoken: getCookie("xToken")
+        }
+    })
+    .then(response => {                
+        if (response.data.result && response.data.data) {
+            const serviceJSON = JSON.parse(response.data.data.data)
+
+            document.getElementById("service_SMS").checked = serviceJSON.SMS == "Y" ? true : false;
+            document.getElementById("service_LMS").checked = serviceJSON.LMS == "Y" ? true : false;
+            document.getElementById("service_MMS").checked = serviceJSON.MMS == "Y" ? true : false;
+            document.getElementById("service_RCS_SMS").checked = serviceJSON.RCSSMS == "Y" ? true : false;
+            document.getElementById("service_RCS_LMS").checked = serviceJSON.RCSLMS == "Y" ? true : false;
+            document.getElementById("service_RCS_MMS").checked = serviceJSON.RCSMMS == "Y" ? true : false;
+            document.getElementById("service_AT").checked = serviceJSON.AT == "Y" ? true : false;
+            document.getElementById("service_FT").checked = serviceJSON.FT == "Y" ? true : false;
+        } 
+    })
+    .catch(error => { console.log(error); alert("서비스 이용 정보를 가져오지 못했습니다.");});
+}
+
+const updateService = async () => {
+    const SMS = document.getElementById("service_SMS").checked ? "Y" : "N";
+    const LMS = document.getElementById("service_LMS").checked ? "Y" : "N";
+    const MMS = document.getElementById("service_MMS").checked ? "Y" : "N";
+    const RCSSMS = document.getElementById("service_RCS_SMS").checked ? "Y" : "N";
+    const RCSLMS = document.getElementById("service_RCS_LMS").checked ? "Y" : "N";
+    const RCSMMS = document.getElementById("service_RCS_MMS").checked ? "Y" : "N";
+    const AT = document.getElementById("service_AT").checked ? "Y" : "N";
+    const FT = document.getElementById("service_FT").checked ? "Y" : "N";
+
+    // 정보를 얻어온다        
+    await axios.post(`${apiServer}/system/apiSave`, {
+        keyword: 'SERVICE',
+        SMS: SMS,
+        LMS: LMS,
+        MMS: MMS,
+        RCSSMS: RCSSMS,
+        RCSLMS: RCSLMS,
+        RCSMMS: RCSMMS,
+        AT: AT,
+        FT: FT,
+        C_ID: userID
+    }, {
+        headers: {
+            xtoken: getCookie("xToken")
+        }
+    })
+    .then(response => {
+        // console.log(returnResult);
+        if (!response.data.result) {
+            alert("서비스 이용 정보를 업데이트하지 못했습니다.");
+        }
+    })
+    .catch(error => { console.log(error); alert("서비스 이용 정보를 업데이트하지 못했습니다.");});
+}
+
+</script>

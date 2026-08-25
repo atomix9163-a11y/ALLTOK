@@ -1,0 +1,290 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row mb-4 justify-content-end">
+    <div class="col-md-3 text-end">
+        <button type="button" id="btn_print" class="btn btn-sm <%=((orderInfo.IS_PRINT == "N") ? "btn-danger" : "btn-secondary") %> waves-effect waves-light" onclick="print('<%=orderInfo.O_CODE %>', '<%=orderInfo.IS_PRINT %>')">
+            인쇄하기
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="gotoList()">돌아가기</button>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">주문 상세</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">주문번호</dt>
+                    <dd class="col-sm-9"><%=orderInfo.O_CODE %></dd>
+
+                    <dt class="col-sm-3">주문상태</dt>
+                    <dd class="col-sm-9"><%-(orderInfo.O_STATUS == "82") ? `<span class="text-danger">${orderInfo.O_STATUS_NAME}</span>` : (orderInfo.O_STATUS == "82") ? `<span class="text-info">${orderInfo.O_STATUS_NAME}</span>` : orderInfo.O_STATUS_NAME  %></dd>
+
+                    <dt class="col-sm-3">결제 방법</dt>
+                    <dd class="col-sm-9"><%=orderInfo.O_PAY_METHOD_NAME %></dd>
+
+                    <dt class="col-sm-3">주문확인일</dt>
+                    <dd class="col-sm-9"><%=moment(orderInfo.C_TIME).format('YYYY-MM-DD HH:mm:ss') %></dd>
+
+                    <dt class="col-sm-3">총 결제 가격</dt>
+                    <dd class="col-sm-9"><%=numeral(orderInfo.O_PAY_AMOUNT).format('0,0') %> 원</dd>
+
+                    <dt class="col-sm-3">고객 메모</dt>
+                    <dd class="col-sm-9"><%=orderInfo.O_REQ %></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">고객 정보</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">이름</dt>
+                    <dd class="col-sm-9"><%=orderInfo.U_ADDR_RECI %></dd>
+
+                    <dt class="col-sm-3">휴대폰 번호</dt>
+                    <dd class="col-sm-9"><%=orderInfo.U_ADDR_PHONE %></dd>
+
+                </dl>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">배송 정보</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">이름</dt>
+                    <dd class="col-sm-9"><%=orderInfo.U_ADDR_RECI %></dd>
+
+                    <dt class="col-sm-3">휴대폰 번호</dt>
+                    <dd class="col-sm-9"><%=orderInfo.U_ADDR_PHONE %></dd>
+
+                    <dt class="col-sm-3">주소</dt>
+                    <dd class="col-sm-9"><%=orderInfo.U_ADDR_RA %> <%=orderInfo.U_ADDR_DETAIL %> (우편번호: <%=orderInfo.U_POST_CODE %>)</dd>
+                </dl>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">상태</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead class="">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">상태</th>
+                            <th scope="col">시간</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%
+                        if (orderHistory) {
+                            let index = 1;
+                            for (let history of orderHistory) {
+                            %>
+                            <tr>
+                                <th><%=index++ %></th>
+                                <td><%-(history.O_STATUS == "82") ? `<span class="text-danger">${history.O_STATUS_NAME}</span>` : (history.O_STATUS == "82") ? `<span class="text-info">${history.O_STATUS_NAME}</span>` : history.O_STATUS_NAME  %></td>
+                                <td><%=moment(history.C_TIME).format('YYYY-MM-DD HH:mm:ss') %></td>
+                            </tr>
+                            <%
+                            }
+                        }
+                        %>
+
+                        <!-- <tr>
+                            <th>1</th>
+                            <td>주문확인중</td>
+                            <td>2022-11-10 14:24:41 ( SYSTEM )</td>
+                        </tr>
+                        <tr>
+                            <th>2</th>
+                            <td>결제 확인중	</td>
+                            <td>2022-11-10 14:24:41 ( SYSTEM )</td>
+                        </tr>
+                        <tr>
+                            <th>3</th>
+                            <td>주문완료</td>
+                            <td>2022-11-10 14:24:41 ( SYSTEM )</td>
+                        </tr>
+                        <tr>
+                            <th>4</th>
+                            <td>배송준비중</td>
+                            <td>2022-11-10 14:24:41 ( SYSTEM )</td>
+                        </tr> -->
+
+                    </tbody>
+                </table>
+
+                <div class="row row-cols-lg-auto g-3 align-items-center">
+                    <div class="col-12">
+                        <select class="form-select" id="O_STATUS">
+                            <!-- <option value="60">주문확인중</option> -->
+                            <option value="61">주문취소</option>
+                            <option value="70">주문접수</option>
+                            <!-- <option value="71">결제확인중</option> -->
+                            <!-- <option value="72">주문접수</option> -->
+                            <!-- <option value="80">배송준비중</option> -->
+                            <!-- <option value="81">배송중</option> -->
+                            <option value="82">주문완료</option>
+                            <!-- <option value="83">배송취소</option> -->
+                            <!-- <option value="90">픽업준비중</option>
+                            <option value="91">픽업준비완료</option>
+                            <option value="92">픽업완료</option>
+                            <option value="93">픽업취소</option> -->
+                        </select>
+                    </div>
+                  
+                    <div class="col-12">
+                        <button type="button" class="btn btn-sm btn-primary" onclick="changeStatus('<%=orderInfo.O_CODE %>')">변경하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row table-responsive">
+                    <table class="table table-striped">
+                        <thead class="">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">사진</th>
+                                <th scope="col">상품명</th>
+                                <th scope="col">단가</th>
+                                <th scope="col">수량</th>
+                                <th scope="col">개별합</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-main">
+                            <%
+                            if (orderDetails) {
+                                let index = 1;
+                                for (let orderDetail of orderDetails) { %>
+                                    <tr>
+                                        <th><%=index++ %></th>
+                                        <td><img class="img pointer" src="<%=orderDetail.P_IMG %>" style="max-width: 80px"></td>                                        
+                                        <td><%=orderDetail.P_NAME %> <%=orderDetail.P_UNIT %></td>
+                                        <td><%=numeral(orderDetail.P_SALE_PRICE).format('0,0') %> 원</td>
+                                        <td><%=orderDetail.O_QTY %></td>
+                                        <td><%=numeral(orderDetail.O_QTY * orderDetail.P_SALE_PRICE).format('0,0') %> 원</td>
+                                    </tr>
+                                    <%
+                                }
+                            }
+                        %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->
+
+<%- contentFor('script') %>
+<script>
+    const storeCode = '<%=storeInfo.store_code %>';
+    // 검색 관련
+    const searchType = '<%=searchType %>';
+    const searchValue = '<%=searchValue %>';
+    const startDate = '<%=startDate %>';
+    const endDate = '<%=endDate %>';
+    const o_status = '<%=o_status %>';
+    const o_payMethod = '<%=o_payMethod %>';
+    const o_platform = '<%=o_platform %>';
+    let page = '<%=page %>';
+
+    // 체크 관련
+    const current_o_status = '<%=orderInfo.O_STATUS %>'
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        document.getElementById("O_STATUS").value = '<%=orderInfo.O_STATUS %>';
+    })
+
+    function gotoList() {
+        self.location = `/order/list?searchType=${searchType}&searchValue=${searchValue}&startDate=${startDate}&endDate=${endDate}&o_status=${o_status}&o_payMethod=${o_payMethod}&o_platform=${o_platform}&page=${page}`;
+    }
+    
+    async function showOrderHistory(O_CODE) {
+
+    }
+
+    async function changeStatus(O_CODE) {
+        let new_O_STATUS = document.getElementById("O_STATUS").value;
+        if (current_o_status == new_O_STATUS) {
+            alert("동일한 상태로 변경할 수 없습니다");
+            return;
+        }
+        let callApi = `${apiServer}/order/apiSetStatus`;
+        await axios.post(callApi, {
+            O_CODE: O_CODE,
+            O_STATUS: document.getElementById("O_STATUS").value
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {
+            if (response.data.result) {
+                // 상태가 변경되었다. 기록 변경
+                // await showOrderHistory(O_CODE);
+                alert(`주문 상태가 변경되었습니다`);
+                self.location.reload();
+            } else {
+                alert(`주문 상태를 변경하는 중 오류가 발생했습니다`);
+            }
+        })
+        .catch(error => { console.log(error); alert(`주문 상태를 변경하는 중 오류가 발생했습니다`); return;});
+    }
+
+    async function print(O_CODE, IS_PRINT) {
+        if (IS_PRINT == "N") {
+            let callApi = `${apiServer}/order/apiSetPrint`;
+            await axios.post(callApi, {
+                    O_CODE: O_CODE,
+                    IS_PRINT: 'Y'
+                }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+            }).then(response => {
+                if (response.data.result) {
+                    let button_print = document.getElementById("btn_print");
+                    button_print.classList.remove("btn-danger");
+                    button_print.classList.add("btn-secondary");
+                }
+            })
+            .catch(error => { console.log(error); alert(`프린트 화면을 불러오지 못했습니다`); return;});
+        }
+        window.open("/order/print?O_CODE=" + O_CODE, "_blnk", "width=800,height=800");
+        setTimeout(reloadParent, 1000);
+    }
+
+    const reloadParent = () => {
+        console.log(0)
+        self.location.reload();
+    }
+
+</script>

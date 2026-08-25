@@ -1,0 +1,974 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="search-box mb-2 me-2">
+                            <div class="position-relative">
+                                <input type="text" id="search-key" class="form-control form-control-sm border-light rounded" placeholder="Search..." value="">
+                                <i class="search-icon" data-eva="search-outline" data-eva-height="26" data-eva-width="26"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-1">
+                        <button id="search" class="fc-today-button btn btn-sm btn-primary" type="button" onclick="listStore(1)">검색</button>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-check form-check-inline">
+                            <input id="rd-show-normal" class="form-check-input" type="radio" name="rd-show" value="A" checked="">
+                            <label for="rd-show-normal" class="form-check-label">정상</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input id="rd-show-close" class="form-check-input" type="radio" name="rd-show" value="D">
+                            <label for="rd-show-close" class="form-check-label">정지</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input id="rd-show-all" class="form-check-input" type="radio" name="rd-show" value="">
+                            <label for="rd-show-all" class="form-check-label">전체</label>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-sm-6">
+                        <div class="mt-4 mt-sm-0 d-flex align-items-center justify-content-sm-end">
+                            <div class="mb-2 me-2">
+                                <div class="dropdown">
+                                    <button id="btn-store-add" class="btn btn-sm btn-primary" type="button" onclick="openAddStoreModal()" >
+                                        <i class="mdi mdi-plus me-1"></i> 새 가맹점 추가
+                                    </button>
+                                    <input type="text" class="hidden-text">
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="font-size-16 me-3 mb-0">가맹점 목록</h5>
+                    <hr class="mt-2">
+                    <div class="table-responsive mb-5">
+                        <table class="table table-striped table-hover">
+                            <thead class="">
+                                <tr>
+                                    <th scope="col">가맹점코드</th>
+                                    <th scope="col">가맹점명</th>
+                                    <th scope="col">연동서비스</th>
+                                    <th scope="col">연동코드</th>
+                                    <th scope="col">담당자</th>
+                                    <th scope="col">대행</th>
+                                    <th scope="col">서비스</th>
+                                    <th scope="col">로그인아이디</th>
+                                    <th scope="col">잔액</th>
+                                    <th scope="col">상태</th>
+                                    <th scope="col">등록일</th>
+                                    <th scope="col" class="text-center">작업</th>
+                                </tr>
+                            </thead>
+                            <tbody id="store-main">                            
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center" id="store-pager"></ul>
+                    </nav>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 기본정보 Modal -->
+<div class="modal fade" id="modal-store" tabindex="-1" aria-labelledby="modal_store_Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"> 가맹점 관리</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="store-code">
+                <div class="row mb-3">
+                    <div class="col-lg-4">
+                        <label for="store-name" class="form-label">가맹점명 (*) :</label>
+                        <input type="text" class="form-control" maxlength="45" placeholder="가맹점명를 입력하세요" id="store-name" name="store-name">
+                    </div>
+                    <div class="col-lg-2">
+                        <label class="form-label">모바일웹 구분 :</label>
+                        <select class="form-select" id="shop-type">
+                            <option value="U">단독</option>
+                            <option value="QU">큐마켓 단독</option>
+                            <option value="Q">큐마켓 연동</option>
+                            <option value="L">슈켓 연동</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="store-name" class="form-label">M CODE :</label>
+                        <input type="text" class="form-control" maxlength="10" placeholder="MOA CODE를 입력하세요" id="m-code" name="m-code">
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="store-name" class="form-label">연동코드 :</label>
+                        <input type="text" class="form-control" maxlength="10" placeholder="마트코드를 입력하세요" id="mart-code" name="mart-code">
+                    </div>
+                </div>        
+                <div class="row mb-3">
+                    <div class="col-lg-4">
+                        <label for="store-login-id" class="form-label">로그인 아이디 (*) :</label>
+                        <input type="text" class="form-control" maxlength="45" placeholder="로그인 아이디를 입력하세요" id="store-login-id" name="store-login-id">
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="store-login-pwd" class="form-label">로그인 암호 (*) :</label>
+                        <input type="password" class="form-control" maxlength="20" placeholder="로그인 암호를 입력하세요" id="store-login-pwd" name="store-login-pwd">
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="store-login-pwd-confirm" class="form-label">로그인 암호 확인 (*) :</label>
+                        <input type="password" class="form-control" maxlength="20" placeholder="정확한 입력을 위해 암호를 한 번 더 입력하세요" id="store-login-pwd-confirm" name="store-login-pwd-confirm">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-lg-6">
+                        <label for="store-name-reg" class="form-label">사업장 이름(ERP) :</label>
+                        <input type="text" class="form-control" maxlength="50" placeholder="ERP 등록을 위한 사업장 이름을 입력하세요" id="store-name-reg" name="store-name-reg">
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="store-regno" class="form-label">사업자번호(ERP) :</label>
+                        <input type="text" class="form-control" maxlength="20" placeholder="사업자등록번호를 입력하세요" id="store-regno" name="store-regno">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-lg-6">
+                        <label for="shuket-manager" class="form-label">슈켓 담당자 :</label>
+                        <input type="text" class="form-control" maxlength="45" placeholder="담당자 이름을 입력하세요." id="shuket-manager" name="shuket-manager">
+                    </div>
+                    <div class="col-lg-6">
+                        <label class="form-label">대행 :</label>
+                        <select class="form-select" id="store-manager-id">
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-lg-6">
+                        <label class="form-label">상태 :</label>
+                        <select class="form-select" id="store-active">
+                            <option value="A">정상</option>
+                            <option value="W">대기</option>
+                            <option value="D">이용중지</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary waves-effect waves-light" onclick="updateStore()">저장하기</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal -->
+
+<!-- 딥링크 Modal -->
+<!-- <div class="modal fade" id="modal-deeplink" tabindex="-1" aria-labelledby="modal_deeplink_Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_userView_Label"> 스토어 연결 정보</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="deeplink-storeCode">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="user_loginId" class="form-label">접속 시 팝업 보이기:</label>
+                            <select class="form-select" id="direct-link">
+                                <option value="Y">사용</option>
+                                <option value="N">사용 안함</option>
+                            </select>
+                        </div>                                   
+                    </div>
+                    <div class="col-lg-6 fs-7">
+                        
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="user_loginId" class="form-label">안드로이드 스키마(scheme):</label>
+                            <input type="text" class="form-control" maxlength="50" placeholder="앱의 스키마를 입력하세요" id="android-scheme" name="android_scheme">
+                        </div>                                   
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="user_loginId" class="form-label">인드로이드 패키지(package):</label>
+                            <input type="text" class="form-control" maxlength="50" placeholder="구글 플레이스토어의 패키지 값을 입력하세요" id="android-package" name="android_package">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="user_loginId" class="form-label">아이폰앱 아이디(Id):</label>
+                            <input type="text" class="form-control" maxlength="50" placeholder="애플 앱스토어의 앱 아이디를 입력하세요" id="ios-appId" name="ios-appId">
+                        </div>                                   
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3 d-none">
+                            <label for="user_loginId" class="form-label">IOS App scheme:</label>
+                            <input type="text" class="form-control" maxlength="50" placeholder="App의 scheme를 입력하세요" id="ios-scheme" name="ios_scheme">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary waves-effect waves-light" id="btnDeepLinkSave" onclick="saveDeepLink()">저장하기</button>
+            </div>
+        </div>
+    </div>
+</div> -->
+<!-- end modal -->
+
+<!-- 서비스 Modal -->
+<div class="modal fade" id="modal-service" tabindex="-1" aria-labelledby="modal_service_Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_userView_Label"> 서비스 이용 정보
+                    <em class="fs-7 text-danger">이 설정보다 시스템의 서비스 이용 설정이 우선됩니다.</em>
+                </h5>
+                
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row mb-2">
+                    <div class="col-lg-6">
+                        <div class="row">
+                            <label for="call-phone" class="col-sm-3">발신 번호</label>
+                            <div class="col-sm-9"><input type="text" class="form-control form-control-sm" maxlength="20" placeholder="발신번호를 입력하세요" id="call-phone" name="call-phone"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="balance-check" checked="">
+                            <label class="form-check-label" for="balance-check">
+                                예상 잔액 부족 시 발송 취소
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-lg-6">
+                        <div class="row">
+                            <label for="shop-url" class="col-sm-3">접속 URL</label>
+                            <div class="col-sm-9"><input type="text" class="form-control form-control-sm" placeholder="접속 URL" id="shop-url" name="shop-url" readonly></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="row">
+                            <label for="shop-short-url" class="col-sm-3">대체 URL</label>
+                            <div class="col-sm-9"><input type="text" class="form-control form-control-sm" placeholder="단축 URL" id="shop-short-url" name="shop-short-url"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-lg-6">
+                        <div class="row">
+                            <label for="shop-index" class="col-sm-3">첫페이지</label>
+                            <div class="col-sm-9">
+                                <select class="form-select form-select-sm" id="shop-index">                                    
+                                    <option value="1">특매상품</option>
+                                    <option value="2">전단지</option>                                    
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 d-none">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="use-shop" checked="">
+                            <label class="form-check-label" for="use-shop">
+                                모바일웹 주문 허용
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="allow-appPush" checked="">
+                            <label class="form-check-label" for="allow-appPush">
+                                앱 푸시 사용 허용
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="allow-send-repeat" checked="">
+                            <label class="form-check-label" for="allow-send-repeat">
+                                재발송 허용
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row mb-3">
+                    <div class="col-lg-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="SMS" checked="" onchange="checkRCS('SMS')">
+                            <label class="form-check-label" for="SMS">
+                                SMS 이용
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="row">
+                            <label for="UP-SMS" class="col-sm-4">단가</label>
+                            <div class="col-sm-8"><input type="number" class="form-control form-control-sm" value="0" placeholder="SMS 단가를 입력하세요" id="UP-SMS" name="UP-SMS"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="LMS" checked="" onchange="checkRCS('LMS')">
+                            <label class="form-check-label" for="LMS">
+                                LMS 이용
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="row">
+                            <label for="UP-LMS" class="col-sm-4">단가</label>
+                            <div class="col-sm-8"><input type="number" class="form-control form-control-sm" value="0" placeholder="LMS 단가를 입력하세요" id="UP-LMS" name="UP-LMS"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-lg-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="RCSSMS" checked="" onchange="changeRCS('SMS')">
+                            <label class="form-check-label" for="RCSSMS">
+                                RCS SMS 이용
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="row">
+                            <label for="UP-RCSSMS" class="col-sm-4">단가</label>
+                            <div class="col-sm-8"><input type="number" class="form-control form-control-sm" value="0" placeholder="RCS SMS 단가를 입력하세요" id="UP-RCSSMS" name="UP-RCSSMS"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="RCSLMS" checked="" onchange="changeRCS('LMS')">
+                            <label class="form-check-label" for="RCSLMS">
+                                RCS LMS 이용
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="row">
+                            <label for="UP-RCSLMS" class="col-sm-4">단가</label>
+                            <div class="col-sm-8"><input type="number" class="form-control form-control-sm" value="0" placeholder="RCS LMS 단가를 입력하세요" id="UP-RCSLMS" name="UP-RCSLMS"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-lg-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="AT" checked="">
+                            <label class="form-check-label" for="AT">
+                                카카오 알림톡 이용
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="row">
+                            <label for="UP-AT" class="col-sm-4">단가</label>
+                            <div class="col-sm-8"><input type="number" class="form-control form-control-sm" value="0" placeholder="카카오 알림톡 단가를 입력하세요" id="UP-AT" name="UP_AT"></div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <div class="row mb-3">
+                    <div class="col-lg-4">
+                        <label for="brand-key">RCS Brand Key</label>
+                        <input type="text" class="form-control form-control-sm" maxlength="20" placeholder="브랜드 Key를 입력하세요" id="brand-key" name="brand_key">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-lg-4">
+                        <label for="kakao-client-id" class="form-label">카카오 Client ID</label>
+                        <input type="text" class="form-control form-control-sm" value="0" placeholder="카카오 Client ID를 입력하세요" id="kakao-client-id" name="kakao_client-id">
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="kakao-profilekey" class="form-label">카카오 프로필 키</label>
+                        <input type="text" class="form-control form-control-sm" value="" placeholder="카카오 프로필 키를 입력하세요" id="kakao-profilekey" name="kakao_profilekey">
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="kakao-default-template" class="form-label">카카오 기본 템플릿</label>
+                        <input type="text" class="form-control form-control-sm" maxlength="20" placeholder="기본 템플릿 번호 (설정하지 않으면 비워두세요)" id="kakao-default-template" name="kakao_default_template">
+                    </div>
+                </div>
+                <hr />
+                <div class="row mb-3">
+                    <div class="col-lg-4">
+                        <label for="kakao-profilekey" class="form-label">MTS 서비스 사용</label>
+                        <div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="mts-use"></div>
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="kakao-profilekey" class="form-label">카카오 프로필 키</label>
+                        <input type="text" class="form-control form-control-sm" value="" placeholder="카카오 프로필 키를 입력하세요" id="mts-kakao-profilekey" name="mts-kakao_profilekey">
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="kakao-client-id" class="form-label">카카오 기본 템플릿</label>
+                        <input type="text" class="form-control form-control-sm" maxlength="20" placeholder="기본 템플릿 번호 (설정하지 않으면 비워두세요)" id="mts-kakao-default-template" name="mts-kakao_default_template">
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="user_loginId" class="form-label">안드로이드 스키마(scheme):</label>
+                            <input type="text" class="form-control" maxlength="50" placeholder="앱의 스키마를 입력하세요" id="android-scheme" name="android_scheme">
+                        </div>                                   
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="user_loginId" class="form-label">인드로이드 패키지(package):</label>
+                            <input type="text" class="form-control" maxlength="50" placeholder="구글 플레이스토어의 패키지 값을 입력하세요" id="android-package" name="android_package">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="user_loginId" class="form-label">아이폰앱 아이디(Id):</label>
+                            <input type="text" class="form-control" maxlength="50" placeholder="애플 앱스토어의 앱 아이디를 입력하세요" id="ios-appId" name="ios-appId">
+                        </div>                                   
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary waves-effect waves-light" id="modal_saveService" onclick="saveService()">저장하기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal -->
+
+<%- contentFor('script') %>
+<script>
+    const apiServer = '<%=apiServer %>';
+    const appStatus = '<%=appStatus %>';
+    let page = 1;    
+    const rowCount = 20;
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        document.getElementById("search-key").value = "";
+        document.getElementById("search-key").addEventListener("keypress", async (e) => {
+            if (e.keyCode == 13) {
+                await listStore(1);
+            }
+        })
+        await listStore(1);
+        const radioButtons = document.querySelectorAll('input[name="rd-show"]');
+        radioButtons.forEach((radio) => {            
+            radio.addEventListener('click', async (event) => {
+                await listStore(1);
+            });
+        });
+    })
+
+    const listStore = async (page) => {
+        let searchKey = document.getElementById("search-key").value;
+        const selectedRadio = document.querySelector('input[name="rd-show"]:checked');
+        // let callApi = `/api/store/list`;
+
+        let callApi = `${apiServer}/store/apiList`;
+        await axios.post(callApi, {          
+            storeType: "MT",
+            searchKey: searchKey,
+            active: selectedRadio.value,
+            page: page,
+            rowCount: rowCount
+            // searchKey: searchKey,            
+            // page: page,
+            // rowCount : rowCount
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {            
+            console.log(response.data)
+            if (response.data.result) {
+                let HTML = "";
+                if (response.data.data.rows) {
+                    for (let item of response.data.data.rows) {
+                        // console.log(item)
+                        const serviceJSON = JSON.parse(item.data)
+                        // console.log(serviceJSON)
+                        HTML += `                    
+                        <tr>
+                            <td>${item.store_code}</td>
+                            <td><a href="javascript:void(0);" onclick="showStore('${item.store_code }')">${item.name }</a></td>
+                            <td><span class='text-${item.shop_type == 'QU' ? "danger'>큐마켓 단독" : item.shop_type == 'Q' ? "danger'>큐마켓" : item.shop_type == 'L' ? "info'>슈켓" : "'>단독"}</span></td>
+                            <td>${item.app_mart_code ? item.app_mart_code : ""}${item.M_MOA_CODE ? ` (${item.M_MOA_CODE})` : ""}</td>
+                            <td>${item.shuket_manager && item.shuket_manager != "" ? item.shuket_manager : "(미지정)" }</td>
+                            <td>${item.manager_name != "" ? item.manager_name : "(없음)" }</td>
+                            <td>${serviceJSON ? serviceJSON.MTS_use && serviceJSON.MTS_use == 'Y' ? "<span class='text-danger'>MTS</span>" : "KBiz" : "(미지정)"}</td>
+                            <td>${item.login_id }</td>
+                            <td><span class='text-${(item.balance < 0 ? 'danger' : 'success') + "'>" + numeral(item.balance).format('0,0.00') + "</span>"}</td>
+                            <td>
+                                ${ (item.active == 'A') ? 
+                                '<span class="badge bg-success rounded-pill"> 정상 </span>' : 
+                                (item.active == 'W') ? '<span class="badge bg-warning rounded-pill"> 대기 </span>' : 
+                                '<span class="badge bg-danger rounded-pill"> 정지 </span>' }
+                            </td>
+                            <td>${moment(item.C_TIME).format("YYYY-MM-DD") }</td>
+                            <td class='text-center'>
+                                <button class="btn btn-sm btn-primary me-1" onclick="showStore('${item.store_code }')"><i class="fas fa-edit"></i> 수정</a>
+                                <button class="btn btn-sm btn-secondary me-1" onclick="showService('${item.store_code }')"><i class="fas fa-cogs"></i> 서비스</a>
+                                <!-- <button class="${(item.app_mart_code != "") ? "d-none" : ""} btn btn-sm btn-danger me-1" onclick="showDeepLink('${item.store_code }')"><i class="fab fa-google-play"></i> 앱연결</a>-->
+                                <button class="btn btn-sm btn-success" onclick="manageLink('${item.store_code }')"><i class="fas fa-hammer"></i> 관리</a>
+                            </td>
+                        </tr>`;
+                    }
+                }
+                document.getElementById("store-main").innerHTML = HTML;
+
+                let pagerHTML = createPagerHTML(response.data.data.count, rowCount, page, 5, "changePage");
+                document.getElementById("store-pager").innerHTML = pagerHTML;
+
+            }
+        })
+        .catch(error => { console.log(error); alert(`가맹점 내역을 가져오지 못했습니다.`);});
+    }
+
+    function changePage(page, rowPerPage) {
+        listStore(page);
+    }
+
+    const getSubAdminToSelect = async (selectElement) => {
+        const callApi = `/api/user/list`; 
+        const html = await axios.post(callApi, {
+            page: 0,
+            rowCount: 0,
+            adminType: "A",
+            active: "A"
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(response => {
+            let html = "<option value=''>대행없음</option>";
+            for (let user of response.data.data.rows) {
+                html += `<option value='${user.login_id}'>${user.name}</option>`;
+            }
+            return html;
+        }).catch(error => {
+            return "<option value=''>대행없음</option>";
+        })
+        selectElement.innerHTML = html;
+    }
+
+    const openAddStoreModal = async () => {
+        // 새로 등록            
+        document.getElementById("store-code").value = "";
+        document.getElementById("store-name").value = "";
+        document.getElementById("m-code").value = "";
+        document.getElementById("mart-code").value = "";
+        document.getElementById("store-name-reg").value = "";
+        document.getElementById("store-regno").value = "";
+        document.getElementById("store-login-id").value = "";
+        document.getElementById("store-login-pwd").value = "";
+        document.getElementById("store-login-pwd-confirm").value = "";
+        document.getElementById("shop-type").value = "U";
+        document.getElementById("store-active").value = "A";
+
+        // 등록된 중간 관리자 목록을 얻어서 select에 채운다
+        await getSubAdminToSelect(document.getElementById("store-manager-id"));
+        
+        const modal = new bootstrap.Modal(document.getElementById('modal-store'));
+        modal.show();
+    }
+
+    async function showStore(storeCode) {
+        // 등록된 중간 관리자 목록을 얻어서 select에 채운다
+        await getSubAdminToSelect(document.getElementById("store-manager-id"));
+
+        // 정보를 얻어온다        
+        await axios.post(`/api/store/get`, {
+            storeCode: storeCode
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {            
+            // console.log(response.data)
+            if (response.data) {
+                let storeData = response.data.data;
+
+                document.getElementById("store-code").value = storeData.store_code;
+                document.getElementById("store-name").value = storeData.name;
+                document.getElementById("m-code").value = storeData.M_MOA_CODE ? storeData.M_MOA_CODE : '';
+                document.getElementById("mart-code").value = storeData.app_mart_code ? storeData.app_mart_code : '';
+                document.getElementById("store-name-reg").value = storeData.name_reg ? storeData.name_reg : '';
+                document.getElementById("store-regno").value = storeData.regno ? storeData.regno : '';
+                document.getElementById("store-login-id").value = storeData.login_id;
+                document.getElementById("store-login-pwd").value = "";
+                document.getElementById("shop-type").value = storeData.shop_type;
+                document.getElementById("store-active").value = storeData.active;
+                document.getElementById("shuket-manager").value = storeData.shuket_manager ? storeData.shuket_manager : "";
+                document.getElementById("store-manager-id").value = storeData.manager_id ? storeData.manager_id : "";
+
+                const modal = new bootstrap.Modal(document.getElementById('modal-store'));
+                modal.show();
+            } else {
+                alert("가맹점 정보를 읽지 못했습니다.");
+            }
+        })
+        .catch(error => { console.log(error); alert("가맹점 정보를 읽지 못했습니다.");});
+    }
+
+    function validation(
+            storeCode,
+            POSType,
+            name, 
+            owener, 
+            regno, 
+            address, 
+            email, 
+            contact,
+            loginId,
+            loginPwd,
+            loginPwdConfirm) {
+
+        if (name.length == 0) {
+            alert("가맹점 명을 입력해야만 합니다.");
+            return false;
+        }
+        if (loginId.length == 0) {
+            alert("로그인 아이디를 입력해야만 합니다.");
+            return false;
+        }
+        if (storeCode == "" && loginPwd.length == 0) {
+            alert("암호를 입력해야만 합니다.");
+            return false;
+        }       
+
+        if (loginPwd != loginPwdConfirm) {
+            alert("암호와 확인 암호가 다릅니다.");
+            return false;
+        }
+        return true;
+    }
+
+    let addProcess = false;
+    async function updateStore() {
+        if (addProcess) return;
+
+        let storeCode = document.getElementById("store-code").value;
+        let mCode = document.getElementById("m-code").value;
+        let martCode = document.getElementById("mart-code").value;
+        let POSType = 'ETC';
+        let name = document.getElementById("store-name").value.trim();
+        let owener = '';
+        let nameReg = document.getElementById("store-name-reg").value.trim();
+        let regno = document.getElementById("store-regno").value.trim();
+        let address = '';
+        let email = '';
+        let contact = '';
+        let loginId = document.getElementById("store-login-id").value;
+        let loginPwd = document.getElementById("store-login-pwd").value;
+        let loginPwdConfirm = document.getElementById("store-login-pwd-confirm").value;
+        let shuketManager = document.getElementById("shuket-manager").value;
+        let managerId = document.getElementById("store-manager-id").value;
+        let shopType = document.getElementById("shop-type").value;
+        let active = document.getElementById("store-active").value;
+       
+        if (!validation(
+            storeCode,
+            POSType,
+            name,
+            owener, 
+            regno, 
+            address, 
+            email, 
+            contact,
+            loginId,
+            loginPwd,
+            loginPwdConfirm)) return;
+
+        addProcess = true;
+        let callApi = ((storeCode == "") ? "/api/store/create" : "/api/store/update");
+        // 정보를 업데이트        
+        await axios.post(callApi, {
+            storeCode: storeCode,
+            mCode: mCode,
+            martCode: martCode,
+            shuketManager: shuketManager,
+            managerId: managerId,
+            POSType: POSType,            
+            name: name, 
+            owener: owener, 
+            nameReg: nameReg,
+            regno: regno, 
+            address: address, 
+            email: email, 
+            contact: contact,
+            loginId: loginId,
+            loginPwd: loginPwd,
+            active: active,
+            shopType: shopType,
+            storeType: 'MT'
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {
+            // console.log(response)
+            if (response.data.result) {
+                self.location.reload();
+            } else {
+                if (response.data.data && response.data.data == 2) {
+                    alert(`가맹점에서 사용하려는 아이디가 이미 존재합니다.`);
+                } else {
+                    alert(`가맹점 정보를 ${(storeCode == "") ? "추가" : "변경"}하지 못했습니다.`);
+                }
+            }
+        })
+        .catch(error => { console.log(error); alert(`가맹점 정보를 ${(storeCode == "") ? "추가" : "변경"}하지 못했습니다.`);});
+        addProcess = false;
+    }
+
+    async function showService(storeCode) {
+        
+        // let mobileUri = "http://localhost:8096";
+        document.getElementById("store-code").value = storeCode;
+        await axios.post(`/api/store/get`, {
+            storeCode: storeCode
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {
+            // console.log(response)
+            if (response.data.data) {                
+                let mobileUri = (response.data.data.shop_type == "U") ? "https://shop.alltok.co.kr?c=" + storeCode: 
+                    (response.data.data.shop_type == "Q") ? "https://shop.qmarket.co.kr?c=" + response.data.data.app_mart_code: 
+                    "https://m.shuket.co.kr?c=" + response.data.data.app_mart_code;
+                
+                let service = response.data.data.service;
+                console.log(service)
+
+                document.getElementById("call-phone").value = service.callPhone;
+                document.getElementById("brand-key").value = (service.brandKey) ? service.brandKey : '';
+                document.getElementById("balance-check").checked = (service.balanceCheck == "Y") ? true : false;
+                // mobileUri = `${mobileUri}?c=${storeCode}`;
+                document.getElementById("shop-url").value = mobileUri;
+                document.getElementById("shop-short-url").value = service.shopShortUrl ? service.shopShortUrl : "";                
+                document.getElementById("shop-index").value = service.shopIndex ? service.shopIndex : '1';
+                document.getElementById("use-shop").checked = (service.useShop == "Y") ? true : false;
+                document.getElementById("allow-appPush").checked = (service.allowAppPush == "Y") ? true : false;
+                document.getElementById("allow-send-repeat").checked = (service.allowSendRepeat && service.allowSendRepeat == "N") ? false : true;
+                
+                document.getElementById("SMS").checked = service.SMS == "Y" ? true : false
+                document.getElementById("LMS").checked = service.LMS == "Y" ? true : false
+                document.getElementById("AT").checked = service.AT == "Y" ? true : false                
+                document.getElementById("RCSSMS").checked = service.RCSSMS == "Y" ? true : false
+                document.getElementById("RCSLMS").checked = service.RCSLMS == "Y" ? true : false
+
+                document.getElementById("kakao-client-id").value = service.kakaoClientId;
+                document.getElementById("kakao-profilekey").value = service.kakaoProfilekey;
+                document.getElementById("kakao-default-template").value = service.kakaoDefaultTemplate ? service.kakaoDefaultTemplate : '';
+
+                document.getElementById("mts-use").checked = service.MTS_use == 'Y' ? true : false;
+                document.getElementById("mts-kakao-profilekey").value = service.MTS_kakaoProfilekey ? service.MTS_kakaoProfilekey : '';
+                document.getElementById("mts-kakao-default-template").value = service.MTS_kakaoDefaultTemplate ? service.MTS_kakaoDefaultTemplate : '';
+
+                document.getElementById("UP-AT").value = service.UP_AT;                
+                document.getElementById("UP-SMS").value = service.UP_SMS;
+                document.getElementById("UP-LMS").value = service.UP_LMS;
+                document.getElementById("UP-RCSSMS").value = service.UP_RCSSMS;
+                document.getElementById("UP-RCSLMS").value = service.UP_RCSLMS;
+
+                document.getElementById("android-scheme").value = service.androidScheme ? service.androidScheme : '';
+                document.getElementById("android-package").value = service.androidPackage ? service.androidPackage : '';
+                document.getElementById("ios-appId").value = service.iosAppId ? service.iosAppId : '';
+
+                const modal_service = new bootstrap.Modal(document.getElementById('modal-service'));
+                modal_service.show();
+            }
+        });
+    }
+
+    async function saveService() {
+        const storeCode = document.getElementById("store-code").value;
+
+        const callPhone = document.getElementById("call-phone").value;
+        const balanceCheck = document.getElementById("balance-check").checked ? "Y" : "N";
+        const useShop = document.getElementById("use-shop").checked ? "Y" : "N";        
+        const allowAppPush = document.getElementById("allow-appPush").checked ? "Y" : "N";
+        const allowSendRepeat = document.getElementById("allow-send-repeat").checked ? "Y" : "N";
+        const shopShortUrl = document.getElementById("shop-short-url").value;
+        const shopIndex = document.getElementById("shop-index").value;    
+        const SMS = document.getElementById("SMS").checked ? "Y" : "N";
+        const LMS = document.getElementById("LMS").checked ? "Y" : "N";
+        const AT = document.getElementById("AT").checked ? "Y" : "N";
+        const RCSSMS = document.getElementById("RCSSMS").checked ? "Y" : "N";
+        const RCSLMS = document.getElementById("RCSLMS").checked ? "Y" : "N";
+
+        const brandKey = document.getElementById("brand-key").value;
+        const kakaoClientId = document.getElementById("kakao-client-id").value;
+        const kakaoProfilekey = document.getElementById("kakao-profilekey").value;
+        const kakaoDefaultTemplate = document.getElementById("kakao-default-template").value;
+
+        const MTS_use = document.getElementById("mts-use").checked ? "Y" : "N";
+        const MTS_kakaoProfilekey = document.getElementById("mts-kakao-profilekey").value;
+        const MTS_kakaoDefaultTemplate = document.getElementById("mts-kakao-default-template").value;
+        
+        const androidScheme = document.getElementById("android-scheme").value;
+        const androidPackage = document.getElementById("android-package").value;
+        const iosAppId = document.getElementById("ios-appId").value;
+
+        const UP_AT = document.getElementById("UP-AT").value;        
+        const UP_SMS = document.getElementById("UP-SMS").value;
+        const UP_LMS = document.getElementById("UP-LMS").value;        
+        const UP_RCSSMS = document.getElementById("UP-RCSSMS").value;
+        const UP_RCSLMS = document.getElementById("UP-RCSLMS").value;
+
+
+        await axios.post(`/api/store/service/save`, {
+            storeCode: storeCode,
+            callPhone: callPhone,
+            balanceCheck: balanceCheck,
+            useShop: useShop,
+            allowAppPush: allowAppPush,
+            allowSendRepeat: allowSendRepeat,
+            shopShortUrl: shopShortUrl,
+            shopIndex: shopIndex,            
+            SMS: SMS,
+            LMS: LMS,            
+            AT: AT,            
+            RCSSMS: RCSSMS,
+            RCSLMS: RCSLMS,            
+            brandKey: brandKey,
+            kakaoClientId: kakaoClientId,
+            kakaoProfilekey: kakaoProfilekey,
+            kakaoDefaultTemplate: kakaoDefaultTemplate,
+            MTS_use: MTS_use,
+            MTS_kakaoProfilekey: MTS_kakaoProfilekey,
+            MTS_kakaoDefaultTemplate: MTS_kakaoDefaultTemplate,
+            androidScheme: androidScheme,
+            androidPackage: androidPackage,
+            iosAppId: iosAppId,
+            UP_AT: (UP_AT.length != 0) ? UP_AT : '0',            
+            UP_SMS: (UP_SMS.length != 0) ? UP_SMS : '0',
+            UP_LMS: (UP_LMS.length != 0) ? UP_LMS : '0',            
+            UP_RCSSMS: (UP_RCSSMS.length != 0) ? UP_RCSSMS : '0',
+            UP_RCSLMS: (UP_RCSLMS.length != 0) ? UP_RCSLMS : '0'            
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {
+            // console.log(response)
+            if (response.data.result) {                
+                let modal = bootstrap.Modal.getInstance(document.getElementById('modal-service'));
+                modal.hide();
+            } else {
+                alert("서비스 이용 정보를 저장하지 못했습니다.");
+            }
+        }).catch(error => { console.log(error); alert("서비스 이용 정보를 저장하지 못했습니다.");});
+    }
+
+    // async function showDeepLink(store_code) {
+    //     document.getElementById("deeplink-storeCode").value = store_code;
+    //     // 정보를 얻어온다        
+    //     await axios.post(`${apiServer}/affiliatedStore/apiGetDeepLink`, {
+    //         store_code: store_code
+    //     }, {
+    //         headers: {
+    //             xtoken: getCookie("xToken")
+    //         }
+    //     })
+    //     .then(returnResult => {
+    //         // console.log(returnResult);
+    //         if (returnResult.statusText == "OK" && returnResult.data) {
+    //             if (returnResult.data.data == null) {
+    //                 document.getElementById("direct-link").value = "N";
+    //                 document.getElementById("android-scheme").value = "";
+    //                 document.getElementById("android-package").value = "";
+    //                 document.getElementById("ios-appId").value = "";
+    //                 document.getElementById("ios-scheme").value = "";
+    //             } else {
+    //                 let deepLink = returnResult.data.data;
+    //                 document.getElementById("direct-link").value = deepLink.DIRECT_LINK;
+    //                 document.getElementById("android-scheme").value = deepLink.ANR_SCHEME;
+    //                 document.getElementById("android-package").value = deepLink.ANR_PACKAGE;
+    //                 document.getElementById("ios-appId").value = deepLink.IOS_APPID;
+    //                 document.getElementById("ios-scheme").value = deepLink.IOS_SCHEME;
+    //             }
+                
+    //             const modal_deeplink = new bootstrap.Modal(document.getElementById('modal-deeplink'));
+    //             modal_deeplink.show();
+    //         } else {
+    //             alert("Deep Link 정보를 읽지 못했습니다.");
+    //         }
+    //     })
+    //     .catch(error => { console.log(error); alert("Deep Link 정보를 읽지 못했습니다.");});
+    // }
+
+    // const saveDeepLink = async () => {
+    //     // 정보를 얻어온다
+    //     let storeCode = document.getElementById("deeplink-storeCode").value;
+    //     let directLink = document.getElementById("direct-link").value;
+    //     let androidScheme = document.getElementById("android-scheme").value.trim();
+    //     let androidPackage = document.getElementById("android-package").value.trim();
+    //     let iosAppId = document.getElementById("ios-appId").value.trim();
+    //     let iosScheme = document.getElementById("ios-scheme").value.trim();
+    //     await axios.post(`${apiServer}/affiliatedStore/apiSaveDeepLink`, {
+    //         storeCode: storeCode,
+    //         directLink: directLink,
+    //         androidScheme: androidScheme,
+    //         androidPackage: androidPackage,
+    //         iosAppId: iosAppId,
+    //         iosScheme: iosScheme
+    //     }, {
+    //         headers: {
+    //             xtoken: getCookie("xToken")
+    //         }
+    //     })
+    //     .then(returnResult => {
+    //         // console.log(returnResult);
+    //         if (returnResult.statusText == "OK" && returnResult.data) {
+    //             let modal_deeplink = bootstrap.Modal.getInstance(document.getElementById('modal-deeplink'));
+    //             modal_deeplink.hide();
+    //         } else {
+    //             alert("Deep Link 정보를 저장하지 못했습니다.");
+    //         }
+    //     })
+    //     .catch(error => { console.log(error); alert("Deep Link 정보를 저장하지 못했습니다.");});
+    // }
+
+    const changeRCS = (serviceType) => {
+        if (document.getElementById("RCS" + serviceType).checked) document.getElementById(serviceType).checked = document.getElementById("RCS" + serviceType).checked;
+    }
+
+    const checkRCS = (serviceType) => {
+        if (document.getElementById("RCS" + serviceType).checked) document.getElementById(serviceType).checked = true;
+    }
+
+    const manageLink = (storeCode) => {
+        let xToken = getCookie("xToken");
+        if (appStatus == "development") {
+            window.open(`http://localhost:4003/auth/manage/${storeCode}/${xToken}`)
+        } else {
+            window.open(`https://www.alltok.co.kr/auth/manage/${storeCode}/${xToken}`)
+        }
+    }
+</script>
+

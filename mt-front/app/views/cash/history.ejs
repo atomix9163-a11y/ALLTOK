@@ -1,0 +1,169 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-sm-2">
+                        <input type="date" class="form-control" id="start-date" name="start-date" value="2018-07-22" min="2022-01-01" max="2050-12-31" />
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="date" class="form-control" id="end-date" name="end-date" value="2018-07-22" min="2022-01-01" max="2050-12-31" />
+                    </div>
+                    <div class="col-sm">
+                        <button id="search" class="fc-today-button btn btn-primary" type="button" onclick="search()">검색</button>
+                    </div>
+                </div>
+                <div class="row table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead class="">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">날짜</th>
+                                <th scope="col">시간</th>
+                                <th scope="col">구분</th>
+                                <th scope="col" class="text-end">금액</th>
+                                <th scope="col" class="text-end">충전 전 잔액</th>
+                                <th scope="col" class="text-end">충전 후 잔액</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-main">
+                            
+                        </tbody>
+                    </table>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center" id="history-main-pager"></ul>
+                    </nav>
+            </div>
+
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->
+
+<%- contentFor('script') %>
+<script>
+    const rowCount = 10;
+    const storeCode = '<%=user.storeCode %>';
+    let currentPage = 1;
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        let d = new Date();
+        let lastMonthDate = new Date(moment().add(-6, 'month').format("YYYY-MM-DD"));
+        document.getElementById("start-date").value = [lastMonthDate.getFullYear(), (lastMonthDate.getMonth() + 1).AddZero(), lastMonthDate.getDate().AddZero()].join('-');
+        document.getElementById("end-date").value = [d.getFullYear(), (d.getMonth() + 1).AddZero(), d.getDate().AddZero()].join('-');
+
+        showHistoryMainList(currentPage);
+    })
+
+    function search() {
+        currentPage = 1;
+        showHistoryMainList(currentPage);
+    }
+
+    async function showHistoryMainList(page) {
+        let startDate = document.getElementById("start-date").value;
+        let endDate = document.getElementById("end-date").value;
+        
+        let callApi = `${apiServer}/cash/apiCashHistoryList`;
+        await axios.post(callApi, {
+            storeCode: storeCode,
+            startDate: startDate,
+            endDate: endDate,
+            page: page,
+            rowCount : rowCount
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {
+            if (response.data.result && response.data.data.rows) {
+                let historyHTML = "";
+                let num = response.data.data.count - (page - 1) * rowCount;                
+                for (let history of response.data.data.rows) {
+                    historyHTML += `                    
+                        <tr>
+                            <th scope="row">${num--}</th>
+                            <td>${moment(history.c_time).format('YYYY-MM-DD')}</td>
+                            <td>${moment(history.c_time).format('HH:mm:ss')}</td>
+                            <td>${(history.cash_type == "A") ? "적립" : (history.cash_type == "R") ? "차감" : "정정"}</td>
+                            <td class='text-end'>${numeral(history.amount).format("0,0.0")} 원</td>
+                            <td class='text-end'>${(history.old_balance) ? numeral(history.old_balance).format("0,0.0") : "-"} 원</td>
+                            <td class='text-end'>${(history.balance) ? numeral(history.balance).format("0,0.0") : "-"} 원</td>
+                        </tr>
+                            `
+                }
+                document.getElementById("history-main").innerHTML = historyHTML;
+
+                let pagerHTML = createPagerHTML(response.data.data.count, rowCount, page, 5, "changePageMain");
+                document.getElementById("history-main-pager").innerHTML = pagerHTML;
+
+            } else {
+                document.getElementById("history-main").innerHTML = "";
+                document.getElementById("history-main-pager").innerHTML = "";
+            }
+        })
+        .catch(error => { console.log(error); alert(`충전 내역을 가져오지 못했습니다.`);;});
+    }
+
+    function changePageMain(page, rowPerPage) {
+        // self.location.href = "/history/list?page=" + page;
+        // document.getElementById("history-detail").innerHTML = "";
+        // document.getElementById("history-detail-pager").innerHTML = "";
+
+        currentPage = page;
+        showHistoryMainList(page);
+    }
+
+    async function showHistoryDetailList(send_code, page) {
+        let callApi = `${apiServer}/history/apiDetailList`;
+        await postData(callApi, {
+            send_code: send_code,
+            page: page,
+            rowCount : rowCount
+        })
+        .then(response => {
+            if (response && response.result) {
+                let historyHTML = "";
+                let num = response.data.count - (page - 1) * rowCount;
+                for (let historyDetail of response.data.rows) {
+                    historyHTML += `                    
+                        <tr>
+                            <th scope="row">${num--}</th>
+                            <td>${historyDetail.phone}</td>
+                            <td>${(historyDetail.send_method == "K") ? ((historyDetail.response == "W") ? "대기" : (historyDetail.response == "S") ? "발송성공" : (historyDetail.response == "C") ? "취소"  : "발송실패") : ""}</td>
+                        </tr>`
+                }
+                document.getElementById("history-detail").innerHTML = historyHTML;
+
+                let pagerHTML = createPagerHTML(response.data.count, rowCount, page, 5, "changePageDetail");
+                document.getElementById("history-detail-pager").innerHTML = pagerHTML;
+
+            }
+        })
+        .catch(error => { console.log(error); alert(`발송 내역을 가져오지 못했습니다.`);;});
+    }
+
+    async function cancelReserve(send_code) {
+        let callApi = `${apiServer}/history/apiCancelReserve`;
+        await postData(callApi, {
+            send_code: send_code
+        })
+        .then(response => {
+            if (response && response.result) {
+                showHistoryMainList(currentPage);
+            } else {
+                alert(`발송 예약 취소가 실패했습니다.`)
+            }
+        })
+        .catch(error => { console.log(error); alert(`발송 예약 취소가 실패했습니다.`);});
+    }
+</script>

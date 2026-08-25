@@ -1,0 +1,558 @@
+/* @font-face {
+    font-family: 'S-CoreDream-3Light';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+} */
+@import url(//fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+.notosanskr * { 
+ font-family: 'Noto Sans KR', sans-serif;
+}
+
+@import url('https://cdn.rawgit.com/moonspam/NanumSquare/master/nanumsquare.css');
+* {
+    font-family: "notosanskr" !important;
+}
+
+body * {
+    font-family: "notosanskr" !important;
+}
+
+.clean-spam {
+    position: absolute;
+    left: 150px;
+}
+
+@media (max-width: 991px) {
+    .clean-spam {
+      display: none;
+    }
+}
+
+.mainnav__inner .mainnav__categoriy.card  .mainnav__menu>.nav-item>.nav-link {
+    font-size: 16px;
+    font-weight: 500;
+    color: #000;
+}
+
+.mainnav__inner .mainnav__categoriy.card  .mainnav__menu>.nav-item>.nav-link.active {
+    color: #fff;
+}
+
+.mainnav__avatar {
+    width: 100%;
+}
+
+.fs-7 {
+    font-size: .675rem!important;
+}
+
+.phone {
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    overflow-wrap: anywhere;
+    max-width: 249px;
+    height: 493px;
+    background-image: URL('/assets/img/alltok/phone-sms.png');
+    padding-top: 70px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 80px;
+}
+
+.phone.phone-rcs {
+    background-image: URL('/assets/img/alltok/phone-sms.png');
+}
+
+.phone.phone-kakao {
+    background-image: URL('/assets/img/alltok/phone-kko.png');
+}
+
+.phone.phone-kakaoFT {
+    background-image: URL('/assets/img/alltok/phone-kkoft.png');
+}
+
+.phone.phone-app {
+    background-image: URL('/assets/img/alltok/phone-app.png');
+}
+
+.phone.phone-push {
+    padding-top: 40px;
+    background-image: URL('/assets/img/alltok/phone-blank.png');
+}
+
+.phone .review-title {
+    padding-left: 50px;   
+    max-width: 200px;
+}
+
+.phone-push .review-title {
+    padding-left: 5px;   
+    max-width: 200px;
+    font-weight: 900;
+}
+
+
+.phone .review {
+    margin-top: 50px;
+    margin-left: 0px;
+    margin-right: 0px;
+    height: 350px;
+    background-color: #EEEEEE !important;
+    overflow: auto;
+    border-radius: calc(1rem - 1px);    
+    padding: 10px;
+    overflow-wrap: anywhere;
+    overflow-x: hidden;
+    font-size: 9pt;
+}
+
+.phone.phone-push .review {
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    height: auto;
+    max-height: 430px;
+    background-color: #FFFFFF !important;
+    overflow: auto;
+    border-radius: 0 0 calc(1rem - 1px) calc(1rem - 1px);
+    background-color: white;
+    padding: 10px;
+    overflow-wrap: anywhere;
+    overflow-x: hidden;
+    font-size: 8pt;
+}
+
+
+.phone.phone-kakao .review {
+    margin-top: 90px;
+    margin-left: 26px;
+    margin-right: 5px;
+    height: auto;
+    background-color: #FFFFFF !important;
+    overflow: auto;
+    border-radius: 0 0 calc(1rem - 1px) calc(1rem - 1px);
+    background-color: white;
+    padding: 10px;
+    overflow-wrap: anywhere;
+    overflow-x: hidden;
+    font-size: 8pt;
+}
+
+.phone.phone-kakaoFT .review {
+    margin-top: 40px;
+    margin-left: 26px;
+    margin-right: 5px;
+    min-height: 50px;
+    height: auto;
+    background-color: #FFFFFF !important;
+    overflow: auto;
+    border-radius: calc(1rem - 1px);
+    background-color: white;
+    padding: 10px;
+    overflow-wrap: anywhere;
+    overflow-x: hidden;
+    font-size: 8pt;
+}
+
+#app-push-review {
+    background-color: #f5f6f8;
+    height: 157px;
+    overflow: auto;
+}
+
+
+
+/* 큰 크기 미리 보기 */
+.phone-l {
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    overflow-wrap: anywhere;
+    max-width: 324px;
+    min-width: 324px;
+    max-height: 641px;
+    min-height: 641px;
+    padding-top: 160px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 80px;
+    background-image: URL('/assets/img/alltok/phone-sms-l.png');
+    /* overflow: auto; */
+}
+
+.phone-l.phone-kakao {
+    background-image: URL('/assets/img/alltok/phone-kko-l.png');
+}
+
+.phone-l.phone-kakao .review {
+    margin-top: 49px;
+    margin-left: 40px;
+    margin-right: 12px;
+    height: auto;
+    background-color: #FFFFFF !important;
+    overflow: auto;
+    border-radius: 0 0 calc(1rem - 1px) calc(1rem - 1px);
+    background-color: white;
+    padding: 10px;
+    overflow-wrap: anywhere;
+    overflow-x: hidden;
+    font-size: 8pt;
+}
+/* 큰 크기 미리 보기 끝 */
+
+/* 큰 크기 미리 푸시 보기 */
+.phone-l.phone-app {
+    background-image: URL('/assets/img/alltok/phone-app-l.png');
+}
+.phone-l.phone-push .review-icon img {
+    max-width: 20px;
+}
+.phone-l.phone-push .review-photo img {
+    width: 100%;
+}
+#modal-app-push-review .modal-content {
+    width: 360px;
+}
+.phone-l.phone-app #review-title {
+    padding-top: 2px;
+    font-size: 8pt;
+}
+
+.phone-l.phone-app #review-title .appPushTitleIcon,
+.phone-l.phone-app #appPush-review-title .appPushTitleIcon {
+    padding-top: 5px;
+    max-width: 40px;
+}
+.phone-l.phone-app #appPush-review-title,
+.phone-l.phone-app #appPush-review-text {
+    text-align: left;
+}
+.phone-l.phone-app #appPush-review-title {
+    font-size: 14px;
+    margin-top: -65px;
+}
+.phone-app .review {
+    margin-top: 100px;
+    margin-left: 0px;
+    margin-right: 0px;
+    height: 380px;    
+    overflow: auto;    
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: calc(1rem - 1px);
+    border-bottom-right-radius: calc(1rem - 1px);
+    background-color: white !important;
+    overflow-wrap: anywhere;
+    overflow-x: hidden;
+    font-size: 9pt;
+    padding: 10px;
+}
+/* 큰 크기 미리 푸시 보기 끝 */
+
+/* 큰 SMS 미리 보기 */
+
+/* 큰 SMS 미리 보기 끝 */
+
+/* 큰 모바일웹 미리 보기 */
+.phone-mobile {
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    overflow-wrap: anywhere;
+    max-width: 378px;
+    min-width: 378px;
+    max-height: 764px;
+    min-height: 764px;
+    padding-top: 60px;
+    padding-left: 22px;
+    padding-right: 22px;
+    padding-bottom: 100px;
+    background-image: URL('/assets/img/alltok/phone-blank.png');
+    font-size: 12pt;
+
+}
+/* 큰 모바일웹 미리 보기 끝 */
+
+.btn-group-modify {
+    position: absolute;
+    right: 45px;
+}
+
+.btn-group-delete {
+    position: absolute;
+    right: 5px;
+}
+
+.btn-group-recover {
+    position: absolute;
+    right: 5px;
+}
+
+#group-list a.active .btn-group-modify,
+#group-list a.active .btn-group-delete {
+    color: white
+}
+
+.text-area-editorable {
+    background-color: aliceblue;
+}
+
+.btn-kakao {
+    color: #888;
+    background-color: #ddd;
+    border-color: #ddd;
+}
+
+#rcs-text-count,
+#text-count {
+    position: relative;
+    top: -30px;
+    left: 10px;
+}
+
+/* 전단지 - 상품 세트 */
+
+#leaflet-thumbnail-view img {
+    width: 100%;
+}
+
+#modal-product-select label {
+    margin-bottom: 0 !important;
+}
+
+#modal-product-select .table>:not(caption)>*>* {
+    padding: 0.4rem;
+}
+
+.template-list .form-switch {   
+    position: relative;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select: none;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#leaflet-review {
+    /* border: 1px solid red; */
+    max-height: 640px;
+    overflow: auto;
+    background-color: #fff;
+}
+
+/* ckeditor 설정 */
+#push-content-area .ck-editor__editable {
+    min-height: 420px !important;
+    max-height: 420px;
+}
+
+#push-content-area .ck-editor__editable_inline {
+    
+}
+
+#info-content-area .ck-editor__editable {
+    min-height: 150px !important;
+}
+
+.ck-editor__editable p {
+    margin-bottom: 0rem !important;
+}
+
+.product-setting .table>:not(caption)>*>* {
+    padding: 5px;
+}
+
+.form-control-sm {  
+    padding: .25rem .25rem;
+}
+
+.btn-product-photo-add {
+    width: 50px;
+    height: 50px;
+}
+
+.btn-product-leafet-add i {
+    margin-top: 3em;
+}
+
+.btn-product-leafet-add {
+    position: relative;
+    /* width: 100%;
+    height: 90px; */
+    text-align: center;
+    border-radius: 5px;
+    background-color: #EEEEEE;
+    min-height: 90px;
+ }
+
+ .btn-product-leafet-add img {
+    /* position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); */
+    width: 100%;
+ }
+
+
+ .file_upload {
+    opacity: 0.0;
+ 
+    /* IE 8 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+ 
+    /* IE 5-7 */
+    filter: alpha(opacity=0);
+  
+    /* Netscape or and older firefox browsers */
+    -moz-opacity: 0.0;
+ 
+    /* older Safari browsers */
+    -khtml-opacity: 0.0;
+ 
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height:100%;
+ }
+
+ .dt-leaflet-date {
+    min-width: 100px;
+ }
+
+ #mart-logo {
+    max-height: 35px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+ }
+
+ #section-list {
+    max-height: 950px;
+    overflow: auto;
+ }
+
+ /* 글꼴 크기 조정 */
+ .nav-link {
+    font-size: 110% !important;
+ }
+
+ .col-form-label {
+    font-size: 110% !important;
+ }
+
+ label {
+    font-size: 110% !important;
+ }
+
+.form-control,
+.form-select {
+    font-size: 110% !important;
+}
+
+#section-list .section-switch {
+    margin-left: 10px;
+}
+
+#section-list .section-switch .form-check-input:checked {
+    background-color: green;
+    border-color: white;
+}
+
+#section-list .moveArrow {
+    width: 50px; 
+    height: 50px;
+    padding-top: 12px;
+    /* cursor: n-resize; */
+}
+
+#section-list .product-image {
+    width: 50px;
+    height: 50px;
+}
+
+#section-list .product-name {
+    width: 100%;
+    height: 30px;
+    padding-top: 5px;
+}
+
+#section-list .product-price {
+    width: 150px;
+    height: 30px;
+    padding-top: 5px;
+}
+
+#section-list .product-remove {
+    width: 50px;
+    height: 30px;
+    padding-top: 12px;
+}
+
+#section-list .product-switch {
+    margin-left: 10px;
+    padding-top: 12px;
+}
+
+.ghost {
+    opacity: .4;
+}
+  
+#loading,
+#sendProcess,
+#syncProcess {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    /* opacity: 0.7; */
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+}
+
+#loading .dialog,
+#sendProcess .dialog,
+#syncProcess .dialog {
+    background-color: white;
+    text-align: center;
+    border-radius: 20px;
+    width: 500px;
+    z-index: 100;
+    padding: 30px;
+}
+
+#payment-FAQ button {
+    font-weight: 900;
+}
+
+.top-notice {
+    font-size: 12px !important;
+    margin: 0px 20px 0px 20px;
+    padding: 10px;
+    background-color: #fcf3f3;
+}
+
+.top-notice p {
+    margin-bottom: 0rem !important;
+}
+
+.top-notice p .text-tiny {
+    font-size: 0.7em;
+}
+
+.top-notice p .text-small {
+    font-size: 0.85em;
+}
+
+.top-notice p .text-big {
+    font-size: 1.4em;
+}
+
+.top-notice p .text-huge {
+    font-size: 1.8em
+}

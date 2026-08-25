@@ -1,0 +1,35 @@
+
+<link href="http://127.0.0.1:4001/public/stylesheets/template/TMPL000001.css" id="css-TMPL000001" rel="stylesheet" type="text/css" />
+            <div id="main-template-25">
+                <div class="page-content-template">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="head-banner-template"><img alt="head_template" src="https://s3.ap-northeast-2.amazonaws.com/moa.images/catalogs/background/background_template25.png" /></div>
+                            </div>
+                        </div>
+                        <div class="row list-block-product-cate">
+                            $category{
+                            <div class="col-md-12 banner-cate">
+                                <img  src="https://s3.ap-northeast-2.amazonaws.com/moa.images/catalogs/background/mark_icon.png"  style="width:100%" /><span>${category_name}</span>
+                            </div>
+                            <div class="products-cate">
+                                $sub{
+                                    <div class="s-product">
+                                        <img class="s-product-image" alt="${product_name}" src="${product_imageUri}" />
+                                        <div class="s-product-cart-content">
+                                            <img onClick="${product_action}" alt="CartIcon" class="s-product-cart-icon" src="https://s3.ap-northeast-2.amazonaws.com/moa.images/catalogs/cart_icon_36_36.png" />
+                                        </div>
+                                        <div class="s-product-title">${product_name}</div>                                                
+                                        <div class="s-product-price">${product_sale_price}원</div>
+                                    </div>
+                                }$sub
+                            </div>
+                            }$category
+                            <!-- end row -->
+                        </div> <!-- container-fluid -->
+                    </div>
+                    <!-- End Page-content -->
+                </div>
+            </div>
+    

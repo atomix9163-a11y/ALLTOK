@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <%- include("header.ejs") %>
+        <%- include("header-css.ejs") %>
+        <%-style %>
+    </head>
+   
+    <body class="jumping">
+
+        <!-- PAGE CONTAINER -->
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <div id="root" class="root mn--max">
+    
+            <!-- CONTENTS -->
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+            <section id="content" class="content">
+                <div class="content__header content__boxed overlapping">
+                    <div class="content__wrap">
+    
+                        <!-- Breadcrumb -->
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><%-pageTitle %></li>
+                            </ol>
+                        </nav>
+                        <!-- END : Breadcrumb -->
+    
+                        <h1 class="page-title mb-0 mt-2"><%-pageTitle %></h1>
+    
+                        <p class="lead">
+                            Add your own content to this blank page.
+                        </p>
+    
+                    </div>
+    
+                </div>
+    
+                <!-- FOOTER -->
+                <footer class="mt-auto">
+                    <div class="content__boxed">
+                        <div class="content__wrap py-3 py-md-1 d-flex flex-column flex-md-row align-items-md-center">
+                            <div class="text-nowrap mb-4 mb-md-0">Copyright &copy; 2022 <a href="#" class="ms-1 btn-link fw-bold">My Company</a></div>
+                            <nav class="nav flex-column gap-1 flex-md-row gap-md-3 ms-md-auto" style="row-gap: 0 !important;">
+                                <a class="nav-link px-0" href="#">Policy Privacy</a>
+                                <a class="nav-link px-0" href="#">Terms and conditions</a>
+                                <a class="nav-link px-0" href="#">Contact Us</a>
+                            </nav>
+                        </div>
+                    </div>
+                </footer>
+                <!-- END - FOOTER -->
+    
+            </section>
+    
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+            <!-- END - CONTENTS -->
+    
+            <!-- HEADER -->
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+            <header class="header">
+                <div class="header__inner">
+    
+                    <!-- Brand -->
+                    <div class="header__brand">
+                        <div class="brand-wrap">
+    
+                            <!-- Brand logo -->
+                            <a href="/">
+                                <img src="/assets/img/alltok-logo-3-light.png" alt="" height="22">
+                            </a>
+    
+                            <!-- You can also use IMG or SVG instead of a text element. -->
+    
+                        </div>
+                    </div>
+                    <!-- End - Brand -->
+    
+                    <div class="header__content">
+    
+                        <!-- Content Header - Left Side: -->
+                        <div class="header__content-start">
+    
+                        </div>
+                        <!-- End - Content Header - Left Side -->
+    
+                        <!-- Content Header - Right Side: -->
+                        <div class="header__content-end">
+       
+                            <!-- User dropdown -->
+                            <div class="dropdown">
+    
+                                <!-- Toggler -->
+                                <button class="header__btn btn btn-icon btn-sm" type="button" data-bs-toggle="dropdown" aria-label="User dropdown" aria-expanded="false">
+                                    <i class="demo-psi-male"></i>
+                                </button>
+    
+                                <!-- User dropdown menu -->
+                                <div class="dropdown-menu dropdown-menu-end w-md-450px">
+    
+                                    <!-- User dropdown header -->
+                                    <div class="d-flex align-items-center border-bottom px-3 py-2">
+                                        <div class="flex-shrink-0">
+                                            <img class="img-sm rounded-circle" src="./assets/img/profile-photos/4.png" alt="Profile Picture" loading="lazy">
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h5 class="mb-0"><%=user.name %></h5>
+                                            <span class="text-muted fst-italic"><%=user.loginId %></span>
+                                        </div>
+                                    </div>
+    
+                                    <div class="row">
+                                        <div class="col-md-7">
+    
+                                            <!-- Simple widget and reports -->
+                                            <div class="list-group list-group-borderless mb-3">
+                                                <div class="list-group-item text-center border-bottom mb-3">
+                                                    <p class="h1 display-1 text-green"><%=affiliatedStoreCount.A %></p>
+                                                </div>
+                                            </div>
+    
+                                        </div>
+                                        <div class="col-md-5">
+    
+                                            <!-- User menu link -->
+                                            <div class="list-group list-group-borderless h-100 py-3">
+                                                    
+                                                <a href="/auth/logout" class="list-group-item list-group-item-action">
+                                                    <i class="demo-pli-unlock fs-5 me-2"></i> 로그아웃
+                                                </a>
+                                            </div>
+    
+                                        </div>
+                                    </div>
+    
+                                </div>
+                            </div>
+                            <!-- End - User dropdown -->
+                        </div>
+                    </div>
+                </div>
+            </header>
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+            <!-- END - HEADER -->
+    
+            <!-- MAIN NAVIGATION -->
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+            <nav id="mainnav-container" class="mainnav">
+                <div class="mainnav__inner">
+    
+                    <!-- Navigation menu -->
+                    <div class="mainnav__top-content scrollable-content pb-5">
+    
+                        <!-- Profile Widget -->
+                        <div class="mainnav__profile mt-3 d-flex3">
+    
+                            <div class="mt-2 d-mn-max"></div>
+    
+                            <!-- Profile picture  -->
+                            <div class="mininav-toggle text-center py-2">
+                                <img class="mainnav__avatar img-md rounded-circle border" src="/assets/img/profile-photos/4.png" alt="Profile Picture">
+                            </div>
+        
+                        </div>
+                        <!-- End - Profile widget -->
+                        <%- include("sidebar.ejs") %>
+                                
+                    </div>
+                    <!-- End - Navigation menu -->
+    
+                </div>
+            </nav>
+            <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+            <!-- END - MAIN NAVIGATION -->
+       
+        </div>
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <!-- END - PAGE CONTAINER -->
+    
+        <%- include("footer.ejs") %>
+        <%-script %>
+    </body>
+</html>

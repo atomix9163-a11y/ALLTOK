@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <%- include("header.ejs") %>
+        <%- include("header-css.ejs") %>
+        <%-style %>
+    </head>
+   
+    <body class="jumping">
+
+        <!-- PAGE CONTAINER -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <div id="root" class="root mn--max">
+
+        <!-- CONTENTS -->
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <section id="content" class="content">
+            <div class="content__header content__boxed">
+                <div class="content__wrap">
+
+                    <!-- Breadcrumb -->
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page"><%-pageTitle %></li>
+                        </ol>
+                    </nav>
+                    <!-- END : Breadcrumb -->
+
+                    <h1 class="page-title mb-0 mt-2"><%-pageTitle %></h1>
+
+                    <p class="lead">
+                        
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="content__boxed">
+                <div class="content__wrap">
+                    <%-content %>
+                </div>
+            </div>
+            <!-- FOOTER -->
+            <footer class="mt-auto">
+                <div class="content__boxed">
+                    <div class="content__wrap py-3 py-md-1 d-flex flex-column flex-md-row align-items-md-center">
+                        <div class="text-nowrap mb-4 mb-md-0">Copyright &copy; 2024 <a href="#" class="ms-1 btn-link fw-bold">Alltok</a></div>
+                    </div>
+                </div>
+            </footer>
+            <!-- END - FOOTER -->
+
+        </section>
+
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <!-- END - CONTENTS -->
+
+        <!-- HEADER -->
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <header class="header">
+            <div class="header__inner">
+
+                <!-- Brand -->
+                <div class="header__brand">
+                    <div class="brand-wrap">
+
+                        <!-- Brand logo -->
+                        <a href="/" class="stretched-link">                            
+                            <img src="/assets/img/alltok-logo-small.png" alt="Nifty Logo" class="Nifty logo" height="40" width="40">
+                        </a>
+
+                        <!-- Brand title -->
+                        <div class="brand-title"><img src="/assets/img/alltok-logo-4-light.png" class="img-fluid"></div>
+
+                        <!-- You can also use IMG or SVG instead of a text element. -->
+
+                    </div>
+                </div>
+                <!-- End - Brand -->
+
+                <div class="header__content">
+
+                    <!-- Content Header - Left Side: -->
+                    <div class="header__content-start">
+
+                        <!-- Navigation Toggler -->
+                        <button type="button" class="nav-toggler header__btn btn btn-icon btn-sm" aria-label="Nav Toggler">
+                            <i class="demo-psi-view-list"></i>
+                        </button>
+
+                        <!-- Searchbox -->
+                        <div class="header-searchbox">
+
+                            <!-- Searchbox toggler for small devices -->
+                            <label for="header-search-input" class="header__btn d-md-none btn btn-icon rounded-pill shadow-none border-0 btn-sm" type="button">
+                                <i class="demo-psi-magnifi-glass"></i>
+                            </label>
+
+                        </div>
+                    </div>
+                    <!-- End - Content Header - Left Side -->
+
+                    <!-- Content Header - Right Side: -->
+                    <div class="header__content-end">
+
+                        <!-- User dropdown -->
+                        <div class="dropdown">
+
+                            <!-- Toggler -->
+                            <button class="header__btn btn btn-icon btn-sm" type="button" data-bs-toggle="dropdown" aria-label="User dropdown" aria-expanded="false">
+                                <i class="demo-psi-male"></i>
+                            </button>
+
+                            <!-- User dropdown menu -->
+                            <div class="dropdown-menu dropdown-menu-end w-md-450px">
+
+                                <!-- User dropdown header -->
+                                <div class="d-flex align-items-center border-bottom px-3 py-2">
+                                    <div class="flex-shrink-0">
+                                        <img class="img-sm rounded-circle" src="/assets/img/profile-photos/1.png" alt="Profile Picture" loading="lazy">
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h5 class="mb-0"><%=user.name %></h5>
+                                        <span class="text-muted fst-italic"><%=user.loginId %></span>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-7">
+
+                                        <!-- Simple widget and reports -->
+                                        <div class="list-group list-group-borderless mb-3">
+                                            <div class="list-group-item text-center">
+                                                <p class="h1 display-1 text-green"><%=storeCount.A %></p>
+                                                <p class="h6 mb-0">등록 가맹점 수</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-5">
+
+                                        <!-- User menu link -->
+                                        <div class="list-group list-group-borderless h-100 py-3">
+                                            <a href="/auth/logout" class="list-group-item list-group-item-action">
+                                                <i class="demo-pli-unlock fs-5 me-2"></i> 로그아웃
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- End - User dropdown -->
+
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <!-- END - HEADER -->
+
+        <!-- MAIN NAVIGATION -->
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <nav id="mainnav-container" class="mainnav">
+            <div class="mainnav__inner">
+
+                <!-- Navigation menu -->
+                <div class="mainnav__top-content scrollable-content pb-5">
+
+                    <!-- Profile Widget -->
+                    <div class="mainnav__profile mt-3 d-flex3">
+
+                        <div class="mt-2 d-mn-max"></div>
+
+                        <!-- Profile picture  -->
+                        <div class="mininav-toggle text-center py-2">
+                            <img class="mainnav__avatar img-md rounded-circle border" src="/assets/img/profile-photos/4.png" alt="Profile Picture">
+                        </div>
+
+                        <div class="mininav-content d-mn-max">
+                            <div class="d-grid">
+
+                                <!-- User name and position -->
+                                <button class="d-block btn shadow-none p-2">
+                                    <span class="d-flex justify-content-center align-items-center">
+                                        <h6 class="mb-0 me-3"><%=user.name %></h6>
+                                    </span>
+                                    <small class="text-muted"><%=user.loginId %></small>
+                                </button>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- End - Profile widget -->
+
+                    <%- include("sidebar.ejs") %>
+
+                </div>
+                <!-- End - Navigation menu -->
+
+                <!-- Bottom navigation menu -->
+                <div class="mainnav__bottom-content border-top pb-2">
+                    <ul id="mainnav" class="mainnav__menu nav flex-column">
+                        <li class="nav-item has-sub">
+                            <a href="/auth/logout" class="nav-link">
+                                <i class="demo-pli-unlock fs-5 me-2"></i>
+                                <span class="nav-label ms-1">Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- End - Bottom navigation menu -->
+
+            </div>
+        </nav>
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <!-- END - MAIN NAVIGATION -->
+
+    </div>
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- END - PAGE CONTAINER -->
+   
+        <%- include("footer.ejs") %>
+        <%-script %>
+    </body>
+</html>

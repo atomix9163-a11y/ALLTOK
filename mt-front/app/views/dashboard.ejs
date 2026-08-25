@@ -1,0 +1,708 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row">
+    <div class="col-xxl-3">
+        <div class="user-sidebar">
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="user-profile-img">
+                        <img src="<%=(storeInfo.mart_image) ? `${apiServer}/public/uploads/store/${storeInfo.mart_image}` : '/assets/images/pattern-bg.jpg' %>"
+                            class="profile-img profile-foreground-img rounded-top" style="height: 120px;"
+                            alt="">
+                        <div class="overlay-content rounded-top">
+                            <div>
+                                <div class="user-nav p-3">
+                                    <div class="d-flex justify-content-end">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end user-profile-img -->
+
+                    <div class="position-relative">
+                        <div class="text-center">
+
+                            <div class="mt-3">
+                                <%-(storeInfo.logo_image) ? `<img src="${apiServer}/public/uploads/store/${storeInfo.logo_image}" style="height: 30px;" alt="">` : `<h5 class="mb-1" style="color: black;">${storeInfo.name}</h5>` %>
+                                <div class="mt-2">
+                                    <a href="#" onclick="showAffiliatedStore('<%-storeInfo.store_code %>')" class="btn btn-primary waves-effect waves-light btn-sm"><i class="bx bx bx-edit-alt me-1 align-middle"></i> 정보 수정</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="row text-center">
+                            <div class="col-12 border-end">
+                                <div class="p-1">
+                                    <h5 class="mb-1"><%-storeInfo.name %></h5>
+                                    <p class="text-muted mb-0"><%-storeInfo.regno %></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end card body -->
+            </div>
+            <!-- end card -->
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">이용 중인 서비스2</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0 pt-1">
+                        <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i><%=(storeInfo.service.shuket == "Y") ? "앱 연동 모바일 Shop 사용" : "단독 모바일 Shop 사용" %></li>
+
+                        <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>복합발송 <%=(storeInfo.service.complex_send == "Y") ? "이용 중" : "이용 안 함" %></li>    
+
+                        <% if (storeInfo.service.P_SMS == "Y") {%> 
+                            <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>폰 문자 이용 중</li>
+                        <%} %>
+
+                        <% if (storeInfo.service.P_AT == "Y") {%>
+                            <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>폰 알림톡 이용 중</li>
+                        <%} %>
+
+                        <% if (storeInfo.service.SMS == "Y") {%> 
+                            <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>SMS <%=`이용 중 (${storeInfo.service.UP_SMS})` %></li>
+                        <%} %>
+
+                        <% if (storeInfo.service.LMS == "Y") {%> 
+                            <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>LMS <%=`이용 중 (${storeInfo.service.UP_LMS})` %></li>
+                        <%} %>
+
+                        <% if (storeInfo.service.RCSSMS == "Y") {%>
+                            <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>RSC SMS <%=`이용 중 (${storeInfo.service.UP_RCSSMS})` %></li>
+                        <%} %>
+
+                        <% if (storeInfo.service.RCSLMS == "Y") {%>
+                            <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>RSC LMS <%=`이용 중 (${storeInfo.service.UP_RCSLMS})` %></li>    
+                        <%} %>
+                        
+                        <% if (storeInfo.service.AT == "Y") {%>
+                            <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>알림톡 <%=`이용 중 (${storeInfo.service.UP_AT})` %></li>
+                        <%} %>
+
+                        <% if (storeInfo.service.FT == "Y") {%>
+                            <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>친구톡 <%=`이용 중 (${storeInfo.service.UP_FT})` %></li>
+                        <%} %>
+                    </ul>
+                </div>
+                <!-- end card body -->
+            </div>
+            <!-- end card -->
+
+        </div>
+    </div>
+
+    <div class="col-xxl-9">
+        <div class="row">
+            <div class="col-xl-6 col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3">
+                                <div class="avatar">
+                                    <div class="avatar-title rounded bg-primary bg-gradient">
+                                        <i data-eva="people" class="fill-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <p class="text-muted mb-1">고객 수</p>
+                                <h4 class="mb-0"><%=numeral(storeInfo.customerCount).format("0,0") %></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end card body -->
+                </div>
+                <!-- end card -->
+            </div>
+            <!-- end col -->
+            <div class="col-xl-6 col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0 me-3">
+                                <div class="avatar">
+                                    <div class="avatar-title rounded bg-primary bg-gradient">
+                                        <i data-eva="shopping-bag" class="fill-white"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <p class="text-muted mb-1">잔액</p>
+                                <h4 class="mb-0"><%=numeral(storeInfo.balance).format("0,0.00") %></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end card body -->
+                </div>
+                <!-- end card -->
+
+            </div>
+            <!-- end col -->
+        </div>
+        <!-- end row -->
+
+        <div class="card">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs nav-tabs-custom nav-justified" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#phonesms" role="tab">
+                        <i class="bx bx-user-circle font-size-20"></i>
+                        <span class="d-none d-sm-block">폰문자/폰톡 최근 발송 내역</span> 
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#rcssms" role="tab">
+                        <i class="bx bx-user-circle font-size-20"></i>
+                        <span class="d-none d-sm-block">최근 표준 발송 내역</span> 
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#cash" role="tab">
+                        <i class="bx bx-clipboard font-size-20"></i>
+                        <span class="d-none d-sm-block">최근 예치금 기록</span> 
+                    </a>
+                </li>
+            </ul>
+            <!-- Tab content -->
+            <div class="tab-content p-4">
+
+                <div class="tab-pane active" id="phonesms" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">날짜</th>
+                                    <th scope="col">종류</th>
+                                    <th scope="col">방식</th>
+                                    <th scope="col">고유번호</th>
+                                    <th scope="col">예약일시</th>
+                                    <th scope="col">발송일시/확인일시</th>
+                                    <th scope="col">상태</th>
+                                    <th scope="col">요청</th>
+                                    <th scope="col">성공</th>
+                                    <th scope="col">실패</th>
+                                    <th scope="col">발송률</th>
+                                </tr>
+                            </thead>
+                            <tbody id="phone-main">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="rcssms" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">구분</th>
+                                    <th scope="col">요청날짜</th>
+                                    <th scope="col">예약날짜</th>
+                                    <th scope="col">예상발송수</th>
+                                    <th scope="col">상태</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rcs-main">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="cash" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-nowrap table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">날짜</th>
+                                    <th scope="col">시간</th>
+                                    <th scope="col">구분</th>
+                                    <th scope="col">금액</th>
+                                    <th scope="col">잔액</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cash-main">
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modal_affiliatedStoreView" tabindex="-1" aria-labelledby="modal_userView_Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_userView_Label"> 가맹점 관리</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="as_store_code">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="logo-photo" class="form-label">로고 :</label>
+                            <input type="file" class="mb-1" id="logo-photo" onchange="uploadImage(this, 'logo_image')">
+                            <input type="button" value="로고 지우기" onclick="resetImage('logo_image')">
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="mb-3">
+                            <img src="" id="as_logo" style="max-width:300px" />
+                        </div>
+                    </div>
+                </div>        
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label for="customerinfo-name-input" class="form-label">가맹점명 :</label>
+                            <input type="text" class="form-control" placeholder="가맹점명를 입력하세요" id="as_name" name="as_name">
+                        </div>                            
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label for="as_owener" class="form-label">대표자 :</label>
+                            <input type="text" class="form-control" placeholder="대표자를 입력하세요" id="as_owener" name="as_owener">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label for="as_regno" class="form-label">사업자번호 :</label>
+                            <input type="text" class="form-control" placeholder="사업자번호를 입력하세요" id="as_regno" name="as_regno">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label for="as_email" class="form-label">이메일 :</label>
+                            <input type="text" class="form-control" placeholder="이메일을 입력하세요" id="as_email">
+                        </div>                                        
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label for="as_contact" class="form-label">연락처 :</label>
+                            <input type="text" class="form-control" placeholder="연락처를 입력하세요" id="as_contact">
+                        </div>                                        
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label for="as_workingTime" class="form-label">영업시간 :</label>
+                            <input type="text" class="form-control" placeholder="영업시간을 입력하세요" id="as_workingTime" name="as_workingTime">
+                        </div>                                        
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label for="as_holidays" class="form-label">휴무일 :</label>
+                            <input type="text" class="form-control" placeholder="휴무일을 입력하세요" id="as_holidays" name="as_holidays">
+                        </div>                                        
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="as_address" class="form-label">주소 :</label>
+                            <input type="text" class="form-control" placeholder="주소를 입력하세요" id="as_address" name="as_address">
+                        </div>                                        
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label for="as_mapLocation" class="form-label">맵주소 :</label>
+                            <input type="text" class="form-control" placeholder="맵주소를 입력하세요" id="as_mapLocation" name="as_mapLocation">
+                        </div>                                        
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="mb-3">
+                            <label for="as_deliveryComment" class="form-label">배송 공지 :</label>
+                            <textarea class="form-control" rows="3" placeholder="배송 공지 및 기타 내용을 입력하세요" id="as_deliveryComment" name="as_deliveryComment"></textarea>
+                        </div>                                        
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="mart-photo" class="form-label">매장사진 1:</label>
+                            <input type="file" id="mart-photo" onchange="uploadImage(this, 'mart_image')">
+                            <input type="button" value="사진 지우기" onclick="resetImage('mart_image')">
+                            <img src="" id="as_mart" style="max-width:100px" />
+                        </div>                            
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="mart-photo" class="form-label">매장사진 2:</label>
+                            <input type="file" id="mart-photo" onchange="uploadImage(this, 'mart_image2')">
+                            <input type="button" value="사진 지우기" onclick="resetImage('mart_image2')">
+                            <img src="" id="as_mart" style="max-width:100px" />
+                        </div>                            
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="as_holidays" class="form-label">모바일웹주문 사용 :</label>
+                            <select class="form-select" id="as_use_mobile_order">
+                                <option value="Y">사용</option>
+                                <!-- <option value="N">사용 안함</option> -->
+                            </select>    
+                        </div>                                        
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="as_address" class="form-label">모바일웹주문 최소금액 :</label>
+                            <input type="number" class="form-control" placeholder="주문 최소 금액을 입력하세요" id="as_mobile_order_limit" name="as_mobile_order_limit">
+                        </div>                                        
+                    </div>
+                </div>        
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="as_login_id" class="form-label">로그인 아이디 :</label>
+                            <input type="text" class="form-control" placeholder="로그인 아이디를 입력하세요" id="as_login_id" name="as_login_id" readonly>
+                        </div>                            
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="as_login_pwd" class="form-label">로그인 암호 :</label>
+                            <input type="password" class="form-control" placeholder="변경하려면 입력하세요" id="as_login_pwd" name="as_login_pwd">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="as_login_pwd_confirm" class="form-label">로그인 암호 확인 :</label>
+                            <input type="password" class="form-control" placeholder="정확한 입력을 위해 암호를 한 번 더 입력하세요" id="as_login_pwd_confirm" name="as_login_pwd_confirm">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary waves-effect waves-light" id="modal_affiliatedStoreSave">저장하기</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- end modal -->
+
+<%- contentFor('script') %>
+<script>
+    const apiServer = '<%=apiServer %>';
+    const rowCount = 10;
+    const store_code = '<%=user.store_code %>';
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        document.getElementById("modal_affiliatedStoreSave").addEventListener("click", updateAffiliatedStore);
+
+        // 폰 발송 내역 10개
+        showPhoneHistoryMainList(1);
+
+        // 표준 발송 내역 10개
+        showRCSHistoryMainList(1);
+
+        // 충전 내역 10개
+        showCashHistoryMainList(1);
+    })
+
+    async function showPhoneHistoryMainList(page) {       
+        let callApi = `${apiServer}/history/apiList`;
+        await postData(callApi, {
+            store_code: store_code,
+            start_date: "",
+            end_date: "",
+            page: page,
+            rowCount : rowCount
+        })
+        .then(returnResult => {
+            if (returnResult && returnResult.result) {
+                let historyHTML = "";
+                let num = returnResult.data.count - (page - 1) * rowCount;
+                for (let history of returnResult.data.rows) {
+                    let send_time = history.send_time;
+                    if (history.send_type == "I") {
+                        
+                    }
+                    historyHTML += `                    
+                        <tr>
+                            <th scope="row">${num--}</th>
+                            <td>${moment(history.C_TIME).format('YYYY-MM-DD')}</td>
+                            <td>${(history.send_method == "P") ? "폰문자" : "폰알림톡"}</td>
+                            <td>${(history.send_type == "I") ? "즉시" : "예약"}</td>
+                            <td>${history.send_no}</td>
+                            <td>${(history.reserve_time) ? moment(history.reserve_time).format('YYYY-MM-DD HH:mm:ss') : ""}</td>
+                            <td>${(history.send_time) ? moment(history.send_time).format('YYYY-MM-DD HH:mm:ss') : ""}</td>
+                            <td>${(history.response == "W") ? "대기" : (history.response == "C") ? "취소" : "완료"}</td>
+                            <td>${history.send_count}</td>
+                            <td>${history.success_count}</td>
+                            <td>${history.fail_count}</td>
+                            <td>${numeral(history.success_count / ((history.send_count == 0) ? 1 : history.send_count) * 100).format("0.00")}%</td>
+                        </tr>`;
+                }
+                document.getElementById("phone-main").innerHTML = historyHTML;
+
+            }
+        })
+        .catch(error => { console.log(error); alert(`발송 내역을 가져오지 못했습니다.`);;});
+    }
+
+    async function showRCSHistoryMainList(page) {
+        let callApi = `${apiServer}/history/apiListRCS`;
+        await postData(callApi, {
+            store_code: store_code,
+            start_date: "",
+            end_date: "",
+            page: page,
+            rowCount : rowCount
+        })
+        .then(returnResult => {
+            if (returnResult && returnResult.result) {
+                let historyHTML = "";
+                let num = returnResult.data.count - (page - 1) * rowCount;
+                for (let history of returnResult.data.rows) {
+                    let send_time = history.send_time;
+                    if (history.send_type == "I") {
+                        
+                    }
+                    historyHTML += `                    
+                        <tr>
+                            <th scope="row">${num--}</th>
+                            <td>${history.msg_type}</td>
+                            <td>${moment(history.request_time).format('YYYY-MM-DD hh:mm:ss')}</td>
+                            <td>${(history.status != "I") ? moment(history.reserve_time).format('YYYY-MM-DD hh:mm:ss') : ""}</td>
+                            <td>${history.send_count}</td>
+                            <td>${(history.status == "I") ? "즉시" : (history.status == "R") ? "예약" : "발송예약취소"}</td>
+                            <td>${(history.status == "R") ? 
+                                `<button type="button" class="btn btn-sm btn-danger waves-effect waves-light" onClick="cancelReserve('${history.reserve_code}')">
+                                <i class="bx bx-trash font-size-8 align-middle me-2"></i> 취소</button>` : ''}
+                            </td>
+                        </tr>`;
+                }
+                document.getElementById("rcs-main").innerHTML = historyHTML;
+            }
+        })
+        .catch(error => { console.log(error); alert(`발송 내역을 가져오지 못했습니다.`);;});
+    }
+
+    async function showCashHistoryMainList(page) {       
+        let callApi = `${apiServer}/cash/apiCashHistoryList`;
+        await postData(callApi, {
+            store_code: store_code,
+            start_date: "",
+            end_date: "",
+            page: page,
+            rowCount : rowCount
+        })
+        .then(returnResult => {            
+            if (returnResult && returnResult.result) {
+                let historyHTML = "";
+                let num = returnResult.data.count - (page - 1) * rowCount;
+                for (let history of returnResult.data.rows) {
+                    historyHTML += `                    
+                        <tr>
+                            <th scope="row">${num--}</th>
+                            <td>${moment(history.c_time).format('YYYY-MM-DD')}</td>
+                            <td>${moment(history.c_time).format('HH:mm:ss')}</td>
+                            <td>${(history.cash_type == "A") ? "적립" : (history.cash_type == "R") ? "차감" : "정정"}</td>
+                            <td>${history.amount.format()} 원</td>
+                            <td>${history.balance.format()} 원</td>
+                        </tr>
+                            `
+                }
+                document.getElementById("cash-main").innerHTML = historyHTML;
+
+                // let pagerHTML = createPagerHTML(returnResult.data.count, rowCount, page, 5, "changePageMain");
+                // document.getElementById("history-main-pager").innerHTML = pagerHTML;
+
+            }
+        })
+        .catch(error => { console.log(error); alert(`충전 내역을 가져오지 못했습니다.`);;});
+    }
+
+    async function showAffiliatedStore(store_code) {
+        // 정보를 얻어온다        
+        await axios.post(`${apiServer}/affiliatedStore/apiGet`, {
+            store_code: store_code
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(returnResult => {
+            // console.log(returnResult.data.data)
+            if (returnResult && returnResult.data.result) {
+                document.getElementById("as_store_code").value = returnResult.data.data.store_code;
+                if (returnResult.data.data.logo_image && returnResult.data.data.logo_image != "") document.getElementById("as_logo").src = `${apiServer}/public/uploads/store/${returnResult.data.data.logo_image}`;
+                document.getElementById("as_name").value = returnResult.data.data.name;
+                document.getElementById("as_owener").value = returnResult.data.data.owener;
+                document.getElementById("as_regno").value = returnResult.data.data.regno;
+                document.getElementById("as_address").value = returnResult.data.data.address;
+                document.getElementById("as_email").value = returnResult.data.data.email;
+                document.getElementById("as_contact").value = returnResult.data.data.contact;
+                document.getElementById("as_login_id").value = returnResult.data.data.login_id;
+                document.getElementById("as_workingTime").value = returnResult.data.data.working_time;
+                document.getElementById("as_holidays").value = returnResult.data.data.holidays;
+                document.getElementById("as_mapLocation").value = returnResult.data.data.map_location;
+                document.getElementById("as_deliveryComment").value = returnResult.data.data.delivery_comment;
+                document.getElementById("as_use_mobile_order").value = returnResult.data.data.use_mobile_order;
+                document.getElementById("as_mobile_order_limit").value = returnResult.data.data.mobile_order_limit;
+                if (returnResult.data.data.mart_image && returnResult.data.data.mart_image != "") document.getElementById("as_mart").src = `${apiServer}/public/uploads/store/${returnResult.data.data.mart_image}`;
+                document.getElementById("as_login_pwd").value = "";
+
+                const modal_affiliatedStoreView = new bootstrap.Modal(document.getElementById('modal_affiliatedStoreView'));
+                modal_affiliatedStoreView.show();
+            } else {
+                alert("가맹점 정보를 읽지 못했습니다.");
+            }
+        })
+        .catch(error => { console.log(error); alert("가맹점 정보를 읽지 못했습니다.");});
+    }
+
+    function validation(store_code, 
+            name, 
+            owener, 
+            regno, 
+            address, 
+            email, 
+            contact,
+            login_pwd,
+            login_pwd_confirm) {
+        if (login_pwd.length != 0 &&  (login_pwd != login_pwd_confirm)) {
+            alert("암호와 확인 암호가 다릅니다.");
+            return false;
+        }
+        return true;
+    }
+
+    async function updateAffiliatedStore() {
+        let store_code = document.getElementById("as_store_code").value;
+        let name = document.getElementById("as_name").value.trim();
+        let owener = document.getElementById("as_owener").value;
+        let regno = document.getElementById("as_regno").value;
+        let address = document.getElementById("as_address").value;
+        let email = document.getElementById("as_email").value;
+        let contact = document.getElementById("as_contact").value;
+        let workingTime = document.getElementById("as_workingTime").value;
+        let holidays = document.getElementById("as_holidays").value;
+        let mapLocation = document.getElementById("as_mapLocation").value;
+        let deliveryComment = document.getElementById("as_deliveryComment").value;
+        let login_pwd = document.getElementById("as_login_pwd").value;
+        let login_pwd_confirm = document.getElementById("as_login_pwd_confirm").value;
+        let use_mobile_order = document.getElementById("as_use_mobile_order").value;
+        let mobile_order_limit = (document.getElementById("as_mobile_order_limit").value == "") ? 0 : document.getElementById("as_mobile_order_limit").value;
+
+        if (!validation(
+            store_code, 
+            name, 
+            owener, 
+            regno, 
+            address, 
+            email, 
+            contact,
+            login_pwd,
+            login_pwd_confirm)) return;
+
+        // if (!confirm(`사용자 정보가 ${(seq == "") ? "추가" : "변경"}됩니다. 계속하시겠습니까?`)) return;
+
+        let callApi = `${apiServer}/affiliatedStore/apiUpdateStore`;
+        // 정보를 업데이트        
+        await axios.post(callApi, {
+            store_code: store_code, 
+            name: name, 
+            owener: owener, 
+            regno: regno, 
+            address: address, 
+            email: email,             
+            workingTime: workingTime,
+            holidays: holidays,
+            mapLocation: mapLocation,            
+            deliveryComment: deliveryComment,
+            contact: contact,
+            login_pwd: login_pwd,
+            use_mobile_order: use_mobile_order,
+            mobile_order_limit: mobile_order_limit
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(returnResult => {
+            if (returnResult && returnResult.data.result) {
+                self.location.reload();
+            } else {
+                alert(`가맹점 정보를 변경하지 못했습니다.`);
+            }
+        })
+        .catch(error => { console.log(error); alert(`가맹점 정보를 변경하지 못했습니다.`);});
+    }
+
+    async function uploadImage(obj, target){
+        let uploadFile = obj;
+        const formData = new FormData();
+        formData.append("uploadFile", uploadFile.files[0]);
+        // formData.append("location", "store");
+
+        await axios.post(`${apiServer}/upload/uploadSingle`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "location": "store"
+            },
+        })
+        .then(async response =>  {
+            let photo = response.data.data.filename;
+            let path = response.data.data.path;
+            if (response.data.result === "success") {
+                // 업로드한 파일로 업데이트 실시
+                await axios.post(`${apiServer}/affiliatedStore/apiUpdateStorePhoto`, {
+                    store_code: document.getElementById("as_store_code").value,
+                    target: target,
+                    photo: photo,
+                    path: path
+                }, {
+                    headers: {
+                        xtoken: getCookie("xToken")
+                    }
+                }).then(async response => {
+                    // 로고 업데이트
+                    if (target == "logo_image") {
+                        document.getElementById("as_logo").src = `${apiServer}/public/uploads/store/${photo}`;
+                    } else {
+                        document.getElementById("as_mart").src = `${apiServer}/public/uploads/store/${photo}`;
+                    }
+                })
+            } else {
+                alert("파일 업로드를 실패했습니다.");
+                return null;
+            }
+        });
+    }
+
+    async function resetImage(target) {
+        await axios.post(`${apiServer}/affiliatedStore/apiUpdateStorePhoto`, {
+            store_code: document.getElementById("as_store_code").value,
+            target: target,
+            photo: "",
+            path: ""
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(async response => {
+            // 로고 업데이트
+            if (target == "logo_image") {
+                document.getElementById("as_logo").src = "";
+            } else {
+                document.getElementById("as_mart").src = "";
+            }
+
+        })
+
+    }
+
+</script>

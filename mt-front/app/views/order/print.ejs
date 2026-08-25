@@ -1,0 +1,149 @@
+<%- contentFor('content') %>
+<div class="print_list ng-scope" ng-repeat="OrderPrintDetail in OrderPrintData" style="">
+    <div class="printSection">
+        <div id="printModal" class="print-summary">
+            <!-- 27/10/2020 Task 27102020 add new -->
+            <table id="table_info">
+                <!-- <div style="padding-left:0;margin:0;margin-top:3px;width: 100%;"> -->
+                <tbody><tr>
+                    <td style="width: 50%; text-align: left;" class="ng-binding">
+                        <span style="display: inline-block; padding: 7px;">*주문자</span> : <%=orderInfo.U_ADDR_RECI %>
+                    </td>
+
+                    <td style="width: 50%; text-align: left;" class="ng-binding">
+                        <span style="display: inline-block; padding: 7px;">*주문일</span> : <%=moment(orderInfo.C_TIME).format('YYYY-MM-DD HH:mm:ss') %>
+                    </td>
+                </tr>
+                <!-- </div> -->
+                <!-- <div style="padding-left:0;margin:0;margin-top:3px; width: 100%;"> -->
+                <tr>
+                    <td style="width: 50%; text-align: left;" class="ng-binding">
+                        <span style="display: inline-block; padding: 7px;">*주문번호</span> : <%=orderInfo.O_CODE %>
+                    </td>
+                    <td style="width: 50%; text-align: left;" class="ng-binding">
+                        <span style="display: inline-block; padding: 7px;">*연락처</span> : <%=orderInfo.U_ADDR_PHONE %>
+                    </td>
+                </tr>
+                <!-- </div> -->
+                <!-- <div style="padding-left:0;margin:0;margin-top:3px; width: 100%;"> -->
+                <tr>
+                    <td colspan="2" style="text-align: left;" class="ng-binding">
+                        <span style="display: inline-block; padding: 7px;">*배송주소</span> : <%=orderInfo.U_POST_CODE %> <%=orderInfo.U_ADDR_RA %> <%=orderInfo.U_ADDR_DETAIL %>
+                    </td>
+                </tr>
+                <!-- </div> -->
+            </tbody></table>
+            <div></div>
+        </div>
+        <div class="print-tbl1">
+            <p style="font-weight: bold;font-size: 16px;margin-bottom: 10px;">[메모]</p>
+            <p class="note_content ng-binding">
+                <%=orderInfo.O_REQ %>
+            </p>
+        </div>
+        <!-- End Task 27102020-->
+        <div class="print-tbl">
+            <p style="font-weight: bold;font-size: 16px;margin-bottom: 10px;">[주문내역]</p>
+            <!-- 27/10/2020 Task 27102020 change font-size 11pt -->
+            <table id="table_data" style="border-collapse: collapse;width:100%;margin-top:5px;">
+                <!-- End Task 27102020-->
+                <thead>
+                    <tr>
+                        <th style="width: 30px">No</th>                        
+                        <th>상품명</th>
+                        <th>판매가</th>
+                        <th>수량</th>
+                        <th>출고가액</th>
+                    </tr>
+                </thead>
+                <tbody id="orderlist">
+                    <%
+                            if (orderDetails) {
+                                let index = 1;
+                                for (let orderDetail of orderDetails) {               
+                                    %>
+                                    <tr class="ng-scope">
+                                        <td style="width: 30px" class="ng-binding"><%=index++ %></td>                                        
+                                        <td class="ng-binding"><%=orderDetail.P_NAME %> <%=orderDetail.P_UNIT %></td>                                        
+                                        <td class="ng-binding"><%=numeral(orderDetail.O_PRD_PRICE).format('0,0') %></td>
+                                        <td class="ng-binding"><%=orderDetail.O_QTY %></td>
+                                        <td style="text-align: right;" class="ng-binding"><%=numeral(orderDetail.O_PRD_PRICE * orderDetail.O_QTY).format('0,0') %></td>
+                                    </tr>
+                                    <%
+                                }
+    
+                            }
+                        %>                 
+
+
+                    <!-- <tr>
+                        <td colspan="6">소계</td>
+                        <td colspan="2" style="text-align: right;" class="ng-binding">26,500</td>
+                    </tr> -->
+                    <tr>
+
+                        <td colspan="4">합계</td>
+                        <td style="text-align: right;" class="ng-binding"><%=numeral(orderInfo.O_PAY_AMOUNT).format('0,0') %></td>
+                    </tr>
+
+
+                </tbody>
+            </table>
+
+        </div>
+        <div class="print-tbl">
+            <p style="font-weight: bold;font-size: 16px;margin-bottom: 10px;margin-top: 30px;">[결제정보]</p>
+            <!-- 27/10/2020 Task 27102020 change width: 100% -> 50% and add id-->
+            <table id="table_data2" style="border-collapse: collapse;margin-top:5px;">
+                <!-- End Task 27102020-->
+                <thead>
+                    <tr>
+                        <th>결제 금액</th>
+                        <th>결제수단</th>
+                        <th ng-show="OrderPrintDetail.od_approval_num!=''" class="ng-binding ng-hide">승인번호</th>
+                        <th>현금영수증</th>
+                        <th>지출증빙</th>
+
+
+                    </tr>
+                </thead>
+                <tbody id="orderlist2">
+                    <tr>
+                        <td class="ng-binding"><%=numeral(orderInfo.O_PAY_AMOUNT).format('0,0') %></td>
+                        <td class="ng-binding"><%=orderInfo.O_PAY_METHOD_NAME %></td>
+                        <td ng-show="OrderPrintDetail.od_approval_num!=''" class="ng-binding ng-hide"></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <!-- <div class="print-tbl">
+            <p style="font-weight: bold;font-size: 16px;margin-bottom: 10px;;margin-top: 30px;">[처리상태]</p>
+            <p class="ng-binding">주문완료</p>
+
+        </div> -->
+        <!-- <div style="border: 0.5px solid #bbbbbb;"></div>
+        <div class="print-tbl">
+            <p style="font-weight: bold;font-size: 16px;margin-bottom: 10px;">[관리자 메모]</p>
+
+            <p style="width: 50%;height: 40px;border: 1px solid black;white-space: normal;padding: 15px;word-break: break-all;" class="ng-binding">
+                
+                <input style="display:none" id="total_item" value="1">
+            </p>
+        </div> -->
+
+
+
+    </div>
+    <!-- ngIf: !(OrderPrintData.totalItem == $index+1) -->
+</div>
+
+<%- contentFor('script') %>
+<script>
+    document.addEventListener("DOMContentLoaded", async function(){
+        window.print();
+    })
+
+</script>

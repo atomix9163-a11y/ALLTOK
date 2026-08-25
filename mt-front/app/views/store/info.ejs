@@ -1,0 +1,531 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row">
+    <div class="col-md-3">
+        <div class="card mb-3">
+            <h5 class="card-header"><%-storeInfo.name %></h5>
+            <div class="card-body">
+                <%
+                console.log(storeInfo)
+                    let mobileUri = (storeInfo.shop_type == "Q") ? storeInfo.service.shopShortUrl : (storeInfo.shop_type == "L") ? `https://m.shuket.co.kr?c=${storeInfo.app_mart_code}` : `https://shop.alltok.co.kr?c=${storeInfo.store_code}`;;
+                %>
+                <p class="card-text"><a href="<%-mobileUri %>" target="_blank"><%-mobileUri %></a></p>
+                <p class="card-text">대체 주소: <%-(storeInfo.service.shopShortUrl) ? `<a href="${storeInfo.service.shopShortUrl}" target="_blank">${storeInfo.service.shopShortUrl}</a>` : "없음" %></p>
+            </div>
+            <div class="card-footer">
+                    <p class="card-text">잔액 <%=numeral(storeInfo.balance).format("0,0.0") %>원</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">이용 중인 서비스</h4>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0 pt-1">
+                    <% if (storeInfo.service.SMS == "Y") {%> 
+                        <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>SMS <%=`이용 중 (${storeInfo.service.UP_SMS} 원/건)` %></li>
+                    <%} %>
+
+                    <% if (storeInfo.service.LMS == "Y") {%> 
+                        <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>LMS <%=`이용 중 (${storeInfo.service.UP_LMS} 원/건)` %></li>
+                    <%} %>
+
+                    <% if (storeInfo.service.RCSSMS == "Y") {%>
+                        <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>RSC SMS <%=`이용 중 (${storeInfo.service.UP_RCSSMS} 원/건)` %></li>
+                    <%} %>
+
+                    <% if (storeInfo.service.RCSLMS == "Y") {%>
+                        <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>RSC LMS <%=`이용 중 (${storeInfo.service.UP_RCSLMS} 원/건)` %></li>    
+                    <%} %>
+                    
+                    <% if (storeInfo.service.AT == "Y") {%>
+                        <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>알림톡 <%=`이용 중 (${storeInfo.service.UP_AT} 원/건)` %></li>
+                    <%} %>
+
+                    <% if (storeInfo.service.FT == "Y") {%>
+                        <li class="py-1"><i class="mdi mdi-circle-medium me-1 text-success align-middle"></i>친구톡 <%=`이용 중 (${storeInfo.service.UP_FT} 원/건)` %></li>
+                    <%} %>
+                </ul>
+            </div>
+            <!-- end card body -->
+        </div>
+    </div>
+    <div class="col-md-9">
+        <input type="hidden" id="as_store_code">
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">가맹점명 :</label>
+                            <input type="text" class="form-control" placeholder="가맹점명를 입력하세요" id="name" name="name" readonly>
+                        </div>                            
+                    </div>
+                </div>        
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="login-id" class="form-label">로그인 아이디 :</label>
+                            <input type="text" class="form-control" placeholder="로그인 아이디를 입력하세요" id="login-id" name="login-id" readonly>
+                        </div>                            
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="login-pwd" class="form-label">로그인 암호 :</label>
+                            <input type="password" class="form-control" placeholder="변경하려면 입력하세요" id="login-pwd" name="login-pwd">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="mb-3">
+                            <label for="login-pwd-confirm" class="form-label">로그인 암호 확인 :</label>
+                            <input type="password" class="form-control" placeholder="암호를 한 번 더 입력하세요" id="login-pwd-confirm" name="login-pwd-confirm">
+                        </div>
+                    </div>
+                </div>
+                <div id="store-not-shuket" class="d-none">
+                    <hr>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="logo-photo" class="form-label">로고 :</label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="logo-photo" onchange="uploadImage(this, 'logo_image')">
+                                    <input type="button" class="btn btn-xs btn-secondary" value="지우기" onclick="resetImage('logo_image')">    
+                                </div>
+                                <img src="" id="logo-review" style="max-width:200px" />                                                            
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="holidays" class="form-label">연락처 :</label>
+                                <input type="text" class="form-control" placeholder="연락처를 입력하세요" id="contact" name="contact">
+                            </div>                                        
+                        </div>
+                    </div>        
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="working-time" class="form-label">영업시간 :</label>
+                                <input type="text" class="form-control" placeholder="영업시간을 입력하세요" id="working-time" name="working-time">
+                            </div>                                        
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="holidays" class="form-label">휴무일 :</label>
+                                <input type="text" class="form-control" placeholder="휴무일을 입력하세요" id="holidays" name="holidays">
+                            </div>                                        
+                        </div>
+                        <div class="col-lg-6 d-none">
+                            <div class="mb-3">
+                                <label for="notice-top" class="form-label">상단 알림 :</label>
+                                <textarea class="form-control" rows="3" placeholder="모바일 첫 페이지 상단에 보여줄 내용을 입력하세요" id="notice-top" name="notice-top"></textarea>
+                            </div>                                        
+                        </div>
+                        <div class="col-lg-6 d-none">
+                            <div class="mb-3">
+                                <label for="delivery-comment" class="form-label">배송 공지 :</label>
+                                <textarea class="form-control" rows="3" placeholder="배송 공지 및 기타 내용을 입력하세요" id="delivery-comment" name="delivery-comment"></textarea>
+                            </div>                                        
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="address" class="form-label">주소 :</label>
+                                <input type="text" class="form-control" placeholder="주소를 입력하세요" id="address" name="address">
+                            </div>                                        
+                        </div>
+                        <div class="col-lg-6"></div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="mart-photo" class="form-label">매장사진 1:</label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="mart-photo" onchange="uploadImage(this, 'mart_image')">
+                                    <input type="button" class="btn btn-xs btn-secondary" value="지우기" onclick="resetImage('mart_image')">
+                                </div>
+                                <img src="" id="mart-image-review" style="max-width:300px" />
+                            </div>                            
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="mb-3">
+                                <label for="mart-photo2" class="form-label">매장사진 2:</label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control"  id="mart-photo2" onchange="uploadImage(this, 'mart_image2')">
+                                    <input type="button" class="btn btn-xs btn-secondary" value="지우기" onclick="resetImage('mart_image2')">
+                                </div>
+                                <img src="" id="mart-image-review2" style="max-width:300px" />
+                            </div>                            
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                <label for="use-mobile-order" class="form-label">모바일웹주문 사용 :</label>
+                                <select class="form-select" id="use-mobile-shop">
+                                    <option value="Y">사용</option>
+                                    <option value="N">사용하지 않음</option>
+                                </select>    
+                            </div>                                        
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                <label for="use-mobile-order" class="form-label">주문 기능 사용 :</label>
+                                <select class="form-select" id="use-mobile-order">
+                                    <option value="Y">사용</option>
+                                    <option value="N">사용하지 않음</option>
+                                </select>    
+                            </div>                                        
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                <label for="mobile-order-limit" class="form-label">모바일웹주문 최소금액 :</label>
+                                <input type="number" class="form-control" placeholder="주문 최소 금액을 입력하세요" id="mobile-order-limit" name="mobile-order-limit">
+                            </div>                                        
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                <label for="use-pay-method-bank" class="form-label">주문 시 계좌이체사용 :</label>
+                                <select class="form-select form-select-sm mb-1" id="use-pay-method-bank">
+                                    <option value="N" selected>사용 안 함</option>
+                                    <option value="Y">사용함</option>                                    
+                                </select>
+                                <input type="text" class="form-control d-none" id="bankAccount" placeholder="은행명 계좌번호 계좌명을 입력하세요">
+                            </div>                                        
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                <label for="use-order-time-limit" class="form-label">주문 접수 시간 제한 사용 :</label>
+                                <select class="form-select form-select-sm mb-1" id="use-order-time-limit">
+                                    <option value="N" selected>사용 안 함</option>
+                                    <option value="Y">사용함</option>                                    
+                                </select>
+                                <div class="d-none" id="order-time-limit">
+                                    <div class="row">
+                                        <div class="col-md-6"><label for="order-limit-start" class="form-label">시작시간</label> <input class="form-control" id="order-limit-start" type="time" name="order-limit-start" value="09:00" /></div>
+                                        <div class="col-md-6"><label for="order-limit-end" class="form-label">마감시간</label> <input class="form-control" id="order-limit-end" type="time" name="order-limit-end" value="18:00" /></div>
+                                    </div>
+                                </div>                                
+                            </div>                                        
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                <label for="use-mobile-title" class="form-label">모바일 제목 사용 :</label>
+                                <select class="form-select form-select-sm mb-1" id="use-mobile-title">
+                                    <option value="Y" selected>사용함</option>
+                                    <option value="N">사용 안 함</option>                                    
+                                </select>                                
+                            </div>                                        
+                        </div>
+                    </div>                            
+                </div>
+            </div>
+            <div class="card-footer text-end">
+                <button type="button" class="btn btn-danger" onclick="updateStore()">변경 사항 저장</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<%- contentFor('script') %>
+<script>
+    const rowCount = 10;
+    const storeCode = '<%=user.storeCode %>';
+    const mCode = '<%=storeInfo.M_MOA_CODE %>';
+    const martCode = '<%=storeInfo.appMartCode %>';
+    const shopType = '<%=storeInfo.shop_type %>';
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        if (shopType == "U" || shopType == "QU") {
+            document.getElementById("store-not-shuket").classList.remove("d-none");
+        }
+        await showStore(storeCode, mCode);
+
+        document.getElementById("use-pay-method-bank").addEventListener("click", () => {
+            const useBank = document.getElementById("use-pay-method-bank").value;
+            if (useBank == 'Y') {
+                document.getElementById("bankAccount").classList.remove("d-none");
+            } else {
+                document.getElementById("bankAccount").classList.add("d-none");
+            }
+        })
+
+        document.getElementById("use-order-time-limit").addEventListener("click", () => {
+            const useTimeLimit = document.getElementById("use-order-time-limit").value;
+            if (useTimeLimit == 'Y') {
+                document.getElementById("order-time-limit").classList.remove("d-none");
+            } else {
+                document.getElementById("order-time-limit").classList.add("d-none");
+            }
+        })
+    })
+
+    async function showStore(storeCode, mCode) {
+        if (shopType == "U" || shopType == "QU") {
+            await showStoreNotShuket(storeCode);
+        } else {
+            await showStoreShuket(storeCode);
+        }
+    }
+
+    async function showStoreShuket(storeCode) {
+        // 정보를 얻어온다        
+        await axios.post(`${apiServer}/store/apiGet`, {
+            storeCode: storeCode
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(returnResult => {
+            if (returnResult && returnResult.data.result) {
+                const martInfo = returnResult.data.data;                
+                console.log(martInfo)
+                document.getElementById("name").value = martInfo.name;
+                document.getElementById("login-id").value = martInfo.login_id;
+                document.getElementById("login-pwd").value = ""; 
+                document.getElementById("login-pwd-confirm").value = ""; 
+            } else {
+                alert("가맹점 정보를 읽지 못했습니다.");
+            }
+        })
+        .catch(error => { console.log(error); alert("가맹점 정보를 읽지 못했습니다.");});
+    }
+
+    async function showStoreNotShuket(storeCode) {
+        // 정보를 얻어온다        
+        await axios.post(`${apiServer}/store/apiGet`, {
+            storeCode: storeCode
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {
+            
+            if (response.data.result && response.data.data) {
+                if (response.data.data.logo_image && response.data.data.logo_image != "") document.getElementById("logo-review").src = `${awsCFServer}${response.data.data.logo_image}`;
+                document.getElementById("name").value = response.data.data.name;
+                document.getElementById("login-id").value = response.data.data.login_id;
+                document.getElementById("use-mobile-shop").value = response.data.data.use_mobile_shop ? response.data.data.use_mobile_shop : 'Y';
+                document.getElementById("use-mobile-order").value = response.data.data.use_mobile_order;
+                document.getElementById("login-pwd").value = "";
+                document.getElementById("login-pwd-confirm").value = "";
+                document.getElementById("contact").value = response.data.data.contact;
+                document.getElementById("working-time").value = response.data.data.working_time;
+                document.getElementById("holidays").value = response.data.data.holidays;                
+                document.getElementById("delivery-comment").value = response.data.data.delivery_comment;
+                document.getElementById("address").value = response.data.data.address;
+                document.getElementById("use-mobile-order").value = response.data.data.use_mobile_order;
+                document.getElementById("mobile-order-limit").value = response.data.data.mobile_order_limit;
+                console.log(response.data.data.use_mobile_title)
+                document.getElementById("use-mobile-title").value = response.data.data.use_mobile_title;
+                if (response.data.data.mart_image && response.data.data.mart_image != "") document.getElementById("mart-image-review").src = `${awsCFServer}${response.data.data.mart_image}`;
+                if (response.data.data.mart_image2 && response.data.data.mart_image2 != "") document.getElementById("mart-image-review2").src = `${awsCFServer}${response.data.data.mart_image2}`;
+                //사용 결제수단
+                let usePayMethod = null;
+                if (response.data.data.use_pay_method) {
+                    usePayMethod = JSON.parse(response.data.data.use_pay_method);
+                } else {
+                    usePayMethod = {
+                        useCCOD: 'Y',   //현장카드결제
+                        useCCD: 'Y',    //현장현금결제
+                        useBank: 'N',   //계좌이체
+                        bankAccount: ''
+                    }
+                }
+                document.getElementById("use-pay-method-bank").value = usePayMethod.useBank;
+                if (usePayMethod.useBank == 'Y') {
+                    document.getElementById("bankAccount").classList.remove("d-none");
+                    document.getElementById("bankAccount").value = usePayMethod.bankAccount;
+                }
+                //주문시간제한설정
+                let useTimeLimit = null;
+                if (response.data.data.use_time_limit) {
+                    useTimeLimit = JSON.parse(response.data.data.use_time_limit);
+                } else {
+                    useTimeLimit = {
+                        use: 'N',           //주문 시간 제한 사용 안 함
+                        limitStart: '',     //주문 시작 시간
+                        limitEnd: ''        //주문 종료 시간
+                    }
+                }
+                document.getElementById("use-order-time-limit").value = useTimeLimit.use;
+                if (useTimeLimit.use == 'Y') {
+                    document.getElementById("order-time-limit").classList.remove("d-none");
+                    document.getElementById("order-limit-start").value = useTimeLimit.limitStart;
+                    document.getElementById("order-limit-end").value = useTimeLimit.limitEnd;
+                }
+            } else {
+                alert("가맹점 정보를 읽지 못했습니다.");
+            }
+        })
+        .catch(error => { console.log(error); alert("가맹점 정보를 읽지 못했습니다.");});
+    }
+
+    function validation(contact, loginPwd, loginPwdConfirm) {
+        if (loginPwd.length != 0 &&  (loginPwd != loginPwdConfirm)) {
+            alert("암호와 확인 암호가 다릅니다.");
+            return false;
+        }
+        return true;
+    }
+
+    async function updateStore() {
+        let login_pwd = "";
+        let login_pwd_confirm = "";
+        let contact = "";
+        let workingTime = "";
+        let holidays = "";        
+        let deliveryComment = "";
+        let useMobileShop = "Y";
+        let useMobileOrder = "Y";
+        let mobileOrderLimit = "0";
+        let address = "";
+        let usePayMethod = {
+            useCCOD: 'Y',   //현장카드결제
+            useCCD: 'Y',    //현장현금결제
+            useBank: 'N',   //계좌이체
+            bankAccount: ''
+        }
+        let useTimeLimit = {
+            use: 'N',           //주문 시간 제한 사용 안 함
+            limitStart: '',     //주문 시작 시간
+            limitEnd: ''        //주문 종료 시간
+        }
+
+        loginPwd = document.getElementById("login-pwd").value;
+        loginPwdConfirm = document.getElementById("login-pwd-confirm").value;
+        if (shopType == "U" || shopType == "QU") {
+            contact = document.getElementById("contact").value;
+            workingTime = document.getElementById("working-time").value;
+            holidays = document.getElementById("holidays").value;     
+            address = document.getElementById("address").value;       
+            deliveryComment = document.getElementById("delivery-comment").value;       
+            useMobileShop = document.getElementById("use-mobile-shop").value;
+            useMobileOrder = document.getElementById("use-mobile-order").value;
+            useMobileTitle = document.getElementById("use-mobile-title").value;
+            mobileOrderLimit = (document.getElementById("mobile-order-limit").value == "") ? 0 : document.getElementById("mobile-order-limit").value;
+
+            usePayMethod = {
+                useCCOD: 'Y',   //현장카드결제
+                useCCD: 'Y',    //현장현금결제
+                useBank: document.getElementById("use-pay-method-bank").value,   //계좌이체
+                bankAccount: document.getElementById("bankAccount").value
+            }
+            useTimeLimit = {
+                use: document.getElementById("use-order-time-limit").value,           //주문 시간 제한 사용 여부
+                limitStart: document.getElementById("order-limit-start").value,     //주문 시작 시간
+                limitEnd: document.getElementById("order-limit-end").value        //주문 종료 시간
+            }            
+        }
+        
+
+        if (!validation(
+            contact,
+            loginPwd,
+            loginPwdConfirm)) return;
+                        
+        let callApi = `${apiServer}/store/apiUpdateByFront`;
+        // 정보를 업데이트        
+        await axios.post(callApi, {
+            storeCode: storeCode, 
+            workingTime: workingTime,
+            holidays: holidays,            
+            deliveryComment: deliveryComment,
+            contact: contact,
+            loginPwd: loginPwd,
+            useMobileShop: useMobileShop,
+            useMobileOrder: useMobileOrder,
+            useMobileTitle: useMobileTitle,
+            mobileOrderLimit: mobileOrderLimit,
+            address: address,
+            usePayMethod: JSON.stringify(usePayMethod),
+            useTimeLimit: JSON.stringify(useTimeLimit),
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(returnResult => {
+            if (returnResult && returnResult.data.result) {
+                alert(`가맹점 정보가 변경되었습니다.`);
+                self.location.reload();
+            } else {
+                alert(`가맹점 정보를 변경하지 못했습니다.`);
+            }
+        })
+        .catch(error => { console.log(error); alert(`가맹점 정보를 변경하지 못했습니다.`);});
+    }
+
+    async function uploadImage(obj, target){
+        let uploadFile = obj;
+        const formData = new FormData();
+        formData.append("uploadFile", uploadFile.files[0]);
+        // formData.append("location", "store");
+
+        await axios.post(`${apiServer}/uploadS3/uploadSingle`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "location": `store/${storeCode}/common`
+            },
+        })
+        .then(async response =>  {
+            // let photo = response.data.data.filename;            
+            let photo = response.data.data.key;
+            let path = response.data.data.path;
+            if (response.data.result === "success") {
+                // 업로드한 파일로 업데이트 실시
+                await axios.post(`${apiServer}/store/apiUpdateStorePhoto`, {
+                    storeCode: storeCode,
+                    target: target,
+                    photo: photo,
+                    path: path
+                }, {
+                    headers: {
+                        xtoken: getCookie("xToken")
+                    }
+                }).then(async response => {
+                    // 로고 업데이트
+                    
+                    if (target == "logo_image") {
+                        document.getElementById("logo-review").src = `${s3Server}${photo}`;
+                    } else if (target == "mart_image") {
+                        document.getElementById("mart-image-review").src = `${s3Server}${photo}`;
+                    } else if (target == "mart_image2") {
+                        document.getElementById("mart-image-review2").src = `${s3Server}${photo}`;
+                    }
+                })
+            } else {
+                alert("파일 업로드를 실패했습니다.");
+                return null;
+            }
+        });
+    }
+
+    async function resetImage(target) {
+        await axios.post(`${apiServer}/store/apiUpdateStorePhoto`, {
+            storeCode: storeCode,
+            target: target,
+            photo: "",
+            path: ""
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(async response => {
+            // 로고 업데이트
+            if (target == "logo_image") {
+                document.getElementById("logo-review").src = "";
+            } else if (target == "mart_image") {
+                document.getElementById("mart-image-review").src = "";
+            } else {
+                document.getElementById("mart-image-review2").src = "";
+            }
+
+        })
+
+    }
+
+</script>

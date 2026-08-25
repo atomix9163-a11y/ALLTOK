@@ -1,0 +1,2766 @@
+<%- contentFor('style') %>
+<link rel="stylesheet" href="/assets/vendors/flatpickr/flatpickr.min.css">
+<link rel="stylesheet" href="https://unpkg.com/tagin@2.0.2/dist/tagin.min.css">
+<link rel="stylesheet" href="/assets/css/leaflet.css">
+
+<%- contentFor('content') %>
+
+<div class="row leaflet mb-3">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                        <div class="d-flex">
+                            <div class="col-auto me-2 pt-1">
+                                사용 기간 설정
+                            </div>
+                            <div class="col-auto me-1">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="swc-leaflet-range-use" onclick="toggleUseTimeSetting(this)">                                    
+                                </div>
+                            </div>
+                            <div class="col-6 me-1 d-flex">
+                                <input type="text" class="form-control form-control-sm dt-leaflet-date me-1" id="dt-leaflet-start-date" style="width: 100px;">
+                                <select class="form-select form-select-sm me-1" id="dt-leaflet-start-hour" style="width: 80px;"></select>
+                                <input type="text" class="form-control form-control-sm dt-leaflet-date me-1" id="dt-leaflet-end-date" style="width: 100px;">
+                                <select class="form-select form-select-sm" id="dt-leaflet-end-hour" style="width: 80px;"></select>
+                            </div>                            
+                            <div class="col-auto me-1">
+                                <button type="button" class="btn btn-sm btn-primary waves-effect waves-light" onclick="changeTemplateModal()">
+                                    <i class="far fa-eye font-size-16 align-middle me-2"></i> 템플릿 변경
+                                </button>
+                            </div>                
+                            <div class="col-auto me-1">
+                                <button type="button" class="btn btn-sm btn-success waves-effect waves-light" onclick="showLeafletReview()">
+                                    <i class="far fa-eye font-size-16 align-middle me-2"></i> 미리보기 갱신
+                                </button>
+                            </div>                
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-sm btn-dark waves-effect waves-light" onclick="gotoList()">
+                                    <i class="far fa-list-alt font-size-16 align-middle me-2"></i> 목록으로 돌아가기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3 text-end d-none leaflet-action">
+                        <button class="btn btn-sm btn-secondary" onclick="applyChangeCancel('', '')">변경사항 취소</button>
+                        <button class="btn btn-sm btn-danger" onclick="applyChange('', '')">변경사항 적용</button>
+                    </div>
+                    <div class="col-3 text-end d-none" id="leaflet-qmsync-action">
+                        <button class="btn btn-sm btn-warning" onclick="syncProducts()">큐마켓 상품 보내기</button>
+                    </div>
+                </div>
+            </div>            
+        </div>
+    </div>
+    <!-- end col -->
+</div>
+
+<div class="row leaflet">
+    <div class="col-lg-4 col-md-6 col-sm-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-1">
+                    <div class="col-10">
+                        행사 안내는 변경 저장 시 미리보기에 적용됩니다.
+                    </div>
+                    <div class="col-2">
+                        <select class="form-select form-select-sm" id="show-order-notice" onchange="changeShowOrder('notice', this)" style="width: 80px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-12" id="push-content-area">
+                        <textarea id="push-content"></textarea>
+                        <div class="badge rounded-pill bg-dark float-end mt-1" role="alert" id="push-notice-count">0/10,000 byte</div>
+                    </div>
+                </div>
+                <div class="row mb-1">
+                    <div class="col-10">
+                        <h5>전단지</h5>
+                    </div>
+                    <div class="col-2">
+                        <select class="form-select form-select-sm" id="show-order-leaflet" onchange="changeShowOrder('leaflet', this)" style="width: 80px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-12">                        
+                        <div class="row text-center mb-3">
+                            <div class="col-md-4" id="leaflet-1"></div>
+                            <div class="col-md-4" id="leaflet-2"></div>
+                            <div class="col-md-4" id="leaflet-3"></div>
+                        </div>
+                        <div class="row text-center mb-3">                            
+                            <div class="col-md-4" id="leaflet-4"></div>
+                            <div class="col-md-4" id="leaflet-5"></div>
+                            <div class="col-md-4" id="leaflet-6"></div>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col-md-4" id="leaflet-7"></div>
+                            <div class="col-md-4" id="leaflet-8"></div>
+                            <div class="col-md-4" id="leaflet-9"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-1">
+                    <div class="col-10">
+                        행사 안내는 변경 저장 시 미리보기에 적용됩니다.
+                    </div>
+                    <div class="col-2">
+                        <select class="form-select form-select-sm" id="show-order-info" onchange="changeShowOrder('info', this)" style="width: 80px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <h5>추가 내용</h5>
+                    <div class="col-12" id="info-content-area">
+                        <textarea id="info-content"></textarea>
+                        <div class="badge rounded-pill bg-dark float-end mt-1" role="alert" id="push-info-count">0/5,000 byte</div>
+                    </div>
+                </div>
+            </div>            
+        </div>        
+    </div>
+    <div class="col-lg-5 col-md-6 col-sm-6">
+        <div class="toolbar mb-2">
+            <div class="toolbar-start">
+                <button type="button" class="btn btn-xs btn-primary" onclick="addProductsExcelView()">
+                    엑셀 업로드
+                </button>
+                <button type="button" class="btn btn-xs btn-success" onclick="downloadProductsExcel()">
+                    엑셀 다운로드
+                </button>
+                <button type="button" class="btn btn-xs btn-danger" onclick="initialiszeData()">
+                    전체 초기화
+                </button>
+            </div>
+            <div class="toolbar-end">
+                <button type="button" class="btn btn-xs btn-danger" onclick="addSection()">
+                    섹션 추가
+                </button>
+                <select class="form-select form-select-sm" id="show-order-product" style="width: 80px;" onchange="changeShowOrder('product', this)">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+        </div>
+        <div class='list-hidden'></div>
+        <div class="" id="section-list"></div>
+        <div class="card leaflet-action d-none">
+            <div class="card-body">
+                <div class="text-end">
+                    <button class="btn btn-secondary btn-sm" onclick="applyChangeCancel('', '')">변경사항 취소</button>
+                    <button class="btn btn-danger btn-sm" onclick="applyChange('', '')">변경사항 적용</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-12 col-sm-12">
+        <div class="phone-mobile">
+            <div id="leaflet-review">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="syncProcess" class="d-none">
+    <div class="dialog">
+        <p class="mt-3"><h4 id="loading-message">큐마켓으로 올톡에 등록된 상품들이 연동 중입니다.</h4></p>
+        <p><img src="/assets/img/alltok/mail-send.gif"></p>
+        <p class="mb-3">연동이 완료되면 자동으로 닫히므로 잠시 기다려 주십시오.</p>        
+    </div>
+</div>
+
+<!-- 엑셀 업로드 -->
+<input type="hidden" id="addProductExcel-division" name="addProductExcel-division">
+<input type="hidden" id="addProductExcel-section" name="addProductExcel-section">
+<div class="modal fade" id="modal-excelUpload" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"> 상품 엑셀 업로드</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <label for="uploadFile" class="form-label">정해진 포맷의 엑셀 파일을 이용하세요. <a href="/assets/files/sample.xlsx" target="_blank">sample.xlsx</a></label>
+                    <p>내용을 지우고 등록하실 내용으로 변경하세요</p>
+                    <p>카테고리는 A열만 입력하세요.</p>
+                    <p>상품명, 단위, 판매가격, 바코드(옵션), 사진경로(옵션) 순서입니다.</p>
+                    <p>사진경로는 등록된 사진을 재사용하기 위함입니다.</p>
+                </div>
+                <div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <input class="form-control" id="uploadFile" type="file" accept=".xlsx,.xls">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="check-find-photo" checked>
+                                    <label class="form-check-label" for="check-find-photo">
+                                      상품명으로 사진 자동 검색
+                                    </label>
+                                  </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary waves-effect" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary waves-effect waves-light" id="modal_memberUpload" onclick="uploadProductsExcel()">일괄 등록하기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 상품 사진 찾기 -->
+<input type="hidden" id="product-SEQ">
+<input type="hidden" id="product-code">
+<input type="hidden" id="photo-division">
+<input type="hidden" id="photo-section">
+<div class="modal fade" id="modal-photo" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"> 상품 사진 찾기</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <h5>상품 명칭으로 검색하여 적절한 사진을 선택하세요</h5>
+                    <p class="card-title-desc text-danger">원하는 사진이 없으면 직접 등록하세요.</p>
+                </div>
+                <div class="row">
+                    <div class="col-2">
+                        <select id="photo-category-target" class="form-select">
+                            <option value="alltok">신선</option>
+                            <option value="shuket_bcd">공산</option>
+                            <option value="shuket_all">공용 전체</option>
+                        </select>                        
+                    </div>
+                    <div class="col-5">
+                        <div class="input-group mb-3">
+                            <input type="text" id="photo-tags" class="form-control tagin" data-tagin-separator=" " placeholder="검색 내용을 입력하세요" aria-describedby="btn-search-photo" onkeypress="seachPhotoKeyPress(this)">
+                            <button class="btn btn-primary" type="button" id="btn-search-photo" onclick="seachPhoto(1)">찾기</button>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <!-- Buttons container -->
+                        <div class="hstack gap-3" style="position: relative;">
+                            <!-- The fileinput-button span is used to style the file input field as button -->
+                            <button class="btn btn-sm btn-secondary hstack gap-2 _dm-fileInputButton">
+                                <i class="demo-psi-add fs-3"></i>
+                                <span class="vr"></span>
+                                사진 직접 올리기
+                            </button>
+                            <input type="file" name="product-image-upload" id="product-image-upload" class="file_upload" onchange="uploadProductImage(this)" accept=".jpg,.jpeg,.png">
+                        </div>
+                        <!-- END : Buttons container -->
+                    </div>
+                </div>               
+                <div class="row" >
+                    <img id="preview">
+
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="mb-3">
+                            <div class="row" style="width: 100%; height:510px;overflow: auto;" id="products-photo-list">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="mb-1">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center" id="products-photo-pager"></ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger waves-effect" onclick="clearProductPhoto()">사진 지우기</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 템플릿 선택 모달 -->
+<div class="modal fade" id="modal-template-select" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_userView_Label">템플릿 선택</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row" id="template-select-list"></div>
+                        <div class="row pt-4">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center" id="template-select-list-pager"></ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <!-- end card body -->
+                </div>
+            </div>
+            <div class="p-4 text-center">
+                <button type="button" class="btn btn-primary" onclick="changeTemplate()">템플릿 변경하기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal -->
+
+<div id="loading" class="d-none">
+    <div class="dialog">
+        <p class="mt-3"><h4 id="loading-message">이미지를 찾아서 적용 중입니다.</h4></p>
+        <p>
+            <img src="/assets/img/alltok/processing.gif">
+        </p>
+        <p class="mb-3">잠시 기다려 주십시오.</p>
+    </div>
+</div>
+
+<%- contentFor('script') %>
+<script src="/assets/js/tagin.js"></script>
+<script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script lang="javascript" src="/assets/js/fileSaver/fileSaver.min.js"></script>
+<script src="/assets/vendors/@ckeditor5-41.2.1/build/ckeditor.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+<script src="/assets/js/product-helper.js"></script>
+<script src="/assets/js/leaflet.js"></script>
+
+<script>
+    const qmSyncServer = `<%=qmSyncServer.replace('{martId}', storeInfo.app_mart_code) %>`;
+    const shopType = '<%=storeInfo.shop_type %>';
+    const storeCode = '<%=storeInfo.store_code %>';
+    const leafletCode = "<%=leafletInfo.LEAFLET_CODE %>";
+    const useShop = '<%=storeInfo.use_mobile_order %>';
+    let litepickerStartDate;
+    let litepickerEndDate;
+    let searchTagin;
+    let dataJSON = null;
+    const maxNoticeCount = 60000;
+    const maxInfoCount = 30000;
+    let isInit = true;
+    const rowCount = 12;
+
+    let sectionInitData = [
+                {
+                    section: 0,
+                    title: "야채",
+                    img: "",
+                    color: "#000000",
+                    bgcolor: "#ffffff",
+                    useTable: false,
+                    order: 0,
+                    hide: false,
+                    status: 'A',
+                    product: []
+                },
+                {
+                    section: 1,
+                    title: "청과",
+                    img: "",
+                    color: "#000000",
+                    bgcolor: "#ffffff",
+                    useTable: false,
+                    order: 1,
+                    hide: false,
+                    status: 'A',
+                    product: []
+                },
+                {
+                    section: 2,
+                    title: "정육",
+                    img: "",
+                    color: "#000000",
+                    bgcolor: "#ffffff",
+                    useTable: false,
+                    order: 2,
+                    hide: false,
+                    status: 'A',
+                    product: []
+                },
+                {
+                    section: 3,
+                    title: "수산",
+                    img: "",
+                    color: "#000000",
+                    bgcolor: "#ffffff",
+                    useTable: false,
+                    order: 3,
+                    hide: false,
+                    status: 'A',
+                    product: []
+                },
+                {
+                    section: 4,
+                    title: "공산품",
+                    img: "",
+                    color: "#000000",
+                    bgcolor: "#ffffff",
+                    useTable: false,
+                    order: 4,
+                    hide: false,
+                    status: 'A',
+                    product: []
+                },
+            ]
+
+    window.onbeforeunload = function () {
+        // event.returnValue = "페이지를 벗어 나시겠습니까?";
+        // 변경이 일어나서 저장 버튼이 활성화되었는지 확인
+        let leafetActionElement = document.querySelector('.leaflet-action');
+        if (!leafetActionElement.classList.contains("d-none")) {            
+            return false;
+        }    
+    }
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        await init();
+        
+        dataJSON = await getLeaftlet(leafletCode);
+        if (dataJSON) {
+            showLeaflet();
+        }
+        isInit = false;
+
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+    })
+
+    const init = async () => {
+        // 날짜 선택자 기본 값 및 이벤트 설정
+        litepickerStartDate = new Litepicker({ 
+            element: document.getElementById('dt-leaflet-start-date'),
+            format: 'YYYY-MM-DD',
+        });
+        litepickerStartDate.on("selected", (date) => {
+            document.getElementById("swc-leaflet-range-use").checked = true;
+            showLeafletAction(true, false);
+        })
+        litepickerEndDate = new Litepicker({ 
+            element: document.getElementById('dt-leaflet-end-date'),
+            format: 'YYYY-MM-DD'
+        });
+        litepickerEndDate.on("selected", (date) => {
+            document.getElementById("swc-leaflet-range-use").checked = true;
+            showLeafletAction(true, false);
+        })
+        let html = "";
+        for (let hour = 0; hour <= 24; hour++) {
+            html += `<option valaue="${numeral(hour).format("00")}">${numeral(hour).format("00")}</option>`
+        }
+        document.getElementById("dt-leaflet-start-hour").innerHTML = html;
+        document.getElementById("dt-leaflet-start-hour").addEventListener("change", () => { showLeafletAction(true, false); })
+        document.getElementById("dt-leaflet-end-hour").innerHTML = html;
+        document.getElementById("dt-leaflet-end-hour").addEventListener("change", () => { showLeafletAction(true, false); })
+        // 에디터 설정
+        ClassicEditor.create(document.querySelector("#push-content"), {   
+            toolbar: {
+                items : ['bold', 'italic', 'fontSize', 'highlight', 'alignment', 'fontColor', 'fontBackgroundColor' ], 
+                shouldNotGroupWhenFull: true
+            },
+            language: 'ko'         
+        }).then(ckeditor => {
+                editor = ckeditor;
+                ckeditor.model.document.on('change:data', ( evt, data ) => {
+                    updatePushCount(maxNoticeCount, "push-content-area", "push-notice-count");
+                })
+
+            }).catch(function(e){console.error(e)}
+        );
+        document.getElementById("show-order-notice").value = "1";
+        document.getElementById("show-order-leaflet").value = "2";
+        document.getElementById("show-order-product").value = "3";
+        document.getElementById("show-order-info").value = "4";
+        ClassicEditor.create(document.querySelector("#info-content"), { 
+            toolbar: {
+                items : ['bold', 'italic', ,'fontSize', 'highlight', 'alignment', 'fontColor', 'fontBackgroundColor'], 
+                shouldNotGroupWhenFull: true
+            },
+            language: 'ko'
+        }).then(ckeditor => {
+                editor = ckeditor;
+                ckeditor.model.document.on('change:data', ( evt, data ) => {
+                    updatePushCount(maxNoticeCount, "info-content-area", "push-info-count");
+                })
+
+            }).catch(function(e){console.error(e)}
+        );
+
+        // 이미지 검색에서 사용할 엘리먼트
+        searchTagin = new Tagin(document.getElementById("photo-tags"), { enter: false, placeholder: "검색 내용을 스페이스 또는 엔터로 구분하여 입력", enterFunc: seachPhotoKeyPress});
+
+        // shopType == QU, 큐마켓 단독일 경우만 큐마켓 상품 연동을 활성화한다
+        if (shopType == "QU") document.getElementById("leaflet-qmsync-action").classList.remove("d-none");
+    }
+
+    // 데이터 기초 생성
+    const initDataJSON = () => {
+        let tempJSON = {
+            topNotice: "",
+            bottomInfo: "",
+            leaflet: {
+                leaflet1: "",
+                leaflet2: "",
+                leaflet3: "",
+                leaflet4: "",
+                leaflet5: "",
+                leaflet6: "",
+                leaflet7: "",
+                leaflet8: "",
+                leaflet9: "",
+            },
+            section: [],
+            showOrder: [
+                {
+                    index: 1,
+                    target: "notice"
+                },
+                {
+                    index: 2,
+                    target: "leaflet"
+                },
+                {
+                    index: 3,
+                    target: "product"
+                },
+                {
+                    index: 4,
+                    target: "info"
+                },
+            ]
+        }
+        tempJSON.section = sectionInitData;
+        return tempJSON;
+    }
+
+    // 상품 데이터를 초기화
+    const initialiszeData = () => {        
+        dataJSON.data.section = sectionInitData;
+        updateSectionList();
+        showLeafletAction(true, true);
+    }
+
+    const showLeafletAction = (showAction, showReview) => {
+        if (!showAction || isInit) return;
+        document.querySelectorAll('.leaflet-action').forEach(item => { 
+            if (item.classList.contains("d-none")) item.classList.remove("d-none"); 
+            if (showReview) showLeafletReview();
+        });
+        // 큐마켓 단독일 때, 수정 사항이 발생하면 연동 버튼은 숨겨진다
+        if (shopType == "QU") document.getElementById("leaflet-qmsync-action").classList.add("d-none");
+    }
+
+    const hideLeafletAction = () => {
+        document.querySelectorAll('.leaflet-action').forEach(item => {
+            if (!item.classList.contains("d-none")) item.classList.add("d-none");
+        });
+        // 큐마켓 단독일 때, 수정 사항이 발생이 적용 완료되면 연동 버튼이 다시 보여진다
+        if (shopType == "QU") document.getElementById("leaflet-qmsync-action").classList.remove("d-none");
+    }
+
+    const toggleUseTimeSetting = (obj) => {
+        refreshReview = false;
+        if (!obj.checked) {
+            litepickerStartDate.clearSelection();
+            litepickerEndDate.clearSelection();
+            document.getElementById("dt-leaflet-start-hour").value = "00";
+            document.getElementById("dt-leaflet-end-hour").value = "00";
+
+            obj.checked = false;
+        } else {
+            const startDateSetting = litepickerStartDate.getDate() ? litepickerStartDate.getDate() + " " + document.getElementById("dt-leaflet-start-hour").value + ":00:00" : null;
+            const endDateSetting = litepickerEndDate.getDate() ? litepickerEndDate.getDate() + " " + document.getElementById("dt-leaflet-end-hour").value + ":00:00" : null;
+            if (!startDateSetting && !endDateSetting) {
+                // 지정된 날짜가 없으면 오늘~내일로 설정
+                litepickerStartDate.setDate(moment());
+                litepickerEndDate.setDate(moment().add(1, 'd'));
+                document.getElementById("dt-leaflet-start-hour").value = numeral(moment().hour()).format("00");
+                document.getElementById("dt-leaflet-end-hour").value = numeral(moment().hour()).format("00");
+            }
+        }
+        showLeafletAction(true, false);                
+    }
+
+    // 카테고리 선택 모달 오픈
+    const changeTemplateModal = async () => {
+        // await initTemplateCondition();
+        await searchTemplate(1);
+        
+        const modal = new bootstrap.Modal(document.getElementById('modal-template-select'));
+        modal.show();        
+    }
+
+    const searchTemplate = async (page = 1) => {
+        const rowCount = 6;
+
+        // const searchJSON = createSearchCondition("select", page, rowCount);
+        // console.log(searchJSON)
+        const callApi = `${apiServer}/template/apiList`
+        await axios.post(callApi, {
+            page: page,
+            rowCount: rowCount
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(response => {
+            // console.log(response)
+            if (response.data.data) {
+                let HTML = "";
+                for (let template of response.data.data) {
+                    HTML += `
+                        <div class="col-md-2">
+                            <div class="text-center mb-1">
+                                <input class="form-check-input" type="radio" name="rd-select-template" id="rd-select-template-${template.TEMPLATE_CODE}" value='${template.TEMPLATE_CODE}'>
+                            </div>
+                            <label for="rd-select-template-${template.TEMPLATE_CODE}"><img class="img-fluid" src="${template.THUMBNAIL_URI}"></label>
+                        </div>`;
+                }
+                document.getElementById("template-select-list").innerHTML = HTML;
+
+                // let pagerHTML = createPagerHTML(response.data.data.count, rowCount, page, 5, "changePageSelectTemplate");
+                // document.getElementById("template-select-list-pager").innerHTML = pagerHTML;
+            }
+        })
+        .catch(error => { 
+            console.log(error); alert(`템플릿 내역을 가져오지 못했습니다.`);
+        })       
+    }
+
+    const changePageSelectTemplate = (page, rowPerPage) => {
+        document.getElementById("template-select-list").innerHTML = "";
+        document.getElementById("template-select-list-pager").innerHTML = "";
+
+        searchTemplate(page);
+    }
+
+    const changeTemplate = async () => {
+        const selectedTemplateRadio = document.querySelector("[name='rd-select-template']:checked");
+        if (selectedTemplateRadio) {
+            if (!confirm("템플릿 변경은 즉시 적용됩니다. 계속하시겠습니까?")) return;
+
+            let templateCode = selectedTemplateRadio.value;
+            const callApi = `${apiServer}/leaflet/apiUpdateTemplate`
+            await axios.post(callApi, {
+                leafletCode: leafletCode,
+                templateCode: templateCode
+            }, {
+                    headers: {
+                        xtoken: getCookie("xToken")
+                    }
+            })
+            .then(response => {
+                const templateHTML = response.data.data;
+                if (templateHTML) {
+                    dataJSON.TEMPLATE_HTML = templateHTML;
+                    showLeaflet()
+                } else {
+                    console.log(error); alert(`템플릿 변경에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);    
+                }
+                // 창 닫기
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modal-template-select'));
+                modal.hide();
+            })
+            .catch(error => { 
+                console.log(error); alert(`전단 생성에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);
+            }) 
+        } else {
+            alert("변경할 템플릿을 선택하세요.");
+        }
+    }
+
+    const getLeaftlet = async (leafletCode) => {
+        const callApi = `${apiServer}/leaflet/apiGet`;
+        const result = axios.post(callApi, {
+            leafletCode: leafletCode
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(response => {
+            if (response.data.data)
+                return response.data.data;
+            else
+                return null;
+        }).catch(error => {
+            console.log(error);
+            return null;
+        })
+        return result;
+    }
+
+    // leaftInfo 정보를 가지고 데이터를 표시한다
+    // review도 표시
+    const showLeaflet = () => {
+        // 사용 기간 사용 여부 체크        
+        document.getElementById("swc-leaflet-range-use").checked = dataJSON.USE_TIME == 'Y' ? true : false;
+        // 사용 기간 날짜 값 설정
+        if (dataJSON.USE_TIME == 'Y') {
+            
+            const startDate = moment(dataJSON.START_DATE);
+            const endDate = moment(dataJSON.END_DATE);
+
+            litepickerStartDate.setDate(startDate)
+            litepickerEndDate.setDate(endDate)
+            document.getElementById("dt-leaflet-start-hour").value = numeral(startDate.hour()).format("00");
+            document.getElementById("dt-leaflet-end-hour").value = numeral(endDate.hour()).format("00");
+        }
+
+        // data 표시
+        // 없으면 데이터 초기화        
+        // console.log(dataJSON)
+        if (!dataJSON.DATA) {
+            dataJSON.data = initDataJSON();
+        } else {            
+            dataJSON.data = JSON.parse(dataJSON.DATA);
+            if (!dataJSON.data.showOrder) {
+                dataJSON.data.showOrder = [
+                {
+                    index: 1,
+                    target: "notice"
+                },
+                {
+                    index: 2,
+                    target: "leaflet"
+                },
+                {
+                    index: 3,
+                    target: "product"
+                },
+                {
+                    index: 4,
+                    target: "info"
+                },
+            ];
+            } else if (dataJSON.data.showOrder.length == 3) {
+                // 새로 항목이 추가되었으므로, 기존 데이터는 3개 뿐이라서 기존 데이터를 유지하기 위해 강제로 1개 추가
+                dataJSON.data.showOrder.push({
+                    index: 4,
+                    target: "info"
+                });
+            }
+        }
+        // 공지 표시
+        // 상단 공지
+
+        const pushElement = document.querySelector('#push-content-area .ck-editor__editable_inline');
+        const pushInstance = pushElement.ckeditorInstance;
+        pushInstance.setData(dataJSON.data.topNotice);
+
+        // 하단 공지
+        const infoElement = document.querySelector('#info-content-area .ck-editor__editable_inline');
+        const infoInstance = infoElement.ckeditorInstance;
+        infoInstance.setData(dataJSON.data.bottomInfo);
+        if (dataJSON.data.showOrder) {
+            for (let order of dataJSON.data.showOrder) {
+                document.getElementById("show-order-" + order.target).value = order.index;
+            }
+        }
+
+        showLeafletFile();
+
+        // section 데이터 표시
+        updateSectionList();
+
+        // review 표시
+        showLeafletReview();
+    }
+
+    const buildLeafletFile = (leafletData, index) => {        
+        // console.log(leafletData)
+        leafletData = (leafletData) ? leafletData : '';
+        let HTML = `
+            <div class="btn-product-leafet-add align-middle text-dark mb-2">
+                <div id="leaflet-${index}-review">
+                ${leafletData.length == 0 ? `<i class="psi-add"></i>` : `<img src="${awsCFServer}${leafletData}">`}    
+                </div>
+                <input type="file" name="leaflet-file-${index}" id="leaflet-file-${index}" class="file_upload" onchange="uploadLeaflet(this, '${index}')">
+            </div>
+            <button id="btn-leaflet-upload-${index}" class="btn btn-xs btn-primary ${leafletData.length == 0 ? `` : `d-none`}" onclick="document.getElementById('leaflet-file-${index}').click()">등록</button>
+            <button id="btn-leaflet-remove-${index}" class="btn btn-xs btn-danger ${leafletData.length == 0 ? `d-none` : ``}" onclick="removeLeaflet('${index}')">삭제</button>
+        `;
+        return HTML;
+    }
+
+    const showLeafletFile = () => {        
+        document.getElementById("leaflet-1").innerHTML = buildLeafletFile(dataJSON.data.leaflet.leaflet1, 1);
+        document.getElementById("leaflet-2").innerHTML = buildLeafletFile(dataJSON.data.leaflet.leaflet2, 2);
+        document.getElementById("leaflet-3").innerHTML = buildLeafletFile(dataJSON.data.leaflet.leaflet3, 3);
+        document.getElementById("leaflet-4").innerHTML = buildLeafletFile(dataJSON.data.leaflet.leaflet4, 4);
+        document.getElementById("leaflet-5").innerHTML = buildLeafletFile(dataJSON.data.leaflet.leaflet5, 5);
+        document.getElementById("leaflet-6").innerHTML = buildLeafletFile(dataJSON.data.leaflet.leaflet6, 6);
+        document.getElementById("leaflet-7").innerHTML = buildLeafletFile(dataJSON.data.leaflet.leaflet7, 7);
+        document.getElementById("leaflet-8").innerHTML = buildLeafletFile(dataJSON.data.leaflet.leaflet8, 8);
+        document.getElementById("leaflet-9").innerHTML = buildLeafletFile(dataJSON.data.leaflet.leaflet9, 9);
+    }
+
+    const korean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+
+    const updateSectionData = (section) => {
+        let HTML = `            
+            <div class="card-header bg-dark d-flex justify-content-between" id="section-header-${section.section}">
+                <div>
+                    <button type="button" class="btn btn-xs btn-success" onclick="moveUpSection(${section.section})" ${(section.order > 0) ? '' : 'disabled'}><i class="psi-up"></i></button>
+                    <button type="button" class="btn btn-xs btn-success" onclick="moveDownSection(${section.section})" ${(section.order < dataJSON.data.section.length - 1) ? '' : 'disabled'}><i class="psi-down"></i></button>
+                    <button type="button" class="btn btn-xs btn-primary" onclick="hideSection(${section.section})"}><i class="${section.hide ? "psi-arrow-down" : "psi-arrow-up"}"></i></button>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="m-0 text-white" id="section-title-${section.section}">${section.title}</h5>
+                        <input type="text" class="form-control form-control-sm d-none" id="section-title-edit-${section.section}" value="${section.title}">
+                    </div>
+                    <div class="ms-2">
+                        <button id="btn-section-title-edit-${section.section}" type="button" class="btn btn-xs btn-secondary btn-lg waves-effect waves-light" onclick="setSectionTitleEdit(${section.section})">변경</button>
+                        <button id="btn-section-title-save-${section.section}" type="button" class="btn btn-xs btn-secondary btn-lg waves-effect waves-light d-none" onclick="saveSectionTitle(${section.section})">저장</button>
+                        <button id="btn-section-title-cancel-${section.section}" type="button" class="btn btn-xs btn-secondary btn-lg waves-effect waves-light d-none" onclick="cancelModifySectionTitle(${section.section})">취소</button>
+                    </div>                            
+                </div>
+                <div id="section-controller-${section.section}">
+                    <button type="button" class="btn btn-xs btn-danger" id="btn-section-remove-${section.section}" onclick="removeSection('${section.section}')">
+                        섹션삭제
+                    </button>
+                    <button type="button" class="btn btn-xs btn-light" id="btn-section-add-product-${section.section}"  onclick="addProduct_single('section', '${section.section}')">
+                        상품추가
+                    </button>
+                    <input class="form-check-input" type="checkbox" id="check-design-${section.section}" onclick="setSectionDesign('${section.section}')" ${section.useTable ? "checked" : ""}> 
+                    <label class="form-check-label text-white" for="check-design-${section.section}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="테이블형은 사진이 표시되지 않습니다">
+                        테이블
+                    </label>
+                    <input class="ms-1 form-check-input" type="checkbox" id="check-paging-${section.section}" onclick="setSectionPaging('${section.section}')" ${section.notUsePaging ? "checked" : ""}> 
+                    <label class="form-check-label text-white" for="check-paging-${section.section}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="모두보기는 더보기가 안나타납니다">
+                        모두보기
+                    </label>
+                </div>
+                <div class='section-switch form-check form-switch'><input class="form-check-input" type="checkbox" role="switch" onclick="toggleSection('${section.section}')" ${!section.status || section.status == 'A' ? "checked" : "" }></div>
+            </div>
+            <div class="product-setting ${section.hide ? "d-none" : ""}" id="section-product-${section.section}">
+                <div class="text-center" id="section-product-list-${section.section}">
+        `;
+        let htmlProduct = '';
+        for (let product of section.product) {
+            let imageUrl = "";
+            if (product.tmpl_dt_img != "") {
+                let imageJSON = JSON.parse(product.tmpl_dt_img);
+                imageUrl = (imageJSON[0].items[0].value) ? imageJSON[0].items[0].value : "https://s3.ap-northeast-2.amazonaws.com/moa.images/no-image.jpg";
+                if (imageUrl) {
+                    // console.log(imageUrl)
+                    // S3 경로를 cloudfront 경로로 변경
+                    // alltok S3를 CF 변경
+                    imageUrl = convertCloundFront(imageUrl);
+
+                    const url = imageUrl.split("/");
+                    const fileName = url[url.length - 1];
+                    const newFileName = (korean.test(fileName)) ? encodeURIComponent(fileName) : fileName;
+                    imageUrl = url.slice(0, url.length - 1).join("/") + "/" + newFileName;
+                }
+            }
+
+            htmlProduct += `
+                <div class="align-middle d-flex pb-1 pt-1" id="section-product-${section.section}-${product.tmpl_dt_cd}">
+                    <div class="product-image text-center ps-1" draggable='false' >
+                        ${(imageUrl == "") ? 
+                        `<button draggable='false' type="button" class="btn btn-xs btn-light btn-product-photo-add" onclick="changeImage('section', '${section.section}', '${product.tmpl_dt_cd}')"><i class="psi-add"></i></button>` :
+                        `<a draggable='false' href="javascript:void(0)" onclick="changeImage('section', '${section.section}', '${product.tmpl_dt_cd}')"><img draggable='false' class="img pointer btn-action" src="${imageUrl}" style="max-width: 50px"></a>`}
+                    </div>
+                    <div class='product-name ps-2'><input draggable='false' type="text" class="form-control form-control-sm" value='${product.tmpl_dt_tl}${product.tmpl_dt_unit && product.tmpl_dt_unit != "" ? " " + product.tmpl_dt_unit : ""}' oninput="updateProductValue(this, 'NAME', '${section.section}', '${product.tmpl_dt_cd}')" id='P_${product.tmpl_dt_cd}'></div>
+                    <div class='product-price ps-1'><input draggable='false' type="number" class="form-control form-control-sm" value='${product.tmpl_dt_sale_price}' onkeyup="updateProductValue(this, 'PRICE', '${section.section}', '${product.tmpl_dt_cd}')"></div>
+                    <div class='product-remove'><button draggable='false' type="button" class="btn btn-xs btn-danger" onclick="removeProduct('${section.section}', '${product.tmpl_dt_cd}')"><i class="psi-trash"></i></button></div>
+                    <div class='product-switch form-check form-switch'><input class="form-check-input" type="checkbox" role="switch" onclick="toggleProduct('${section.section}', '${product.tmpl_dt_cd}')" ${product.tmpl_dt_status == 'A' ? "checked" : ""}></div>
+                    <div class="moveArrow" draggable='false'>
+                        <i class="psi-up-down-3" draggable='false'></i>
+                    </div>
+                    <div class="moveArrow" draggable='false'>
+                        <a draggable='false' href="javascript:void(0)" onclick="moveTop('${section.section}', '${product.tmpl_dt_cd}')"><i class="psi-go-top" draggable='false'></i></a>
+                    </div>
+                </div>`;
+            // htmlProduct += `
+            //     <div class="align-middle d-flex pb-1 pt-1" id="section-product-${section.section}-${product.tmpl_dt_cd}">
+            //         <div class="product-image text-center ps-1" draggable='false' >
+            //             ${(imageUrl == "") ? 
+            //             `<button draggable='false' type="button" class="btn btn-xs btn-light btn-product-photo-add" onclick="changeImage('section', '${section.section}', '${product.tmpl_dt_cd}')"><i class="psi-add"></i></button>` :
+            //             `<a draggable='false' href="javascript:void(0)" onclick="changeImage('section', '${section.section}', '${product.tmpl_dt_cd}')"><img draggable='false' class="img pointer btn-action" src="${imageUrl}" style="max-width: 50px"></a>`}
+            //         </div>
+            //         <div class='product-name ps-2'><input draggable='false' type="text" class="form-control form-control-sm" value='${product.tmpl_dt_tl}${product.tmpl_dt_unit && product.tmpl_dt_unit != "" ? " " + product.tmpl_dt_unit : ""}' oninput="updateProductValue(this, 'NAME', '${section.section}', '${product.tmpl_dt_cd}')" id='P_${product.tmpl_dt_cd}'></div>
+            //         <div class='product-price ps-1'><input draggable='false' type="number" class="form-control form-control-sm" value='${product.tmpl_dt_sale_price}' onkeyup="updateProductValue(this, 'PRICE', '${section.section}', '${product.tmpl_dt_cd}')"></div>
+            //         ${ (shopType == "QU") ? `                    
+            //         <div class='product-price ps-1 pe-1'>
+            //             <select class="form-select form-control-sm ${product.tmpl_dt_tax && product.tmpl_dt_tax == "tax" ? "select-tax" : 'select-taxfree'}" onchange="updateTaxType(this, '${section.section}', '${product.tmpl_dt_cd}')">
+            //                 <option value="taxfree" ${product.tmpl_dt_tax && product.tmpl_dt_tax == "taxfree" ? "selected" : ''}>면세</option>
+            //                 <option value="tax" ${product.tmpl_dt_tax && product.tmpl_dt_tax == "tax" ? "selected" : ''}>과세</option>
+            //             </select>
+            //         </div>` : ''}
+            //         <div class='product-remove'><button draggable='false' type="button" class="btn btn-xs btn-danger" onclick="removeProduct('${section.section}', '${product.tmpl_dt_cd}')"><i class="psi-trash"></i></button></div>
+            //         <div class='product-switch form-check form-switch'><input class="form-check-input" type="checkbox" role="switch" onclick="toggleProduct('${section.section}', '${product.tmpl_dt_cd}')" ${product.tmpl_dt_status == 'A' ? "checked" : ""}></div>
+            //         <div class="moveArrow" draggable='false'>
+            //             <i class="psi-up-down-3" draggable='false'></i>
+            //         </div>
+            //         <div class="moveArrow" draggable='false'>
+            //             <a draggable='false' href="javascript:void(0)" onclick="moveTop('${section.section}', '${product.tmpl_dt_cd}')"><i class="psi-go-top" draggable='false'></i></a>
+            //         </div>
+            //     </div>`;
+        }
+        HTML += htmlProduct + `
+                    </div>                
+            </div>        
+        `;
+        return HTML;
+    }
+
+    const updateSectionList = () => {
+        let HTML = "";
+        if (!dataJSON.data) return;
+        
+        let num = 1;
+        for (let section of dataJSON.data.section) {
+            HTML += `<div class="card mb-2" id="section-${section.section}">`
+            HTML += updateSectionData(section);
+            HTML += "</div>"
+        }
+        document.getElementById(`section-list`).innerHTML = HTML;
+
+        // Using 
+        for (let section of dataJSON.data.section) {
+            let list = document.getElementById(`section-product-list-${section.section}`)
+            sortable(list, (item, target, direction) => {
+                changeDataJSONProductSort(item, target, direction);
+                // console.log(item);
+                // console.log(target);
+                // console.log(direction);
+            });
+        }
+
+    }
+
+    const updatePushCount = (maxCount, container, counter) => {
+        if (isInit) showLeafletAction(false, false); else  showLeafletAction(true, false);
+
+        const editorElement = document.querySelector(`#${container} .ck-editor__editable_inline`);
+        const editorInstance = editorElement.ckeditorInstance;
+        const dataText = editorInstance.getData();
+
+        if (container == "push-content-area") {
+            dataJSON.data.topNotice = dataText;
+        } else {
+            dataJSON.data.bottomInfo = dataText;
+        }
+
+        let editorCount = fn_checkByteString(dataText);
+
+        if (editorCount > maxCount) {
+            document.getElementById(counter).innerHTML = `<span class="text-danger fs-5">${numeral(editorCount).format("0,0")}</span>/${numeral(maxCount).format("0,0")} bytes`;
+            return false;
+        } else {            
+            document.getElementById(counter).innerHTML = `${numeral(editorCount).format("0,0")}/${numeral(maxCount).format("0,0")} bytes`;
+            return true;
+        }
+    }
+
+    // const actionStorage = [];
+    /*******************************************/
+    // 섹션 추가, 변경, 삭제
+    const hideSection = (sectionCode) => {
+        const section = dataJSON.data.section.find(e => { return e.section == sectionCode});
+        if (document.querySelector(`#section-header-${sectionCode} div button:last-child i`).classList.contains("psi-arrow-up")) {
+            section.hide = true;
+            document.getElementById(`section-product-${sectionCode}`).classList.add("d-none")
+            document.querySelector(`#section-header-${sectionCode} div button:last-child i`).classList.remove("psi-arrow-up")
+            document.querySelector(`#section-header-${sectionCode} div button:last-child i`).classList.add("psi-arrow-down")
+        } else {
+            section.hide = false;
+            document.getElementById(`section-product-${sectionCode}`).classList.remove("d-none")
+            document.querySelector(`#section-header-${sectionCode} div button:last-child i`).classList.add("psi-arrow-up")
+            document.querySelector(`#section-header-${sectionCode} div button:last-child i`).classList.remove("psi-arrow-down")
+        }        
+    }
+
+    const setSectionDesign = (sectionCode) => {
+        const section = dataJSON.data.section.find(e => { return e.section == sectionCode});
+        section.useTable = document.getElementById("check-design-" + sectionCode).checked;
+
+        showLeafletAction(true, true);
+    }
+
+    const setSectionPaging = (sectionCode) => {
+        const section = dataJSON.data.section.find(e => { return e.section == sectionCode});
+        section.notUsePaging = document.getElementById("check-paging-" + sectionCode).checked;
+
+        showLeafletAction(true, true);
+    }
+
+    const setSectionTitleEdit = (sectionCode) => {
+        document.getElementById(`section-title-edit-${sectionCode}`).value = document.getElementById(`section-title-${sectionCode}`).innerHTML;
+        document.getElementById(`section-title-${sectionCode}`).classList.add("d-none");
+        document.getElementById(`section-title-edit-${sectionCode}`).classList.remove("d-none")
+
+        document.getElementById(`btn-section-title-edit-${sectionCode}`).classList.add("d-none");
+        document.getElementById(`btn-section-title-save-${sectionCode}`).classList.remove("d-none")
+        document.getElementById(`btn-section-title-cancel-${sectionCode}`).classList.remove("d-none")
+    }
+
+    const cancelModifySectionTitle = (sectionCode) => {
+        document.getElementById(`section-title-${sectionCode}`).classList.remove("d-none");
+        document.getElementById(`section-title-edit-${sectionCode}`).classList.add("d-none")
+
+        document.getElementById(`btn-section-title-edit-${sectionCode}`).classList.remove("d-none");
+        document.getElementById(`btn-section-title-save-${sectionCode}`).classList.add("d-none")
+        document.getElementById(`btn-section-title-cancel-${sectionCode}`).classList.add("d-none")
+    }
+
+    const saveSectionTitle = (sectionCode) => {
+        // 저장
+        const section = dataJSON.data.section.find(e => { return e.section == sectionCode});
+        section.title = document.getElementById(`section-title-edit-${sectionCode}`).value;
+        cancelModifySectionTitle(sectionCode);
+        document.getElementById(`section-title-${sectionCode}`).innerHTML = section.title;
+
+        showLeafletAction(true, true);
+    }
+
+    // 새로운 섹션을 추가
+    const getUniqe3Digit = () => {
+        return Math.floor(100 + Math.random() * 900);
+    }
+
+    const addSection = async () => {
+        // 맨 마지막 섹션의 코드를 얻는다
+        const lastSection = dataJSON.data.section.length > 0 ? dataJSON.data.section[dataJSON.data.section.length - 1] : null;
+
+        const section = {
+            section: getUniqe3Digit(),
+            title: "제목없음",
+            img: "",
+            bgcolor: "#ffffff",
+            color: "#000000",
+            order: dataJSON.data.section.length,
+            hide: false,
+            status: 'A',
+            product: []
+        }
+        dataJSON.data.section.push(section);
+        
+        // let addSection = {
+        //     ACTION: "ADD_SECTION",
+        //     P_CODE: "",
+        //     DIVISION: "sub",
+        //     SECTION: section.section,
+        //     DATA: "",
+        //     ORDER: 0
+        // }
+        // actionStorage.push(addSection)
+
+        // 마지막 섹션의 아래 이동 버튼을 활성화한다
+        if (lastSection) {
+            document.getElementById("section-header-" + lastSection.section).querySelector("div>button:last-child").removeAttribute("disabled", "")
+        }
+        let addHTML = `<div class="card mb-2" id="section-${section.section}"">` + updateSectionData(section) + "</div>";
+        document.getElementById(`section-list`).insertAdjacentHTML('beforeend', addHTML);
+
+        showLeafletAction(true, true);
+    }
+    
+    const removeSection = (sectionCode) => {       
+        // 섹션을 찾는다
+        const sectionIndex = dataJSON.data.section.findIndex(item => item.section == sectionCode);
+        // 화면에서 삭제한다
+        const sectionElement = document.getElementById("section-header-" + sectionCode).parentElement;
+        sectionElement.remove();
+        // 데이터 삭제
+        dataJSON.data.section.splice(sectionIndex, 1);
+        // 데이터 순서 정렬
+        arrangeDataJSON(dataJSON.data.section);
+
+        showLeafletAction(true, true);
+    }
+   
+    const arrangeDataJSON = (dataJSON) => {
+        dataJSON.sort((e1, e2) => {
+            return e1.order - e2.order;
+        })
+        let orderIndex = 0;
+        for (let data of dataJSON) {
+            data.order = orderIndex++;
+        }
+    }
+
+    const moveUpSection = async (sectionCode) => {
+        // 메인 상품인 경우, 메인 상품 JSON 데이터에서 해당 항목의 인덱스를 찾아 삭제한 후 데이터를 업데이트하고 화면을 갱신한다
+        const section = dataJSON.data.section.find(e => { return e.section == sectionCode})
+        const prv_section = dataJSON.data.section.find(e => { return e.order == section.order - 1})
+        
+        section.order--;
+        prv_section.order++;  
+        arrangeDataJSON(dataJSON.data.section);          
+        // 데이터 업데이트
+        // let leafletCode = await saveLeafletData();
+        if (leafletCode) {
+            updateSectionList();
+            showLeafletAction(true, true);
+        } else {
+            alert("색션 순서를 바꿀 때 오류가 발생했습니다. 잠시 후 다시 시도해 주십시오.");
+        }
+    }
+
+    const moveDownSection = async (sectionCode) => {
+        // 메인 상품인 경우, 메인 상품 JSON 데이터에서 해당 항목의 인덱스를 찾아 삭제한 후 데이터를 업데이트하고 화면을 갱신한다
+        const section = dataJSON.data.section.find(e => { return e.section == sectionCode})
+        const next_section = dataJSON.data.section.find(e => { return e.order == section.order + 1})
+        
+        section.order++;
+        next_section.order--;  
+        arrangeDataJSON(dataJSON.data.section);          
+        // 데이터 업데이트
+        // let leafletCode = await saveLeafletData();
+        if (leafletCode) {
+            updateSectionList();
+            showLeafletAction(true, true);
+        } else {
+            alert("색션 순서를 바꿀 때 오류가 발생했습니다. 잠시 후 다시 시도해 주십시오.");
+        }
+    }
+
+    const toggleSection = (sectionCode) => {
+        const section = dataJSON.data.section.find(e => { return e.section == sectionCode})
+        section.status = (!section.status || section.status == 'A') ? 'I' : 'A';        
+        
+        showLeafletAction(true, true);
+    }
+    // 섹션 추가, 변경, 삭제 끝
+    /*******************************************/
+
+    /*******************************************/
+    // 상품 추가, 변경, 삭제
+    // let addProductIndex = 1;
+    // 상품 사진 관리
+    const changeImage = (division, section, productCode) => {
+        document.getElementById("product-code").value = productCode;
+        document.getElementById("photo-division").value = division;
+        document.getElementById("photo-section").value = section;
+
+        document.getElementById("photo-tags").value = "";
+        document.getElementById("products-photo-list").innerHTML = "";
+        document.getElementById("products-photo-pager").innerHTML = "";
+        
+        searchTagin.clear();
+        let defaultSearchValue = document.getElementById("P_" + productCode).value;
+        defaultSearchValue = getPlainTextForImageSearch(defaultSearchValue);
+        searchTagin.addTag(defaultSearchValue);
+
+        seachPhoto(1);
+
+        const modal = new bootstrap.Modal(document.getElementById('modal-photo'));
+        modal.show();
+    }
+
+    const seachPhotoAlltok = async (productCode, photoDivision, photoSection, page) => {
+        let keyword = searchTagin.getValue();
+        let callApi = `${apiServer}/image/apiList`;
+        await axios.post(callApi, {
+            categoryCode: "",
+            tags: keyword,
+            page: page,
+            rowCount: rowCount
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(returnResult => {
+            if (returnResult && returnResult.data.data) {                
+                let html = "";
+                for (let photo of returnResult.data.data.rows) {
+                    let imageUrl = `${awsCFServer}${photo.path}`;
+                    html += `
+                        <div class="col-md-3 text-center">
+                            <a href="javascript:void(0)" onclick="useProductPhoto('${photoDivision}', '${photoSection}', '${productCode}', '${imageUrl}')"><img src="${imageUrl}" class="img-thumbnail" style="max-width: 120px"></a>
+                            <p class="mt-1 mb-lg-0">
+                                ${photo.tags.replaceAll(/\s/g, ",")}                                
+                            </p>
+                        </div>
+                    `;
+                }
+                document.getElementById("products-photo-list").innerHTML = html;
+
+                let pagerHTML = createPagerHTML(returnResult.data.data.count, rowCount, page, 5, "changeProductsPhotoPage");
+                document.getElementById("products-photo-pager").innerHTML = pagerHTML;
+
+            } else {
+                alert(`상품 사진을 가져오지 못했습니다`); 
+            }
+        })
+        .catch(error => { 
+            console.log(error); 
+            alert(`상품 사진을 가져오지 못했습니다`); 
+        });
+    }
+
+    const seachPhotoShuket = async (existBarCode, productCode, photoDivision, photoSection, page) => {
+        let keyword = searchTagin.getValue();
+        let callApi = `${apiServer}/image/apiFindPhotoShuket`;
+        await axios.post(callApi, {
+            existBarCode: existBarCode,
+            keyword: keyword,
+            page: page,
+            rowCount: rowCount
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(returnResult => {
+            if (returnResult && returnResult.data.data) {                
+                let html = "";
+                for (let photo of returnResult.data.data.rows) {
+                    let imageUrl = photo.IM_URI;
+                    if (imageUrl) {
+                        const url = imageUrl.split("/");
+                        const fileName = url[url.length - 1];
+                        const newFileName = (korean.test(fileName)) ? encodeURIComponent(fileName) : fileName;
+                        imageUrl = url.slice(0, url.length - 1).join("/") + "/" + newFileName;
+                    }
+                    html += `
+                        <div class="col-md-3 text-center">
+                            <a href="javascript:void(0)" onclick="useProductPhoto('${photoDivision}', '${photoSection}', '${productCode}', '${imageUrl}')"><img src="${imageUrl}" class="img-thumbnail" style="max-width: 120px"></a>
+                            <p class="mt-1 mb-lg-0">
+                                ${photo.IM_NAME}${(photo.IM_UNIT) ? "/" + photo.IM_UNIT : ""}
+                                ${(photo.IM_PROVIDER) ? "<br>" + photo.IM_PROVIDER : ""}
+                            </p>
+                        </div>
+                    `;
+                }
+                document.getElementById("products-photo-list").innerHTML = html;
+
+                let pagerHTML = createPagerHTML(returnResult.data.data.count, rowCount, page, 5, "changeProductsPhotoPage");
+                document.getElementById("products-photo-pager").innerHTML = pagerHTML;
+
+            } else {
+                alert(`상품 사진을 가져오지 못했습니다`); 
+            }
+        })
+        .catch(error => { 
+            console.log(error); 
+            alert(`상품 사진을 가져오지 못했습니다`); 
+        });
+    }
+
+    const seachPhoto = async (page) => {
+        let keyword = searchTagin.getValue();
+        if (keyword.length == 0) {
+            alert("검색어를 입력하세요.");
+            return;
+        }
+        const productCode = document.getElementById("product-code").value;
+        const photoDivision = document.getElementById("photo-division").value;
+        const photoSection = document.getElementById("photo-section").value;
+        
+        const imageStorageType = document.getElementById("photo-category-target").value;
+
+        switch (imageStorageType) {
+            case "alltok":
+                await seachPhotoAlltok(productCode, photoDivision, photoSection, page);
+                break;
+            case "shuket_bcd":
+                await seachPhotoShuket(true, productCode, photoDivision, photoSection, page);
+                break;
+            case "shuket_all":
+                await seachPhotoShuket(false, productCode, photoDivision, photoSection, page);
+                break;
+        }       
+    }
+
+    function seachPhotoKeyPress() {
+        seachPhoto(1);
+    }
+
+    function changeProductsPhotoPage(page, rowPerPage) {
+        seachPhoto(page);
+    }
+
+    // 상품 사진을 변경한다
+    const useProductPhoto = async(division, sectionCode, productCode, IM_URI) => {
+        let modal = bootstrap.Modal.getInstance(document.getElementById('modal-photo'));
+        modal.hide();
+        for (let section of dataJSON.data.section) {
+            let subProducts = section.product.filter(item => item.tmpl_dt_cd == productCode);            
+            if (subProducts.length > 0) {
+                for (let product of subProducts) {
+                    product.tmpl_dt_img = IM_URI != "" ? JSON.stringify([
+                        {
+                            "sv_key": "sv1",
+                            "items":[
+                                {
+                                    "key":"thumb",
+                                    "value": IM_URI
+                                }
+                            ],
+                            "main":"1",
+                            "priority":"1"
+                        }
+                    ]) : "";
+                }
+            }
+        }
+
+        const sectionInfo = dataJSON.data.section.find(item => item.section == sectionCode);
+        const HTML = updateSectionData(sectionInfo);
+        document.getElementById("section-" + sectionCode).innerHTML = HTML;
+
+        showLeafletAction(true, true);
+    }
+
+    const clearProductPhoto = () => {
+        const productCode = document.getElementById("product-code").value;
+        const division = document.getElementById("photo-division").value;
+        const section = document.getElementById("photo-section").value;
+
+        useProductPhoto(division, section, productCode, "");
+    }
+    // productsJSON (배열로 된 상품 정보)을 order에 따라 순서를 정렬한다
+    const arrangeList = (productsJSON) => {
+        productsJSON.sort((e1, e2) => {
+            return e1.tmpl_dt_order - e2.tmpl_dt_order;
+        })
+        let orderIndex = 0;
+        for (let data of productsJSON) {
+            data.tmpl_dt_order = orderIndex++;
+        }
+    }
+    
+    const buildBlankProduct = (productCode, productOrder) => {
+        const productData = {
+            tmpl_dt_cd: productCode,
+            tmpl_dt_bcd: "",
+            tmpl_dt_tl: "",
+            tmpl_dt_unit: "",
+            tmpl_dt_stock: 999,
+            tmpl_dt_img: '',
+            tmpl_dt_category1: "",
+            tmpl_dt_category2: "",
+            tmpl_dt_category3: "",
+            tmpl_dt_list_price: 0,
+            tmpl_dt_sale_price: 0,
+            tmpl_dt_tags: "",
+            tmpl_dt_regist: new Date(),
+            tmpl_dt_register: "",
+            tmpl_dt_status: "A",
+            tmpl_dt_order: productOrder
+        }
+        return productData;
+    }
+
+    const buildProductCode = (unique = 0) => {
+        return `${storeCode}_${moment().format("YYYYMMDDhhmmss")}${numeral(unique).format("000")}_${Math.floor(10000 + Math.random() * 9000)}`        
+    }
+
+    const buildProductImage = (url) => {
+        return JSON.stringify([{
+                "sv_key":"sv1",
+                "items":[
+                    {
+                        "key":"thumb",
+                        "value":url
+                    }
+                ],
+                "main":"1",
+                "priority":"1"
+            }
+        ]);
+    }
+
+    const shiftUpProductsOrder = (products) => {
+        // 상품 정렬 (정렬되어 있을 것으로 예상하지만 아닐 수도 있으므로)
+        products.sort((e1, e2) => {
+            return e1.tmpl_dt_order - e2.tmpl_dt_order;
+        })
+        products.forEach(item => item.tmpl_dt_order++);
+    }
+
+    const addProduct_single = async (division, sectionCode) => {
+        const sectionInfo = dataJSON.data.section.find(item => item.section == sectionCode);
+        // const lastProductInfo = sectionInfo.product[sectionInfo.product.length - 1];
+        // const addProductInfo = buildBlankProduct(`${buildProductCode()}`, sectionInfo.product.length);
+        // const firstProductInfo = sectionInfo.product[0];
+        const addProductInfo = buildBlankProduct(`${buildProductCode()}`, 0);
+        // 대상 섹션의 기존 상품의 순서를 모두 1씩 증가한다
+        shiftUpProductsOrder(sectionInfo.product);
+        sectionInfo.product.push(addProductInfo);
+        sectionInfo.product.sort((e1, e2) => {
+            return e1.tmpl_dt_order - e2.tmpl_dt_order;
+        })
+
+        // let addedProduct = {
+        //     ACTION: "ADD",
+        //     P_CODE: addProductInfo.tmpl_dt_cd,
+        //     DIVISION: division,
+        //     SECTION: sectionCode,
+        //     DATA: "",
+        //     ORDER: addProductIndex
+        // }
+        // actionStorage.push(addedProduct);
+
+        const dataTable = document.getElementById(`section-product-list-${sectionCode}`);
+
+        const addHTML = `
+            <div class="align-middle d-flex pb-1 pt-1" id="section-product-${sectionCode}-${addProductInfo.tmpl_dt_cd}">
+                <div class="product-image text-center ps-1" draggable='false' >
+                    <button type="button" class="btn btn-xs btn-light btn-product-photo-add" onclick="changeImage('section', '${sectionCode}', '${addProductInfo.tmpl_dt_cd}')"><i class="psi-add"></i></button>
+                </div>
+                <div class='product-name ps-2'><input draggable='false' type="text" class="form-control form-control-sm" value='${addProductInfo.tmpl_dt_tl}${addProductInfo.tmpl_dt_unit && addProductInfo.tmpl_dt_unit != "" ? " " + addProductInfo.tmpl_dt_unit : ""}' oninput="updateProductValue(this, 'NAME', '${sectionCode}', '${addProductInfo.tmpl_dt_cd}')" id="P_${addProductInfo.tmpl_dt_cd}"></div>
+                <div class='product-price ps-1'><input draggable='false' type="number" class="form-control form-control-sm" value='${addProductInfo.tmpl_dt_sale_price}' onkeyup="updateProductValue(this, 'PRICE', '${sectionCode}', '${addProductInfo.tmpl_dt_cd}')"></div>
+                <div class='product-remove'><button draggable='false' type="button" class="btn btn-xs btn-danger" onclick="removeProduct('${sectionCode}', '${addProductInfo.tmpl_dt_cd}')"><i class="psi-trash"></i></button></div>
+                <div class='product-switch form-check form-switch'><input class="form-check-input" type="checkbox" role="switch" onclick="toggleProduct('${sectionCode}', '${addProductInfo.tmpl_dt_cd}')" checked></div>
+                <div class="moveArrow" draggable='false'>
+                    <i class="psi-up-down-3" draggable='false'></i>
+                </div>
+            </div>`;
+
+        // const addHTML = `
+        //     <div class="align-middle d-flex pb-1 pt-1" id="section-product-${sectionCode}-${addProductInfo.tmpl_dt_cd}">
+        //         <div class="product-image text-center ps-1" draggable='false' >
+        //             <button type="button" class="btn btn-xs btn-light btn-product-photo-add" onclick="changeImage('section', '${sectionCode}', '${addProductInfo.tmpl_dt_cd}')"><i class="psi-add"></i></button>
+        //         </div>
+        //         <div class='product-name ps-2'><input draggable='false' type="text" class="form-control form-control-sm" value='${addProductInfo.tmpl_dt_tl}${addProductInfo.tmpl_dt_unit && addProductInfo.tmpl_dt_unit != "" ? " " + addProductInfo.tmpl_dt_unit : ""}' oninput="updateProductValue(this, 'NAME', '${sectionCode}', '${addProductInfo.tmpl_dt_cd}')" id="P_${addProductInfo.tmpl_dt_cd}"></div>
+        //         <div class='product-price ps-1'><input draggable='false' type="number" class="form-control form-control-sm" value='${addProductInfo.tmpl_dt_sale_price}' onkeyup="updateProductValue(this, 'PRICE', '${sectionCode}', '${addProductInfo.tmpl_dt_cd}')"></div>
+        //         ${ (shopType == "QU") ? `                    
+        //         <div class='product-price ps-1 pe-1'>
+        //             <select class="form-select form-control-sm"  onchange="updateTaxType(this, '${sectionCode}', '${addProductInfo.tmpl_dt_cd}')">
+        //                 <option value="taxfree">면세</option>
+        //                 <option value="tax">과세</option>
+        //             </select>
+        //         </div>` : ''}
+        //         <div class='product-remove'><button draggable='false' type="button" class="btn btn-xs btn-danger" onclick="removeProduct('${sectionCode}', '${addProductInfo.tmpl_dt_cd}')"><i class="psi-trash"></i></button></div>
+        //         <div class='product-switch form-check form-switch'><input class="form-check-input" type="checkbox" role="switch" onclick="toggleProduct('${sectionCode}', '${addProductInfo.tmpl_dt_cd}')" checked></div>
+        //         <div class="moveArrow" draggable='false'>
+        //             <i class="psi-up-down-3" draggable='false'></i>
+        //         </div>
+        //     </div>`;
+
+        dataTable.insertAdjacentHTML('afterbegin', addHTML);
+        // addProductIndex++;
+        
+        // if (lastProductInfo) {
+        //     // 마지막 섹션의 아래 이동 버튼을 활성화한다
+        //     document.getElementById("section-product-" + sectionInfo.section + "-" + lastProductInfo.tmpl_dt_cd).querySelector("div>button:last-child").removeAttribute("disabled", "")
+        // }
+        // if (firstProductInfo) {
+        //     // 이전의 1번이었던 상품의 위 이동 버튼을 활성화한다
+        //     document.getElementById("section-product-" + sectionInfo.section + "-" + firstProductInfo.tmpl_dt_cd).querySelector("div>button:first-child").removeAttribute("disabled", "")
+        // }
+        showLeafletAction(true, true);
+    }
+
+    const moveUp = async (division, sectionCode, productCode) => {
+        // 컨테이너를 찾는다
+        const sectionInfo = dataJSON.data.section.find(item => item.section == sectionCode);
+        // 메인 상품인 경우, 메인 상품 JSON 데이터에서 해당 항목의 인덱스를 찾아 삭제한 후 데이터를 업데이트하고 화면을 갱신한다
+        const product = sectionInfo.product.find(e => { return e.tmpl_dt_cd == productCode})
+        const prv_product = sectionInfo.product.find(e => { return e.tmpl_dt_order == product.tmpl_dt_order - 1})
+
+        product.tmpl_dt_order--;
+        prv_product.tmpl_dt_order++;  
+        arrangeList(sectionInfo.product);
+        const HTML = updateSectionData(sectionInfo);
+
+        document.getElementById("section-" + sectionCode).innerHTML = HTML;
+        showLeafletAction(true, true);
+    }
+
+    const moveDown = async (division, sectionCode, productCode) => {
+        // 컨테이너를 찾는다
+        const sectionInfo = dataJSON.data.section.find(item => item.section == sectionCode);
+
+        // 메인 상품인 경우, 메인 상품 JSON 데이터에서 해당 항목의 인덱스를 찾아 삭제한 후 데이터를 업데이트하고 화면을 갱신한다
+        const product = sectionInfo.product.find(e => { return e.tmpl_dt_cd == productCode})
+        const prv_product = sectionInfo.product.find(e => { return e.tmpl_dt_order == product.tmpl_dt_order + 1})
+                
+        product.tmpl_dt_order++;
+        prv_product.tmpl_dt_order--;  
+        arrangeList(sectionInfo.product);
+        const HTML = updateSectionData(sectionInfo);
+        document.getElementById("section-" + sectionCode).innerHTML = HTML;
+        showLeafletAction(true, true);
+    }
+
+    const moveTop = (sectionCode, productCode) => {
+        const sectionInfo = dataJSON.data.section.find(item => item.section == sectionCode);
+        const productInfo = sectionInfo.product.find(item => item.tmpl_dt_cd == productCode);
+
+        productInfo.tmpl_dt_order = -1;
+        arrangeList(sectionInfo.product);
+        updateSectionList()
+        // const HTML = updateSectionData(sectionInfo);
+        // document.getElementById("section-" + sectionCode).innerHTML = HTML;
+
+        showLeafletAction(true, true);
+    }
+    
+    const updateProductValue = (obj, changeType, sectionCode, productCode) => {
+        
+        const changedValue = obj.value;
+        
+        // 대상 데이터 항목을 찾는다
+        const sectionInfo = dataJSON.data.section.find(item => item.section == sectionCode);
+        const productInfo = sectionInfo.product.find(item => item.tmpl_dt_cd == productCode);
+        switch (changeType) {
+            case "NAME": 
+                const productNameUnit = changedValue.trim().split(" ");
+                // console.log(productNameUnit[0], productNameUnit[1])
+                // 분리한 맨 뒤가 UNIT
+                productInfo.tmpl_dt_unit = productNameUnit.length > 1 ? productNameUnit[productNameUnit.length - 1] : "";
+                productInfo.tmpl_dt_tl = productNameUnit.length > 1 ? productNameUnit.slice(0, productNameUnit.length - 1).join(' ') : productNameUnit[0];
+                // console.log(productNameUnit.length, productInfo)
+                break;
+            case "PRICE": productInfo.tmpl_dt_sale_price = changedValue; break;
+        }      
+        showLeafletAction(true, true);  
+    }
+
+    const updateTaxType = (obj, sectionCode, productCode) => {
+
+        const sectionInfo = dataJSON.data.section.find(item => item.section == sectionCode);
+        const productInfo = sectionInfo.product.find(item => item.tmpl_dt_cd == productCode);
+
+        // 선택된 값 얻기
+        var selectValue = obj.options[obj.selectedIndex].value;
+        productInfo.tmpl_dt_tax = selectValue;
+        
+        if (selectValue === 'taxfree') {
+            obj.classList.remove('select-tax');
+            obj.classList.add('select-taxfree');
+        } else if (selectValue === 'tax') {
+            obj.classList.remove('select-taxfree');
+            obj.classList.add('select-tax');
+        }
+        showLeafletAction(true, true);  
+    }
+
+    const removeProduct = async (sectionCode, productCode) => {        
+        // 컨테이너를 찾는다
+        const sectionInfo = dataJSON.data.section.find(item => item.section == sectionCode);
+        // 컨테이너에서 삭제한다
+        const productInfo = sectionInfo.product.find(item => item.tmpl_dt_cd == productCode);
+        
+        if (productInfo) {
+            const productIndex = sectionInfo.product.findIndex(item => item.tmpl_dt_cd == productCode);
+            sectionInfo.product.splice(productIndex, 1);
+
+            arrangeList(sectionInfo.product);
+
+            const HTML = updateSectionData(sectionInfo);
+            document.getElementById("section-" + sectionCode).innerHTML = HTML;
+
+            showLeafletAction(true, true);
+        }
+    }
+
+    const toggleProduct = async (sectionCode, productCode) => {        
+        // 컨테이너를 찾는다
+        const sectionInfo = dataJSON.data.section.find(item => item.section == sectionCode);
+        // 컨테이너에서 삭제한다
+        const productInfo = sectionInfo.product.find(item => item.tmpl_dt_cd == productCode);
+        
+        if (productInfo) {
+            // const productIndex = sectionInfo.product.findIndex(item => item.tmpl_dt_cd == productCode);
+            // sectionInfo.product.splice(productIndex, 1);
+
+            // arrangeList(sectionInfo.product);
+
+            // const HTML = updateSectionData(sectionInfo);
+            // document.getElementById("section-" + sectionCode).innerHTML = HTML;
+
+            productInfo.tmpl_dt_status = productInfo.tmpl_dt_status == 'A' ? 'H' : 'A';
+            showLeafletAction(true, true);
+        }
+    }
+    // 상품 추가, 변경, 삭제 끝
+    /*******************************************/
+
+    const uploadLeaflet = async (obj, index) => {
+        let uploadFile = obj;
+        const formData = new FormData();
+        formData.append("uploadFile", uploadFile.files[0]);
+
+        await axios.post(`${apiServer}/uploadS3/uploadSingle`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "location": `store/${storeCode}/leaflet`
+            },
+        }).then(async response =>  {
+            if (response.data.result === "success") {
+                let uploadedFile = response.data.data;
+                // let photo = response.data.data.filename;
+                // let path = response.data.data.path;
+
+                switch (index) {
+                    case '1': dataJSON.data.leaflet.leaflet1 = uploadedFile.key; break;
+                    case '2': dataJSON.data.leaflet.leaflet2 = uploadedFile.key; break;
+                    case '3': dataJSON.data.leaflet.leaflet3 = uploadedFile.key; break;
+                    case '4': dataJSON.data.leaflet.leaflet4 = uploadedFile.key; break;
+                    case '5': dataJSON.data.leaflet.leaflet5 = uploadedFile.key; break;
+                    case '6': dataJSON.data.leaflet.leaflet6 = uploadedFile.key; break;
+                    case '7': dataJSON.data.leaflet.leaflet7 = uploadedFile.key; break;
+                    case '8': dataJSON.data.leaflet.leaflet8 = uploadedFile.key; break;
+                    case '9': dataJSON.data.leaflet.leaflet9 = uploadedFile.key; break;
+
+                }                
+                document.querySelector(`#leaflet-${index} div`).innerHTML = `<img src='${s3Server}${uploadedFile.key}'>`;
+                document.getElementById(`btn-leaflet-upload-${index}`).classList.add("d-none");
+                document.getElementById(`btn-leaflet-remove-${index}`).classList.remove("d-none");
+                
+                showLeafletAction(true, true);
+            } else {
+                alert("파일 업로드를 실패했습니다.");
+                return null;
+            }
+        }).catch(error => {
+            console.log(error);
+            alert("파일 업로드를 실패했습니다.");
+        });
+    }
+
+    const removeLeaflet = (index) => {
+        let photo = ``;
+        switch (index) {
+            case '1': dataJSON.data.leaflet.leaflet1 = photo; break;
+            case '2': dataJSON.data.leaflet.leaflet2 = photo; break;
+            case '3': dataJSON.data.leaflet.leaflet3 = photo; break;
+            case '4': dataJSON.data.leaflet.leaflet4 = photo; break;
+            case '5': dataJSON.data.leaflet.leaflet5 = photo; break;
+            case '6': dataJSON.data.leaflet.leaflet6 = photo; break;
+            case '7': dataJSON.data.leaflet.leaflet7 = photo; break;
+            case '8': dataJSON.data.leaflet.leaflet8 = photo; break;
+            case '9': dataJSON.data.leaflet.leaflet9 = photo; break;
+        }                
+        document.querySelector(`#leaflet-${index} div`).innerHTML = `<i class="psi-add"></i>`;
+        document.getElementById(`btn-leaflet-upload-${index}`).classList.remove("d-none");
+        document.getElementById(`btn-leaflet-remove-${index}`).classList.add("d-none");
+
+        showLeafletAction(true, true);
+    }
+
+    // blob 데이터를 서버에 업로드하고 고객이 사용할 수 있게 등록한다
+    const uploadBlobToServer = async (blob) => {
+        const formData = new FormData();
+        formData.append("uploadFile", blob);
+
+        await axios.post(`${apiServer}/uploadS3/uploadSingle`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "location": `store/${storeCode}/products`
+            },
+        }).then(async response =>  {            
+            if (response.data.result === "success") {
+                const fileInfo = response.data.data;
+                let photoFile = fileInfo.key;
+                photoPath = `${s3Server}${photoFile}`;
+
+                const productCode = document.getElementById("product-code").value;
+                const photoDivision = document.getElementById("photo-division").value;
+                const photoSection = document.getElementById("photo-section").value;
+
+                let html = `
+                    <div class="col-md-3 text-center">
+                        <a href="javascript:void(0)" onclick="useProductPhoto('${photoDivision}', '${photoSection}', '${productCode}', '${photoPath}')"><img src="${photoPath}" class="img-thumbnail" style="max-width: 120px"></a>
+                        <p class="mt-1 mb-lg-0">
+                            사용자 등록 사진
+                        </p>
+                    </div>`;
+                
+                document.getElementById("products-photo-list").innerHTML = html;                
+            } else {
+                alert("파일 업로드를 실패했습니다.");
+                return null;
+            }
+        }).catch(error => {
+            console.log(error);
+            alert("파일 업로드를 실패했습니다.");
+        });
+    }
+
+    // 사용자가 선택한 이미지 파일을 600x600으로 강제 리사이즈해서 업로드한다
+    const uploadProductImage = async (obj) => {
+        let uploadFile = obj;
+
+        // 이미지를 600x600으로 리사이징
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var img = document.createElement("img");
+            img.onload = async (event) => {
+                // Dynamically create a canvas element
+                var canvas = document.createElement("canvas");
+                // var canvas = document.getElementById("canvas");
+                var context = canvas.getContext("2d");
+
+                const MAX_WIDTH = 600;
+                const MAX_HEIGHT = 600;
+                let width = img.width;
+                let height = img.height;
+                let left = 0;
+                let top = 0;
+
+                // Actual resizing
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height = height * (MAX_WIDTH / width);
+                        width = MAX_WIDTH;
+                        top = (MAX_HEIGHT - height) / 2;
+                    } else {
+                        left = (MAX_WIDTH - width) / 2;
+                        top = (MAX_HEIGHT - height) / 2;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width = width * (MAX_HEIGHT / height);
+                        height = MAX_HEIGHT;
+                        left = (MAX_WIDTH - width) / 2;;
+                    } else {
+                        left = (MAX_WIDTH - width) / 2;
+                        top = (MAX_HEIGHT - height) / 2;
+                    }
+                }
+
+                canvas.width = MAX_WIDTH;
+                canvas.height = MAX_HEIGHT;
+                context.fillStyle = "white";
+                context.fillRect(0, 0, MAX_WIDTH, MAX_HEIGHT);
+                context.drawImage(img, left, top, width, height);
+                
+                canvas.toBlob(async (blob) => {
+                    await uploadBlobToServer(blob)
+                    },
+                    "image/jpeg",
+                    1,
+                );
+
+                // // Show resized image in preview element
+                // var dataurl = canvas.toDataURL(uploadFile.files[0].type);
+                // document.getElementById("preview").src = dataurl;
+            }
+            img.src = e.target.result;
+        }
+        reader.readAsDataURL(uploadFile.files[0]);
+
+        
+    }
+
+    /****************************************************/
+    // 메인에서 작업 저장 또는 취소 처리
+    // 간단하게 하기 위하여 작업에 제한을 적용
+    //      메인은 모든 정보를 저장한다
+    //      서브는 해당 서브의 작업만 저장한다. 작업을 저장하거나 취소하기 전에는 모달을 닫지 못하게 한다
+    //      서브를 편집하려면 메인의 수정을 적용하거나 취소해야만 하도록 한다. 이로써 메인과 서브의 작업이 엉키는 것을 방지한다
+    const saveTimeSetting = async () => {
+        let useTimeSetting = document.getElementById("swc-leaflet-range-use").checked;
+
+        const startDateSetting = litepickerStartDate.getDate() ? litepickerStartDate.getDate().format("YYYY-MM-DD") + " " + document.getElementById("dt-leaflet-start-hour").value + ":00:00" : null;
+        const endDateSetting = litepickerEndDate.getDate() ? litepickerEndDate.getDate().format("YYYY-MM-DD") + " " + document.getElementById("dt-leaflet-end-hour").value + ":59:59" : null;
+
+        if (useTimeSetting && (!startDateSetting || !endDateSetting)) {
+            alert("사용 시간을 설정하려면 반드시 사용 기간을 선택해 주세요");
+            return false;
+        }
+
+        const callApi = `${apiServer}/leaflet/apiModifyUseTime`
+        const result = await axios.post(callApi, {
+            leafletCode: leafletCode,
+            useTime: (useTimeSetting) ? 'Y' : 'N',
+            startDate: startDateSetting,
+            endDate: endDateSetting
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(response => {
+            if (response.data.data) {                
+                // alert(`상태가 저장되었습니다.`);    
+                return true;
+            } else {
+                // alert(`상태 변경에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);    
+                return false;
+            }
+        })
+        .catch(error => { 
+            console.log(error); 
+            return false;
+            // alert(`상태 변경에 실패했습니다. 잠시 후 다시 시도해 주십시오.`);
+        }) 
+        return result;
+    }
+
+    // 추가, 변경, 삭제를 모두 한꺼번에 처리
+    let applyProcessFlag = false;
+    const applyChange = async () => {
+        if (applyProcessFlag) return;
+        applyProcessFlag = true;
+
+        // 날짜 변경 저장
+        const dateChangeResult = await saveTimeSetting();
+        if (!dateChangeResult) {
+            alert("날짜 설정 변경이 실패했습니다. 잠시 후 다시 시도해 주십시오.");
+            applyProcessFlag = false;
+            return;
+        }
+
+        // 상단 공지
+        const pushElement = document.querySelector('#push-content-area .ck-editor__editable_inline');
+        const pushInstance = pushElement.ckeditorInstance;
+        dataJSON.data.topNotice = pushInstance.getData();
+
+        // 하단 공지
+        const infoElement = document.querySelector('#info-content-area .ck-editor__editable_inline');
+        const infoInstance = infoElement.ckeditorInstance;
+        dataJSON.data.bottomInfo = infoInstance.getData();
+
+        // 전단지 데이터는 입력 시 즉시 등록
+
+        // console.log(dataJSON)
+        // 데이터 저장
+        await saveLeafletData();
+        applyChangeCancel(false);
+
+        applyProcessFlag = false;
+    }
+
+    const applyChangeCancel = async (changeFlag = true) => {
+        if (changeFlag) {
+            if (!confirm("변경 사항을 취소하면 지금까지 변경한 것이 변경 사항을 저장하기 전으로 되돌아갑니다.")) return;
+        }
+        // 다시 읽어서 표시
+        dataJSON = await getLeaftlet(leafletCode);
+        if (dataJSON) {
+            showLeaflet();
+            showLeafletReview();
+        }
+
+        hideLeafletAction();
+    }
+
+    // leaflet Data JSON을 저장한다
+    const saveLeafletData = async () => {
+        // console.log(dataJSON.data)
+        const callApi = `${apiServer}/leaflet/apiUpdateDataJSON`
+        const retrunLeafletCode = await axios.post(callApi, {
+            leafletCode: leafletCode,
+            dataJSON: JSON.stringify(dataJSON.data)
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(response => {            
+            if (response.data.data) {                
+                return response.data.data;
+            } else {
+                alert(`상품은 등록되었으나 전단지 연결이 되지 않았습니다. 잠시 후 다시 시도해 주십시오.`);    
+                return null;
+            }
+        })
+        .catch(error => { 
+            console.log(error); 
+            alert(`상품은 등록되었으나 전단지 연결이 되지 않았습니다. 잠시 후 다시 시도해 주십시오.`);
+            return null;
+        })
+        return leafletCode;
+    }
+
+    const buildNoticeHTML = (topNotice) => {
+        let HTML = "<div class='top-notice pt-2 pb-2'>" + topNotice + "</div>";
+        return HTML;
+    }
+
+    const buildInfoHTML = (bottomInfo) => {
+        let HTML = "<div class='top-notice pt-2 pt-2'>" + bottomInfo + "</div>";
+        return HTML;
+    }
+
+    const buildLeafletHTML = (leaflets) => {
+        let HTML = "<div class='pt-2 pb-2'>";
+        if (leaflets.leaflet1 != "") {
+            HTML += `<div class='leaflet-uploaded'><img class="img-fluid" src='${awsCFServer}${leaflets.leaflet1}'></div>`;
+        }
+        if (leaflets.leaflet2 != "") {
+            HTML += `<div class='leaflet-uploaded'><img class="img-fluid" src='${awsCFServer}${leaflets.leaflet2}'></div>`;
+        }
+        if (leaflets.leaflet3 != "") {
+            HTML += `<div class='leaflet-uploaded'><img class="img-fluid" src='${awsCFServer}${leaflets.leaflet3}'></div>`;
+        }
+        if (leaflets.leaflet4 != "") {
+            HTML += `<div class='leaflet-uploaded'><img class="img-fluid" src='${awsCFServer}${leaflets.leaflet4}'></div>`;
+        }
+        if (leaflets.leaflet5 && leaflets.leaflet5 != "") {
+            HTML += `<div class='leaflet-uploaded'><img class="img-fluid" src='${awsCFServer}${leaflets.leaflet5}'></div>`;
+        }
+        if (leaflets.leaflet6 && leaflets.leaflet6 != "") {
+            HTML += `<div class='leaflet-uploaded'><img class="img-fluid" src='${awsCFServer}${leaflets.leaflet6}'></div>`;
+        }
+        if (leaflets.leaflet7 && leaflets.leaflet7 != "") {
+            HTML += `<div class='leaflet-uploaded'><img class="img-fluid" src='${awsCFServer}${leaflets.leaflet7}'></div>`;
+        }
+        if (leaflets.leaflet8 && leaflets.leaflet8 != "") {
+            HTML += `<div class='leaflet-uploaded'><img class="img-fluid" src='${awsCFServer}${leaflets.leaflet8}'></div>`;
+        }
+        if (leaflets.leaflet9 && leaflets.leaflet9 != "") {
+            HTML += `<div class='leaflet-uploaded'><img class="img-fluid" src='${awsCFServer}${leaflets.leaflet9}'></div>`;
+        }
+        HTML += "</div>";
+        return HTML;
+    }
+
+    const showLeafletReview = () => {
+        const leafletData = dataJSON.data;
+
+        document.getElementById("leaflet-review").classList.add("d-none");
+
+        let martLogo = '<%=storeInfo.logo_image %>';
+        martLogo = (martLogo != "") ? (martLogo.indexOf("http") >= 0) ? martLogo : `${awsCFServer}${martLogo}` : "";
+        let HTML = `<div class='text-center mb-2'>${martLogo != "" ? `<img src="${martLogo}" style="max-height:25px">` : '<%=storeInfo.name %>'}</div>`
+
+        HTML += "<div id='alltok-leaflet'>";
+//         dataJSON.TEMPLATE_HTML = `
+// <link href="https://api.alltok.co.kr/public/stylesheets/template/TMPL000002.css" id="css-TMPL000002" rel="stylesheet" type="text/css" />
+
+// <div id="main-template-2">
+//     <div class="page-content-template">
+//         <div class="container-fluid">
+//                 $category{
+//                     <div class="row list-block-product-cate mt-4">
+//                         <div class="col-md-12">
+//                             <h3 class="c_orange category-bold">
+//                                 <a>\${category_name}</a>
+//                             </h3>
+//                         </div>
+//                     </div>
+//                     <div class="section-product-container">
+//                         <ul class="" id="section-product-list-\${section}">
+//                         $sub{
+//                             <li>
+//                                 <div class="wrap-box">
+//                                     <div class="wrap-image">
+//                                         <a onclick="\${product_action}"><img loading="lazy" class="swiper-lazy" src="\${product_imageUri}" data-src="\${product_imageUri}" alt="\${product_name}"></a>
+//                                         <div class="info-cart">
+//                                             <div class="info-image-button">
+//                                                 <a class="btn-addCart" href="javascript:;" onclick="\${product_cart_action}"></a>
+//                                             </div>
+//                                         </div>
+//                                     </div>
+//                                     <div class="wrap-info" onclick="\${product_action}">
+//                                         <div class="info-group">
+//                                             <div class="info-title">
+//                                                 <div class="innerBox">
+//                                                     <span class="inner">
+//                                                     <a>\${product_name} \${product_unit}</a>
+//                                                     </span>
+//                                                 </div>
+//                                             </div>
+//                                             <div class="info-price">
+//                                                 <span class="price-discount"><b>\${product_sale_price}</b> 원</span>                                                
+//                                             </div>
+//                                         </div>
+//                                     </div>
+//                                 </div>
+//                             </li>                        	
+//                             $table$
+//                             <ul class="table-type">
+//                                 <li class="w-title">\${product_name} \${product_unit}</li>
+//                                 <li class="w-price"><b>\${product_sale_price}</b> 원</li>
+//                                 <li class="w-cart"><div class="info-cart">
+//                                             <div class="info-image-button">
+//                                                 <a class="btn-addCart" href="javascript:;" onclick="\${product_cart_action}"></a>
+//                                             </div>
+//                                         </div></li>
+//                             </ul>
+//                         }$sub
+//                         </ul>
+//                     </div>
+//                     <div class="clear"></div>
+//                 }$category
+//                 <!-- end row -->
+//             </div> <!-- container-fluid -->
+//         </div>
+//         <!-- End Page-content -->
+//     </div>
+// </div>        
+//         `
+// console.log(leafletData.showOrder)
+        if (leafletData.showOrder && leafletData.showOrder.length >= 3) {
+            for (let showOrder of leafletData.showOrder) {
+                console.log(showOrder.target)
+                switch (showOrder.target) {
+                    case "notice":
+                    // console.log(buildNoticeHTML(leafletData.topNotice))
+                        HTML += buildNoticeHTML(leafletData.topNotice);
+                        break;            
+                    case "leaflet":
+                    // console.log(buildLeafletHTML(leafletData.leaflet))
+                        HTML += buildLeafletHTML(leafletData.leaflet);
+                        break;            
+                    case "product":
+                    // console.log(buildLeafletFromHTML(dataJSON.TEMPLATE_HTML, leafletData.section))
+                        HTML += buildLeafletFromHTML(dataJSON.TEMPLATE_HTML, leafletData.section);
+                        break;            
+                    case "info":
+                    // console.log(buildInfoHTML(leafletData.bottomInfo))
+                        HTML += buildInfoHTML(leafletData.bottomInfo);
+                        break;            
+                }
+            }
+        } else {
+            // 기본값 또는 없을 때
+            // 상단 공지 표시
+            HTML += buildNoticeHTML(leafletData.topNotice);
+            // 전단지 표시
+            HTML += buildLeafletHTML(leafletData.leaflet);
+            // 전단지 생성
+            HTML += buildLeafletFromHTML(dataJSON.TEMPLATE_HTML, leafletData.section);
+            // 하단 공지 표시
+            HTML += buildInfoHTML(leafletData.bottomInfo);
+        }
+
+
+        // 하단 공지 표시
+        
+        HTML += "</div>";
+        // console.log(HTML)
+        document.getElementById("leaflet-review").innerHTML = HTML;
+        
+        if (useShop == 'N') {
+            let carts = document.querySelectorAll(".s-product-cart-content");
+            if (carts.length > 0) {
+                for (let cart of carts)
+                 {
+                    cart.classList.add("d-none")
+                 }
+            }
+            
+        }
+        document.getElementById("leaflet-review").classList.remove("d-none");
+    }
+
+    // const blankImage = 'https://s3.ap-northeast-2.amazonaws.com/moa.images/product/cover/600x600_%EC%9D%B4%EB%AF%B8%EC%A7%80%EC%A4%80%EB%B9%84%EC%A4%91%20%EB%AA%A8%EB%B0%94%EC%9D%BC%20no%20text.png';
+    const blankImage = awsCFServer + '/product/cover/600x600_빈이미지-모바일-no-text.jpg';
+    const buildLeafletFromHTML = (leafletHTML, sectionData) => {
+        let tempHTML = leafletHTML;
+
+        // 서브 섹션 HTML 분리. tempHTML에 섹션 리스트가 들어갈 위치에 $category{}$category 가 남는다
+        let sectionHTML = tempHTML.substring(tempHTML.indexOf("$category{") + 10, tempHTML.indexOf("}$category"));
+        tempHTML = tempHTML.replace(sectionHTML, "");
+
+        // 상품 HTML 분리, sectionHTML에 상품이 들어갈 위치에 $sub{}$sub가 남는다
+        let sectionProductHTML = sectionHTML.substring(sectionHTML.indexOf("$sub{") + 5, sectionHTML.indexOf("}$sub"));
+        sectionHTML = sectionHTML.replace(sectionProductHTML, "");
+
+        const sectionProductHTMLContainer = sectionProductHTML;
+        let sectionProductTableHTML = "";
+        if (sectionProductHTMLContainer.indexOf("$table$") >= 0) {
+            const sectionProductHTMLContainerArray = sectionProductHTMLContainer.split("$table$");
+            sectionProductHTML = sectionProductHTMLContainerArray[0];
+            sectionProductTableHTML = sectionProductHTMLContainerArray[1];
+        } else {
+            sectionProductHTML = sectionProductHTMLContainer;
+            sectionProductTableHTML = `
+            <div class='row s-product-table'>
+                <div class='col-8 s-product-title'>\${product_name} \${product_unit}</div>
+                <div class='col-3 s-product-price text-end'>\${product_sale_price}원</div>
+                <div class='col-1'>
+                    <div class='s-product-cart-content'>
+                        <img onclick="\${product_cart_action}" alt="CartIcon" class="s-product-cart-icon" src="https://s3.ap-northeast-2.amazonaws.com/moa.images/catalogs/cart_icon_36_36.png">
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+        // 섹션 처리
+        let sectionHTML_row = "";
+        if (sectionData) {
+            for (let section of sectionData) {
+                if (section.status && section.status == 'I') continue;
+                let tempSectionHTML = sectionHTML;
+
+                tempSectionHTML = tempSectionHTML.replaceAll('${category_name}', section.title);
+                tempSectionHTML = tempSectionHTML.replaceAll('#${category_color}', (section.bgcolor != "") ? section.bgcolor : "transparent");
+                tempSectionHTML = tempSectionHTML.replaceAll('class="category-title', `class="category-title color-${getCategoryRandomColor()}`);
+
+                // 섹션 이미지 처리
+                // 임시 컨테이너 생성해서 섹션 html을 넣는다
+                const divContainer = document.createElement("div");
+                divContainer.innerHTML = tempSectionHTML;
+
+                // 섹션 이미지 엘리먼트
+                let imageElement = divContainer.querySelector("img");
+                // 섹션 타이틀 엘리먼트
+                let titleElement = divContainer.querySelector("div.banner-cate");
+                tempSectionHTML = divContainer.innerHTML;
+
+                let sectionProductHTML_row = "";
+                if (section.product.length > 0) {
+                    // 페이징 처리. 1페이지
+                    const page = 1;
+                    const rowPerPage = 9;
+                    let targetProducts = section.product.filter(e => e.tmpl_dt_status == 'A');
+                    // targetProducts = (section.product.length <= rowPerPage) ? section.product.slice() : section.product.slice(0, 9);
+                    targetProducts = (targetProducts.length <= rowPerPage) ? targetProducts : targetProducts.slice(0, 9);
+                    const viewMoreFlag = (section.product.length <= rowPerPage) ? false : true;
+
+                    // 보이기 상태인 상품만 목록으로 처리
+
+                    for (let product of targetProducts) {
+                        if (product.tmpl_dt_status == 'H') continue;
+                        const listPrice = product.tmpl_dt_list_price;
+                        const salePrice = product.tmpl_dt_sale_price;
+
+                        let tempProductHTML = (section.useTable) ? sectionProductTableHTML : sectionProductHTML;
+
+                        tempProductHTML = tempProductHTML.replaceAll('${product_name}', product.tmpl_dt_tl);
+                        tempProductHTML = tempProductHTML.replaceAll('${product_unit}', product.tmpl_dt_unit);
+                        tempProductHTML = tempProductHTML.replaceAll('${product_sale_price}', numeral(salePrice).format("0,0"));
+                        if (product.tmpl_dt_img != "") {
+                            let imageUri = imageUrilFromProdcut(product);
+                            imageUri = convertCloundFront(imageUri)
+                            tempProductHTML = tempProductHTML.replaceAll('${product_imageUri}', imageUri);
+                        } else {
+                            tempProductHTML = tempProductHTML.replaceAll('${product_imageUri}', blankImage);
+                        }
+                        tempProductHTML = tempProductHTML.replaceAll('${product_action}', `addToCart('${product.tmpl_dt_cd}', '${salePrice}')`);
+
+                        let tempElement = document.createElement("div");
+                        tempElement.innerHTML = tempProductHTML;
+                        sectionProductHTML_row += tempElement.innerHTML;
+                    }
+                    sectionProductHTML_row += (viewMoreFlag) ? `<button class='btn btn-light w-100' onclick="javascript:alert('모바일에서 확인하세요')">더보기</button>` : '';
+                    tempSectionHTML = tempSectionHTML.replace("$sub{}$sub", sectionProductHTML_row);
+                } else {
+                    tempSectionHTML = tempSectionHTML.replace("$sub{}$sub", "");
+                }
+                sectionHTML_row += tempSectionHTML;
+            }
+        }
+        tempHTML = tempHTML.replace("$category{}$category", sectionHTML_row);
+        return `<div class="products pt-2 pb-2">${tempHTML}</div>`;
+    }
+
+    const addProductsExcelView  = () => {
+        document.getElementById("uploadFile").value = null;
+        document.getElementById("check-find-photo").checked = true;
+        const modal = new bootstrap.Modal(document.getElementById('modal-excelUpload'));
+        modal.show();
+    }
+
+    const addProductsFromSheet = (jsonData) => {
+        let result = {
+            total: 0,
+            success: 0,
+            fail: 0,
+            log: []
+        }
+
+        // console.log(dataJSON)
+        const importSectionJSON = [];
+
+        let sectionIndex = 0;
+        let targetSection = null;
+        let productUnique = 0;
+        for (let row of jsonData) {
+            // {A:"상품명 또는 카테고리명", B:"단위" 또는 공백(카테고리인 경우), C: 금액, D:"이미지경로"}
+            if (row.A != "" && row.C == "") {
+                // console.log(`${row.A} 카테고리 생성`)
+                const sectionJSON = {
+                    section: sectionIndex,
+                    title: row.A,
+                    img: '',
+                    color: '#000000',
+                    bgcolor: '#ffffff',
+                    order: sectionIndex,
+                    product: []
+                }
+                importSectionJSON.push(sectionJSON);
+                targetSection = importSectionJSON.find(item => item.section == sectionIndex);
+                sectionIndex++;
+            }
+            if (targetSection) {
+                if (row.A != "" && row.C != "") {
+                    // 상품 추가
+                    const addProductInfoJSON = buildBlankProduct(`${buildProductCode(productUnique++)}`, targetSection.product.length);
+                    addProductInfoJSON.tmpl_dt_tl = row.A;
+                    addProductInfoJSON.tmpl_dt_unit = row.B;
+                    addProductInfoJSON.tmpl_dt_sale_price = row.C;
+                    addProductInfoJSON.tmpl_dt_list_price = row.C;
+                    addProductInfoJSON.tmpl_dt_bcd = (row.D && row.D !="") ? row.D.toString() : "";
+                    addProductInfoJSON.tmpl_dt_img = (row.E && row.E !="") ? buildProductImage(row.E) : "";
+                    targetSection.product.push(addProductInfoJSON)
+                }
+            }
+        }
+        return importSectionJSON;
+    }
+
+    // barcodes는 ,로 이어진 바코드
+    const getImageFromBarcode = async (barcodes) => {
+        const callApi = `${apiServer}/image/apiGetPhotosShuket`
+        const imageContainer = await axios.post(callApi, {
+            barcodes: barcodes
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(response => {            
+            if (response.data.data) {                
+                return response.data.data;
+            } else {
+                return null;
+            }
+        })
+        .catch(error => { 
+            console.log(error); 
+            return null;
+        })
+        return imageContainer;
+    }
+
+    const getImageFromName  = async (findPhotoArray) => {
+        const callApi = `${apiServer}/image/apiGetPhotosFromNameShuket`
+        const imageContainer = await axios.post(callApi, {
+            findPhotoJSONString: JSON.stringify(findPhotoArray)
+        }, {
+                headers: {
+                    xtoken: getCookie("xToken")
+                }
+        })
+        .then(response => {            
+            if (response.data.data) {                
+                return response.data.data;
+            } else {
+                return null;
+            }
+        })
+        .catch(error => { 
+            console.log(error); 
+            return null;
+        })
+        return imageContainer;
+    }
+
+    const showProgressDialog = () => {
+        document.getElementById("loading-message").innerText = "초기화 중입니다.";
+        // document.getElementById("image-loading-progress").style.width = '0%';
+        document.getElementById("loading").classList.remove("d-none");
+    }
+
+    const setProgressDialog = (percent, message) => {
+        document.getElementById("loading-message").innerText = message;
+        // document.getElementById("image-loading-progress").style.width = percent + '%';
+    }
+
+    const hideProgressDialog = () => {
+        document.getElementById("loading").classList.add("d-none");
+    }
+
+    const getPlainTextForImageSearch = (name) => {
+        let splitedName = name.split(" ");
+        let plainName = (splitedName.length > 0) ? splitedName[0] : products.A;
+        // 괄호 및 내용 제거
+        plainName = plainName.replace(/\([^)]*\)/gi, "");
+        plainName = plainName.replace(/\[[^)]*\]/gi, "");
+        // 영문제거
+        plainName = plainName.replace(/[A-Za-z]/gi, "");
+        // 숫자 제거
+        plainName = plainName.replace(/[0-9]/gi, "");
+        // 구분자인 |를 제외한 모든 특수문자 제거
+        plainName = plainName.replace(/[\{\}\[\]\/?.,;:\)*~`!^\-_+<>@\#$%&\\\=\(\'\" ]/gi, "");
+
+        return plainName;
+    }
+
+    const uploadProductsExcel = async () => {
+        // if (!confirm("기존 등록된 데이터가 모두 사라지고 엑셀 파일로부터 채워집니다. 계속하시겠습니까?")) return;
+        const checkPhoto = document.getElementById("check-find-photo").checked;
+        let uploadFile = document.getElementById("uploadFile");
+        let file = uploadFile.files[0];
+
+        let  reader = new FileReader();
+        reader.onload = async function(e) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modal-excelUpload'));
+            modal.hide();
+
+            showProgressDialog();
+
+            const excelFile = XLSX.read(e.target.result);
+            const jsonData = XLSX.utils.sheet_to_json(excelFile.Sheets[excelFile.SheetNames[0]], { defval : "", header: "A" } );
+
+            // console.log(jsonData, jsonData.length);
+
+            if (jsonData && (jsonData.length == 0 || jsonData[0].A == "")) {
+                hideProgressDialog();
+                alert("등록할 상품 정보가 없습니다. 파일을 다시 확인하시거나, 엑셀 시트 1번에 자료가 있는지 확인해 주세요.");
+            }
+
+            setProgressDialog(10, "입력한 바코드에서 사진을 찾고 있습니다(1/5)")
+
+            // 업로드된 데이터에서 바코드 데이터를 모은다
+            const productBarcodeArray = jsonData.filter(item => item.D && item.D != "");
+            let barcodeString = productBarcodeArray.map(item => { return item.D}).join("','");
+            if (barcodeString != "") {
+                barcodeString = "'" + barcodeString + "'";                
+                const imageContainer = await getImageFromBarcode(barcodeString);
+
+                // 바코드로 이미지를 찾아서 적용
+                if (imageContainer) {
+                    for (let imageData of imageContainer) {
+                        let findBarCodesItems = productBarcodeArray.filter(item => item.D == imageData.IM_BARCODE);
+                        for (findItem of findBarCodesItems) {
+                            findItem.E = imageData.IM_URI;
+                        }
+                    }
+                }
+            }
+
+            if (checkPhoto) {
+                setProgressDialog(40, "사진이 없는 상품 정보를 분석 중입니다(2/5)")
+
+                // 이름으로 사진 찾는 작업 시작, 문자열만으로 찾으면 간단하지만, 매칭을 시켜야 하므로 아래 코드를 이용
+                let findPhotoArray = [];
+                for (let products of jsonData) {
+                    if (products.A != "" && products.C != "" && (!products.E || products.E == "")) {
+                        let plainName = getPlainTextForImageSearch(products.A);
+
+                        findPhotoArray.push({
+                            name: products.A,
+                            plainName: plainName,
+                            IM_URL: ''
+                        })
+                    }
+                }
+
+                setProgressDialog(60, "상품 사진을 찾고 있습니다(3/5)")
+
+                if (findPhotoArray.length > 0) {
+                    const imageContainer = await getImageFromName(findPhotoArray);
+                    // console.log(imageContainer)
+
+                    // 이름으로 이미지를 찾아서 적용
+                    if (imageContainer) {
+                        for (let imageData of imageContainer) {
+                            let findItems = jsonData.filter(item => item.A == imageData.name);
+                            for (findItem of findItems) {
+                                findItem.E = imageData.IM_URI;
+                            }
+                        }
+                    }
+                }
+
+                setProgressDialog(90, "상품 사진을 적용하고 있습니다(4/5)")
+            }
+            dataJSON.data.section = addProductsFromSheet(jsonData);
+            updateSectionList();
+
+            // 액션 버튼과 리뷰 업데이트 모두 수행
+            showLeafletAction(true, true)
+
+            setProgressDialog(100, "상품 사진 적용이 끝났습니다(5/5)")
+
+            hideProgressDialog();
+        }
+        reader.readAsArrayBuffer(file);
+    }
+
+    const downloadProductsExcel = () => {
+        const eventName = "상품 목록";
+
+        var xlsx_workBook = XLSX.utils.book_new();
+        xlsx_workBook.Props = {
+            Title: `상품목록`,
+            Subject: `상품목록`,
+            Author: "ALLTOK",
+            Manager: "ALLTOK",
+            Company: "ALLTOK",
+            Keywords: "ALLTOK",
+            Comments: `상품목록`,
+            LastAuthor: "ALLTOK",
+            CreatedDate: new Date(),
+        };
+        xlsx_workBook.SheetNames.push(`상품목록`);
+        let workSheet_Data = getWorksheetStructure();
+        if (!workSheet_Data) return;
+        var workSheet = XLSX.utils.aoa_to_sheet(workSheet_Data);
+        
+        if(!workSheet["!cols"]) workSheet["!cols"] = [];
+        if(!workSheet["!cols"][0]) workSheet["!cols"][0] = {wch: 30};
+        if(!workSheet["!cols"][1]) workSheet["!cols"][1] = {wch: 15};
+        // workSheet["!cols"][COL_INDEX].hidden = true;
+        xlsx_workBook.Sheets[`상품목록`] = workSheet;
+        var workbook = XLSX.write(xlsx_workBook, {
+            bookType: "xlsx",
+            type: "binary",
+            cellStyles: true
+        });
+        saveAs(
+            new Blob([string2arrayBuffer(workbook)], {
+                type: "application/octet-stream",
+            }),
+            `상품목록_${moment(new Date()).format("YYYYMMDD")}.xlsx`
+        );
+        return;
+    }
+
+    const getWorksheetStructure = () => {
+        let dataArray = [];
+        // dataArray.push(
+        //     new Array("상품코드", "대분류", "상품명", "단위", "바코드", "가격", "할인가")
+        // );
+
+        for (let section of dataJSON.data.section) {
+            dataArray.push(
+                new Array(section.title)
+            );
+            for (let product of section.product) {
+                let imageUrl = "";
+                if (product.tmpl_dt_img != "") {
+                    const imageJSON = JSON.parse(product.tmpl_dt_img);
+                    imageUrl = (imageJSON[0].items[0].value) ? imageJSON[0].items[0].value : "https://s3.ap-northeast-2.amazonaws.com/moa.images/no-image.jpg";
+                }
+                
+                dataArray.push(
+                    new Array(product.tmpl_dt_tl, product.tmpl_dt_unit, product.tmpl_dt_sale_price, product.tmpl_dt_bcd, imageUrl)
+                );
+            }
+        }
+        return dataArray;
+    }
+
+    const string2arrayBuffer = (s) => {
+        let buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+        let view = new Uint8Array(buf); //create uint8array as viewer
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff; //convert to octet
+        return buf;
+    }
+
+    const addToCart = () => {
+        alert("모바일에서 확인하세요.");
+    }
+
+    const gotoList = () => {
+        self.location = "/leaflet/list";
+    }
+
+    // drag drop으로 위치 상품 위치 이동
+    const getMouseOffset = (evt) => {
+        const targetRect = evt.target.getBoundingClientRect()
+        const offset = {
+            x: evt.pageX - targetRect.left,
+            y: evt.pageY - targetRect.top
+        }
+        return offset
+    }
+
+    const getElementVerticalCenter = (el) => {
+        const rect = el.getBoundingClientRect()
+        return (rect.bottom - rect.top) / 2
+    }
+
+    const sortable = (rootEl, onUpdate) => {
+        let dragEl;
+        let targetEl;
+        let direction = 0;  // 0은 위에 놓은 것 1은 아래에 놓은 것
+        
+        // Making all siblings movable
+        [].slice.call(rootEl.children).forEach(function (itemEl) {
+            itemEl.draggable = true;
+        });
+        
+        // Function responsible for sorting
+        const _onDragOver = (evt) => {
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = 'move';
+            
+            var target = evt.target;
+            if (target && target !== dragEl && target.nodeName == 'DIV') {
+                    // Sorting
+                const offset = getMouseOffset(evt)
+                const middleY = getElementVerticalCenter(evt.target)
+
+                try {
+                    if (offset.y > middleY) {
+                        // console.log("아래로")
+                        direction = 1;
+                        rootEl.insertBefore(dragEl, target.nextSibling)
+                    } else {
+                        // console.log("위로")
+                        direction = 0;
+                        rootEl.insertBefore(dragEl, target)
+                    }
+                    targetEl = target;
+                } catch {
+                    // console.log("에러", offset.y, middleY)                    
+                    direction = 1;
+                }
+            }
+        }
+        
+        // End of sorting
+        function _onDragEnd(evt){
+            evt.preventDefault();
+            
+            dragEl.classList.remove('ghost');
+            rootEl.removeEventListener('dragover', _onDragOver, false);
+            rootEl.removeEventListener('dragend', _onDragEnd, false);
+
+            // Notification about the end of sorting
+            onUpdate(dragEl, targetEl, direction);
+        }
+        
+        // Sorting starts
+        rootEl.addEventListener('dragstart', function (evt){
+            dragEl = evt.target; // Remembering an element that will be moved
+            
+            // Limiting the movement type
+            evt.dataTransfer.effectAllowed = 'move';
+            evt.dataTransfer.setData('Text', dragEl.textContent);
+
+
+            // Subscribing to the events at dnd
+            rootEl.addEventListener('dragover', _onDragOver, false);
+            rootEl.addEventListener('dragend', _onDragEnd, false);
+
+
+            setTimeout(function () {
+                // If this action is performed without setTimeout, then
+                // the moved object will be of this class.
+                dragEl.classList.add('ghost');
+            }, 0)
+        }, false);
+    }
+
+    const changeDataJSONProductSort = (item, target, direction) => {
+        if (!target) return;
+        // direction == 1 이면, 이동한 것은 item이고, target은 위에 있는 항목이다
+        // direction ==  0이면, 이동한 것은 item이고, target은 아래에 있는 항목이다
+        const itemId = item.id.split("-");
+        const targetId = target.id.split("-");
+        // console.log(itemId, targetId)
+
+        // 대상 section은 itemId[2]
+        const targetSection = dataJSON.data.section.find(item => item.section == parseInt(itemId[2]));
+        if (!targetSection) return;
+        // 대상 상품 id는 itemId[3]
+        const itemProduct = targetSection.product.find(item => item.tmpl_dt_cd == itemId[3]);
+        const targetProduct = targetSection.product.find(item => item.tmpl_dt_cd == targetId[3]);
+
+        if (direction == 0) {
+            itemProduct.tmpl_dt_order = targetProduct.tmpl_dt_order - 0.5;
+            targetSection.product.sort((e1, e2) => e1.tmpl_dt_order - e2.tmpl_dt_order);
+        } else {
+            itemProduct.tmpl_dt_order = targetProduct.tmpl_dt_order + 0.5;
+            targetSection.product.sort((e1, e2) => e1.tmpl_dt_order - e2.tmpl_dt_order);
+        }
+        let index = 0;
+        for (let product of targetSection.product) {
+            product.tmpl_dt_order = index++;
+        }
+        // section은 itemId[2], productId = itemId[3], targetId[3]
+        showLeafletAction(true, true);
+    };
+
+    const changeShowOrder = (orderType, obj) => {
+        const value = parseInt(obj.value);
+        if (!dataJSON.data.showOrder || dataJSON.data.showOrder.length < 3 ) {
+            // 없으면, 하나도 없다고 판단하고 기초 데이터를 먼저 생성
+            dataJSON.data.showOrder = [
+                {
+                    index: 1,
+                    target: "notice"
+                },
+                {
+                    index: 2,
+                    target: "leaflet"
+                },
+                {
+                    index: 3,
+                    target: "product"
+                },
+                {
+                    index: 4,
+                    target: "info"
+                }
+            ]
+        }
+        if (dataJSON.data.showOrder && dataJSON.data.showOrder.length < 4) {
+            dataJSON.data.showOrder.push({
+                index: 4,
+                target: "info"
+            })
+        }
+        // 현재 항목을 찾는다
+        const currentOrder = dataJSON.data.showOrder.find(e => e.target == orderType);
+        if (currentOrder.index < value) {
+            // 순번을 뒤로 설정
+            currentOrder.index = value + 0.5;
+        } else {
+            // 순번을 앞으로 설정
+            currentOrder.index = value - 0.5;
+        }
+
+        // 정렬
+        dataJSON.data.showOrder.sort((e1, e2) => {return e1.index - e2.index});
+        let index = 1;
+        // 인덱스 순서 다시 설정
+        dataJSON.data.showOrder.forEach( e => e.index = index++)
+
+        // console.log(dataJSON.data.showOrder)
+     
+        // 표시 엘리먼트 설정
+        if (dataJSON.data.showOrder) {
+            for (let order of dataJSON.data.showOrder) {
+                document.getElementById("show-order-" + order.target).value = order.index;
+            }
+        }
+        showLeafletAction(true, true);
+    }
+
+    const getImageUrlFromJsonData = (tmpl_dt_img) => {
+        let imageUrl = "";
+        if (tmpl_dt_img != "") {
+            let imageJSON = JSON.parse(tmpl_dt_img);
+            imageUrl = (imageJSON[0].items[0].value) ? imageJSON[0].items[0].value : "https://s3.ap-northeast-2.amazonaws.com/moa.images/no-image.jpg";
+            if (imageUrl) {
+                // console.log(imageUrl)
+                // S3 경로를 cloudfront 경로로 변경
+                // alltok S3를 CF 변경
+                imageUrl = convertCloundFront(imageUrl);
+
+                const url = imageUrl.split("/");
+                const fileName = url[url.length - 1];
+                const newFileName = (korean.test(fileName)) ? encodeURIComponent(fileName) : fileName;
+                imageUrl = url.slice(0, url.length - 1).join("/") + "/" + newFileName;
+            }
+        }
+        return imageUrl;
+    }
+
+    const syncProducts = async () => {        
+        // 연동은 10분이 1회만 허용한다
+        console.log("큐마켓 상품 동기화: 시작")
+        console.log("큐마켓 상품 동기화: 동기화 시간 체크. 동기화 후 10분 지나야 재동기화 가능")
+        const savedTime  = getCookie("syncQM");
+        if (savedTime) {
+            const lastMoment = moment(savedTime);
+            const diffHours = moment().diff(lastMoment, 'minutes', true);
+
+            if (diffHours < 10) {
+                console.log("큐마켓 상품 동기화: 이전 동기화 이후 10분이 지나지 않았습니다.")
+                // alert("큐마켓 동기화 액션은 10분에 한 번만 가능합니다.");
+                // return;
+            }
+        }
+        // 연동 시간을 쿠키로 기록한다 1시간 유효
+        console.log("큐마켓 상품 동기화: 현재 시간 기록, UTC ", moment().toISOString())
+        setCookie("syncQM", moment().toISOString(), {secure: true, 'max-age': 3600, path: '/'});
+        
+        // 연동 호출
+        // 연동용 데이터 제작        
+        console.log("큐마켓 상품 동기화: 연동용 데이터 생성")
+        let startDate = moment().format("YYYY-MM-DD");
+        let endDate = moment().format("YYYY-MM-DD");
+        if (dataJSON.USE_TIME == 'Y') {  
+            startDate = moment(dataJSON.START_DATE).format("YYYY-MM-DD");
+            endDate = moment(dataJSON.END_DATE).format("YYYY-MM-DD");
+        } 
+        const qmsyncData = {
+            "entireStartDate": startDate,
+            "entireEndDate": endDate,
+            "products": []
+        }
+        for (let sectionData of dataJSON.data.section) {
+            // 활성화 섹션만 대상
+            if (!sectionData.status || sectionData.status == 'A') {
+                // console.log(sectionData)
+                // dataSection에 포함된 활성 상품 숫자를 카운트하여 1개 이상일 때만 전달
+                const countActive = sectionData.product.filter(item => item.tmpl_dt_status === 'A').length;
+                if (countActive > 0) {
+                    for (let productData of sectionData.product) {
+                        if (productData.tmpl_dt_status == 'A') {
+                            if (productData.tmpl_dt_sale_price > 0) {
+                                // 기존 단위가 단위 값이 맞는지 확인한다
+                                let title = productData.tmpl_dt_tl + ' ' + productData.tmpl_dt_unit;                                
+                                const match = title.match(/(\d+(?:\.\d+)?|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열|열한|열둘|열셋|열넷|열다섯|열여섯|열일곱|열여덟|열아홉|스무|스물|서른|마흔|쉰)\s*(개|망|통|단|봉지|봉|팩|포기|근|병|캔|박스|마리|줄|컵|장|g|kg|l|ml)/gi);
+                                console.log(match)
+                                const standard = match && match[0] ? match[0].trim() : null;                                    
+
+                                qmsyncData.products.push(
+                                    {
+                                        "name": productData.tmpl_dt_tl + ' ' + productData.tmpl_dt_unit,
+                                        "standard": standard,
+                                        "price": parseInt(productData.tmpl_dt_sale_price),
+                                        // "tax": productData.tmpl_dt_tax ? productData.tmpl_dt_tax == "tax" ? 'tax' : 'free' : 'free',
+                                        "imageUrl": getImageUrlFromJsonData(productData.tmpl_dt_img)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        console.log(qmsyncData)
+        return;
+
+        console.log("큐마켓 상품 동기화: API 호출")
+        // console.log(qmsyncData)
+        showSyncProcess();
+        await axios.post(qmSyncServer, qmsyncData)
+        .then(response => {
+            console.log(response)            
+            hideSyncProcess();
+            alert(`큐마켓 상품이 연동되었습니다.`);
+        })
+        .catch(error => { 
+            hideSyncProcess();
+            console.log(error); 
+            console.log(error.response); 
+            alert(`큐마켓 상품 연동에 실패했습니다. ${error.response.status == 409 ? error.response.data.message : ''}`);
+        })
+    }
+
+    const showSyncProcess = () => {
+        document.getElementById("syncProcess").classList.remove("d-none");
+    }
+
+    const hideSyncProcess = () => {
+        console.log("hide")
+        document.getElementById("syncProcess").classList.add("d-none");
+    }
+
+</script>

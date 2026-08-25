@@ -1,0 +1,276 @@
+<%- contentFor('style') %>
+
+<%- contentFor('content') %>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-lg-1 col-sm-3">
+                        <select class="form-select form-select-sm" id="selected-year">
+                          </select>
+                        </div>
+                        <div class="col-lg-1 col-sm-3">
+                          <select class="form-select form-select-sm" id="selected-month">
+                          </select>
+                    </div>
+                    <div class="col-lg-1">
+                        <button id="search" class="fc-today-button btn btn-sm btn-primary" type="button" onclick="listAccount(1)">보기</button>
+                    </div>
+                    <div class="col-lg text-end">
+                        <!-- <button id="search" class="fc-today-button btn btn-sm btn-secondary" type="button" onclick="downloadExcel()">엑셀다운로드</button> -->
+                        <button id="download" class="fc-today-button btn btn-sm btn-secondary" type="button" onclick="downloadExcel()">ERP용 다운로드</button>
+                    </div>
+                </div>
+
+                <h5 class="font-size-16 me-3 mb-0">월 별 가상계좌 입금 내역</h5>
+                    <hr class="mt-2">
+                    <div class="table-responsive mb-5">
+                        <table class="table table-striped table-hover">
+                            <thead class="">
+                                <tr>
+                                    <th scope="col">순번</th>
+                                    <th scope="col">가맹점번호</th>
+                                    <th scope="col">가맹점명</th>
+                                    <th scope="col">신청일</th>
+                                    <th scope="col">입금일</th>
+                                    <th scope="col">충전일</th>
+                                    <th scope="col">입금액</th>
+                                    <th scope="col">수수료</th>
+                                    <th scope="col">정산액</th>
+                                </tr>
+                            </thead>
+                            <tbody id="account-main">                            
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center" id="account-pager"></ul>
+                    </nav>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<%- contentFor('script') %>
+<script lang="javascript" src="/assets/js/xlsx/xlsx.full.min.js"></script>
+<script lang="javascript" src="/assets/js/fileSaver/fileSaver.min.js"></script>
+
+<script>
+    const apiServer = '<%=apiServer %>';
+    let page = 1;    
+    const rowCount = 20;
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        setSelectDate();
+
+        listAccount(page);
+    })
+
+    const setSelectDate = () => {
+        const nowYear = moment().year();
+        const nowMonth = moment().month() + 1;
+        let html = "";
+        for (let year = 2024; year <= nowYear; year ++) {
+            html += `<option value='${year}'>${year}</option>`;
+        }
+        document.getElementById("selected-year").innerHTML = html;
+        document.getElementById("selected-year").value = nowYear;
+
+        html = "";
+        for (let month = 1; month <= 12; month ++) {
+            html += `<option value='${month}'>${month}</option>`;
+        }
+        document.getElementById("selected-month").innerHTML = html;
+        document.getElementById("selected-month").value = nowMonth;
+
+    }
+
+    const listAccount = async (page) => {
+        let selectedYear = document.getElementById("selected-year").value;
+        let selectedMonth = document.getElementById("selected-month").value;
+        
+        let callApi = `/api/account/historyListMonth`;
+        await axios.post(callApi, {            
+            year: selectedYear,            
+            month: selectedMonth,
+            page: page,
+            rowCount : rowCount
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        })
+        .then(response => {                        
+            if (response.data.result) {
+                let HTML = "";
+                if (response.data.data.rows) {
+                    let num = ((page - 1) * rowCount) + 1;
+                    for (let item of response.data.data.rows) {
+                        // const callData = JSON.parse(item.verify_call_data);
+
+                        HTML += `
+                        <tr>
+                            <td>${num++}</td>
+                            <td>${item.store_code}</td>
+                            <td>${item.name}</td>
+                            <td>${moment(item.verify_call_time).format("YYYY-MM-DD HH:mm:ss")}</td>
+                            <td>${moment(item.callback_time).format("YYYY-MM-DD HH:mm:ss")}</td>
+                            <td>${moment(item.cash_time).format("YYYY-MM-DD HH:mm:ss")}</td>
+                            <td>${numeral(item.cash_amount).format("0,0")}원</td>
+                            <td>${numeral(250).format("0,0")}원</td>
+                            <td>${numeral(item.cash_amount - 250).format("0,0")}원</td>
+                        </tr>`;
+
+                    }
+                }
+                document.getElementById("account-main").innerHTML = HTML;
+
+                let pagerHTML = createPagerHTML(response.data.data.count, rowCount, page, 5, "changePage");
+                document.getElementById("account-pager").innerHTML = pagerHTML;
+
+            }
+        })
+        .catch(error => { console.log(error); alert(`가상계좌충전내역을 가져오지 못했습니다.`);});
+    }
+
+    function changePage(page, rowPerPage) {
+        console.log(page, rowPerPage)
+        listAccount(page);
+    }
+
+    const getProcessType = (processType) => {
+        switch (processType) {
+            case 0 :
+                return "신청";
+            case 1 :
+                return "입금대기";
+            case 2 :
+                return "입금완료";
+            case 3 :
+                return "충전완료";
+        }
+    }
+
+    async function downloadExcel() {
+        const selectedYear = document.getElementById("selected-year").value;
+        const selectedMonth = document.getElementById("selected-month").value;
+
+        const eventName = `가상계좌 ERP ${selectedYear}${selectedMonth}`;
+
+        var xlsx_workBook = XLSX.utils.book_new();
+        xlsx_workBook.Props = {
+            Title: `${eventName}_가상계좌내역`,
+            Subject: `${eventName}_가상계좌내역`,
+            Author: "슈켓",
+            Manager: "슈켓",
+            Company: "슈켓",
+            Keywords: "슈켓",
+            Comments: `${eventName} 가상계좌내역`,
+            LastAuthor: "슈켓",
+            CreatedDate: new Date(),
+        };
+        xlsx_workBook.SheetNames.push(`${selectedYear}-${selectedMonth}`);
+        var workSheet_Data = await getWorksheetStructure();
+        
+        var workSheet = XLSX.utils.aoa_to_sheet(workSheet_Data);
+        xlsx_workBook.Sheets[`${selectedYear}-${selectedMonth}`] = workSheet;
+        var workbook = XLSX.write(xlsx_workBook, {
+            bookType: "xlsx",
+            type: "binary",
+        });
+        saveAs(
+            new Blob([string2arrayBuffer(workbook)], {
+                type: "application/octet-stream",
+            }),
+            `${eventName}_${moment(new Date()).format("YYYYMMDD")}.xlsx`
+        );
+        return;
+    }
+
+    function string2arrayBuffer(s) {
+        let buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+        let view = new Uint8Array(buf); //create uint8array as viewer
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff; //convert to octet
+        return buf;
+    }
+
+    async function getWorksheetStructure() {
+        let dataArray = [];
+        dataArray.push(
+            // new Array("#", "가맹점번호", "가맹점명", "신청일", "입금일", "충전일", "입금액", "수수료", "정산액")
+            new Array("일자", "순번", "거래유형", "거래처코드", "거래처명", "담당자", "검색창내용", "부서", "인쇄소", "프로젝트", "M마트코드(SUBID)", "입금확인", "정액제(Y/N/미개통)", "항목3", "슈켓수수료율", "PG수수료율", "메인적요", "기타항목", "품목코드", "품목명", "규격", "수량", "하청금액", "외화금액", "공급가액", "부가세", "품목적요", "생산전표생성")
+        );
+        const selectedYear = document.getElementById("selected-year").value;
+        const selectedMonth = document.getElementById("selected-month").value;
+        let lastDate = moment(selectedYear + "-" + numeral(selectedMonth).format("00") + "-01").add(1, 'M').add(-1, 'd');
+
+        let callApi = `/api/account/historyListMonthERP`;
+        // let callApi = `/api/account/historyListMonth`;
+        await axios.post(callApi, {
+            year: selectedYear,            
+            month: selectedMonth,
+            page: 0,
+            rowCount: 0
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then((response) => {
+            console.log(response)
+            if (response.data.result && response.data.data.rows.length > 0) {
+                
+                let num = 1;
+                let totalAmount = 0;
+                let totalComission = 0;
+
+                for (let item of response.data.data.rows) {
+                    // const callData = JSON.parse(item.verify_call_data);
+                    // const amount = Math.round(callData.Amt / 1.1);
+                    // const VAT = callData.Amt - amount;
+                    const amount = Math.round(item.cash_amount / 1.1);
+                    const VAT = item.cash_amount - amount;
+
+                    let rowArray = [];
+                    rowArray.push(moment(item.cash_time).format("YYYYMMDD")); //일자
+                    rowArray.push(num++);   // 순번
+                    rowArray.push(11);      // 거래유형
+                    rowArray.push(item.regno);      // 거래처코드 (사업자등록증)
+                    rowArray.push(item.name_reg);      // 거래처명 (사업자등록증 상의 명칭)
+                    rowArray.push("");      // 담당자
+                    rowArray.push("");      // 검색창내용
+                    rowArray.push("");      // 부서
+                    rowArray.push("00089");    // 인쇄소
+                    rowArray.push("09001");      // 프로젝트
+                    rowArray.push("");      // M마트코드(SUBID)
+                    rowArray.push("");      // 입금확인
+                    rowArray.push("");      // 정액제
+                    rowArray.push("");      // 항목3
+                    rowArray.push("");      // 슈켓수수료율
+                    rowArray.push("");      // PG수수료율
+                    rowArray.push("");      // 메인적요
+                    rowArray.push("");      // 기타항목
+                    rowArray.push("11");      // 품목코드
+                    rowArray.push("광고마케팅비(문자)");      // 품목명
+                    rowArray.push("");      // 규격
+                    rowArray.push("1");      // 수량
+                    rowArray.push("");      // 하청금액
+                    rowArray.push("");      // 외화금액
+                    rowArray.push(amount);      // 공급가액
+                    rowArray.push(VAT);      // 부가세
+                    rowArray.push("");      // 품목적요
+                    rowArray.push("");      // 생산전표생성
+
+                    dataArray.push(rowArray);
+                }
+            }
+        }).catch((error) => {
+            console.log(error);
+            alert(`내역을 가져오지 못했습니다.`);
+        });
+        return dataArray;
+    }
+</script>

@@ -1,0 +1,394 @@
+<%- contentFor('style') %>
+<link rel="stylesheet" href="/assets/vendors/tagin-master/dist/tagin.min.css">
+<link rel="stylesheet" href="/assets/vendors/dropzone/dropzone.min.css" type="text/css" />
+
+<%- contentFor('content') %>
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-lg-6 col-sm-6">
+                        <div class="input-group">
+                            <select id="search-category" class="form-select" onchange="showList()">
+                                <option selected value="">전체</option>
+                            </select>
+                            <input type="text" name="search-tags" id="search-tags" data-tagin-separator=" "  class="form-control tagin" value="">
+                            <button class="btn btn-primary" type="button" onclick="showList()">찾기</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 col-sm-6 text-end">
+                        <!-- <button id="btn-addUser" class="btn btn-primary" type="button" onclick="openNewModal()">
+                            <i class="mdi mdi-plus me-1"></i> 새 이미지 추가
+                        </button> -->
+                    </div>                    
+                </div>
+                <div class="row mb-3">
+                    <div class="col-8 table-responsive mb-5">                        
+                        <table class="table table-striped table-hover">
+                            <thead class="">
+                                <tr>
+                                    <th scope="col">이미지코드</th>
+                                    <th scope="col">분류</th>
+                                    <th scope="col">미리보기</th>
+                                    <th scope="col">검색태그</th>
+                                    <th scope="col">사용횟수</th>
+                                    <th scope="col">등록일</th>
+                                    <th scope="col">작업</th>
+                                </tr>
+                                </thead>
+                            <tbody id="image-list">
+                            </tbody>
+                        </table>
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination justify-content-center" id="image-pager"></ul>
+                        </nav>
+                    </div>
+                    <div class="col-4">
+                        <h5>새 이미지 등록하기</h5>
+                        <form action="#" class="dropzone text-center dz-clickable mb-2" id="add-image">
+                            <div class="dz-message m-0 bg-light rounded mb-2 pb-1">
+                                <div class="p-3 text-muted text-opacity-25">
+                                    <i class="demo-psi-upload-to-cloud display-2"></i>
+                                </div>
+                                <h4>이미지를 여기에 드롭하세요.</h4>
+                                <p class="text-muted mb-0">클릭하여 선택할 수 있습니다.</p>
+                            </div>
+                            <div id="image-review" class="dropzone-previews bg-light rounded mb-2 d-none"></div>
+                            <div class="mb-2">
+                                <select id="add-category" class="form-select">                                
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <input type="text" name="add-tags" id="add-tags" class="form-control tagin" data-tagin-separator=" " value="">
+                            </div>
+                            <div>
+                                <button class="btn btn-primary w-100" type="submit">추가하기</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modal-modify" tabindex="-1"aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_userView_Label"> 이미지 정보 변경</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="hidden" id="user-seq">
+                <div class="text-center mb-4">
+                    <img class="img-fluid" src="" id="modify-image" style="max-width: 200px;">
+                </div>
+                <div>                    
+                    <div class="row mb-3">
+                        <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm">분류</label>
+                        <div class="col-sm-10">
+                            <select id="modify-category" class="form-select">                                
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="colFormLabelSm" class="col-sm-2 col-form-label col-form-label-sm">검색태그</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="modify-tags" id="modify-tags" class="form-control tagin" data-tagin-separator=" " value="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary waves-effect waves-light" onclick="modifyImageProcess()">변경하기</button>
+                <button type="button" class="btn btn-secondary waves-effect" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end modal -->
+
+<%- contentFor('script') %>
+<script src="/assets/js/tagin.js"></script>
+<script src="/assets/vendors/dropzone/dropzone.min.js"></script>
+
+<script>
+    const apiServer = '<%=apiServer %>';
+    const s3Server = '<%=s3Server %>';
+    const awscfServer = '<%=awscfServer %>';
+    const categoryCode = '<%=categoryCode %>';
+    let currentPage = 1;
+    const rowPerPage = 5;
+    let searchTagin;
+    let addTagin;
+    let modifyTagin;
+
+    // dropzone을 이용한 이미지 업로드
+    let imageDropZone = Dropzone.options.addImage = {
+        autoProcessQueue: false,
+        acceptedFiles: ".jpg, .jpeg, .png",
+        maxFiles:1,
+        previewsContainer: document.getElementById("image-review"),
+        init: function() {
+            var imageDropzone = this;
+
+            this.element.querySelector("button[type=submit]").addEventListener("click", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log("start")
+                imageDropzone.processQueue();
+            });
+            
+            this.on('addedfile', function(file) {
+                document.querySelector(".dz-message").classList.add("d-none");
+                document.getElementById("image-review").classList.remove("d-none");
+                if (this.files.length > 1) {
+                    this.removeFile(this.files[0]);                    
+                }
+                // 파일 이름에서 숫자를 없앤 후 -와 _로 구분하여 tag로 삼는다
+                let fileName = file.name.toUpperCase();
+                fileName = fileName.replace(/[0-9]|\s|.PNG|.JPG|.JPEG/g,""); // 숫자제거
+                // fileName = fileName.replace(/ /g,""); // 공백제거
+
+                const tags = fileName.split(/[_-]|\(|\)/)
+
+                if (tags.length > 0) {                
+                    addTagin.clear();
+                    for (let tag of tags) {
+                        addTagin.addTag(tag)
+                    }
+                }                
+            }),
+            this.on('sending', async (file) => {
+                // 단일 파일이므로 여기서 시작
+                const formData = new FormData();
+                formData.append("uploadFile", file);
+
+                const categoryCode = document.getElementById("add-category").value;
+                let uploadFile = await axios.post(`${apiServer}/uploadS3/uploadSingle`, formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",                        
+                        "location": `product-images/${categoryCode}`
+                    },
+                }).then(async response =>  {   
+                    if (response.data.result == "success") {
+                        return response.data.data;
+                    }
+                    return null;                    
+                }).catch(error => {
+                    console.log(error)
+                    return null;
+                })
+                if (uploadFile) {
+                    // 이미지가 S3에 잘 올라갔다면
+                    // 나머지 정보로 데이터를 업데이트한다
+                    await axios.post(`${apiServer}/image/apiCreate`, {
+                        categoryCode: categoryCode,
+                        path: uploadFile.key,
+                        tags: addTagin.getValue()
+                    }, {
+                        headers: {
+                            xtoken: getCookie("xToken")
+                        }
+                    }).then(response => {
+                        if (response.data.result == "success") {
+                            // 파일 리셋
+                            imageDropzone.removeFile(imageDropzone.files[0]);
+                            document.querySelector(".dz-message").classList.remove("d-none");
+                            document.getElementById("image-review").classList.add("d-none");
+                            // 태그 리셋
+                            addTagin.clear();
+                            currentPage = 1;
+                            showList();
+                        } else {
+                            alert("이미지가 업로드되지 않았습니다.");        
+                        }
+                        
+                    }).catch(error => {
+                        console.log(error);
+                        alert("이미지가 업로드되지 않았습니다.");
+                    })
+                } else {
+                    alert("이미지가 업로드되지 않았습니다.");
+                }
+            })
+        }  
+    };
+
+    // <!-- 페이지 로드 완료 시 실행 -->
+    document.addEventListener("DOMContentLoaded", async function(){
+        await init();
+        if (categoryCode != "") {
+            document.getElementById("search-category").value = categoryCode;
+            document.getElementById("add-category").value = categoryCode;        
+        }
+        await showList();
+    })
+
+    const init = async () => {
+        // select에 image category 채우기
+        const callAPI = `${apiServer}/image/apiListCategory`;
+        const categoryList = await axios.post(callAPI, {}, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(response => {
+            if (response.data.data) return response.data.data;
+            return [];
+        }).catch(error => {
+            return []
+        })
+        let HTML = "";
+        for (let category of categoryList) {
+            HTML += `<option value='${category.category_code}'>${category.category_name}</option>`;
+        }
+        document.getElementById("search-category").insertAdjacentHTML('beforeend', HTML)
+        document.getElementById("add-category").insertAdjacentHTML('beforeend', HTML)
+        document.getElementById("modify-category").insertAdjacentHTML('beforeend', HTML)
+
+        searchTagin = new Tagin(document.getElementById("search-tags"), { enter: true, placeholder: "검색 내용을 스페이스 또는 엔터로 구분하여 입력"});
+        addTagin = new Tagin(document.getElementById("add-tags"), { enter: true, placeholder: "태그 내용을 스페이스 또는 엔터로 구분하여 입력"});      
+        modifyTagin = new Tagin(document.getElementById("modify-tags"), { enter: true, placeholder: "태그 내용을 스페이스 또는 엔터로 구분하여 입력"});      
+
+    }
+
+    // 이미지 리스트 뷰
+    const showList = () => {
+        const categoryCode = document.getElementById("search-category").value;
+        const tags = searchTagin.getValue();
+
+        let callApi = `${apiServer}/image/apiList`;
+        const result = axios.post(callApi, {
+            categoryCode: categoryCode,
+            tags: tags,
+            page: currentPage,
+            rowCount: rowPerPage
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(response => {  
+            let html = "";            
+            if (response.data.result && response.data.data) {
+                for (let item of response.data.data.rows) {
+                    html += `
+                        <tr>
+                            <td>${item.image_code}</td>
+                            <td>${item.category_name}</td>
+                            <td><img class="img-fluid" src="${awscfServer}${item.path}"></td>
+                            <td>${item.tags}</td>
+                            <td>${item.use_count}</td>
+                            <td>${moment(item.C_TIME).format("YYYY-MM-DD")}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm font-20 btn-primary" onclick="modifyImage('${item.image_code}')">수정</button>
+                                <button type="button" class="btn btn-sm font-20 btn-danger" onclick="terminateImage('${item.image_code}')">삭제</button>
+                            </td>
+                        </tr>`;                                
+                }
+                let pagerHTML = createPagerHTML(response.data.data.count, rowPerPage, currentPage, 5, "changePage");
+                document.getElementById("image-pager").innerHTML = pagerHTML;
+            } else {
+                document.getElementById("image-pager").innerHTML = "";
+            }
+            document.getElementById("image-list").innerHTML = html;
+
+
+        }).catch(error => {
+
+        })
+    }
+
+    const changePage = async (page, rowPerPage) => {
+        currentPage = page;
+        await showList();
+    }
+
+    const terminateImage = async (imageCode) => {
+        let callApi = `${apiServer}/image/apiTerminate`;
+        const result = axios.post(callApi, {
+            imageCode: imageCode
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(async response => {  
+            if (response.data.result == "success") {
+                await showList();
+            } else {
+                alert("이미지를 삭제하지 못했습니다.");    
+            }
+        }).catch(error => {
+            console.log(error);
+            alert("이미지를 삭제하지 못했습니다.");
+        })
+    }
+
+    // 정보 변경
+    let targetImageCode = "";
+    const modifyImage = async (imageCode) => {
+        targetImageCode = imageCode;
+
+        modifyTagin.clear();
+        let callApi = `${apiServer}/image/apiGet`;
+        const imageInfo = await axios.post(callApi, {
+            imageCode: imageCode
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(async response => {  
+            if (response.data.data) return response.data.data;
+            return null;
+        }).catch(error => {
+            console.log(error);            
+            return null;
+        })
+        if (imageInfo) {
+            document.getElementById("modify-image").src = `${s3Server}${imageInfo.path}`;
+            document.getElementById("modify-category").value = imageInfo.category_code;
+            let tags = imageInfo.tags.split(/\s/);
+            if (tags.length > 0) {
+                for (let tag of tags) {
+                    modifyTagin.addTag(tag);
+                }
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('modal-modify'));
+            modal.show();
+
+        } else {
+            alert("이미지 정보를 가져오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+        }
+
+    }
+
+    const modifyImageProcess = async () => {
+        const categoryCode = document.getElementById("modify-category").value;
+        let callApi = `${apiServer}/image/apiUpdate`;
+        const imageInfo = await axios.post(callApi, {
+            imageCode: targetImageCode,
+            categoryCode: categoryCode,
+            tags: modifyTagin.getValue()
+        }, {
+            headers: {
+                xtoken: getCookie("xToken")
+            }
+        }).then(async response => {  
+            if (response.data.result == "success") {
+                let modal = bootstrap.Modal.getInstance(document.getElementById('modal-modify'));
+                modal.hide();
+
+                showList();
+            } else {
+                alert("이미지 정보를 변경할 때 오류가 발생했습니다. 잠시 후 다시 시도해 주십시오.");
+            }
+        }).catch(error => {
+            console.log(error);            
+            alert("이미지 정보를 변경할 때 오류가 발생했습니다. 잠시 후 다시 시도해 주십시오.");
+        })
+    }
+</script>

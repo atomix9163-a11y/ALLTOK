@@ -1,0 +1,155 @@
+<!-- Navigation Category -->
+<div class="mainnav__categoriy py-3">
+    <h6 class="mainnav__caption mt-0 px-3 fw-bold"></h6>
+    <ul class="mainnav__menu nav flex-column">
+
+        <div class="mainnav__categoriy py-3 card ps-1 pe-1">
+            <ul class="mainnav__menu nav flex-column">
+
+                <% if (storeInfo.service.RCSSMS == 'Y' || storeInfo.service.SMS == 'Y') {%>
+                <li class="nav-item">
+                    <a href="<%=(storeInfo.service.RCSSMS == 'Y') ? "/message/rcssms" : "/message/sms" %>" class="nav-link mininav-toggle <%=active == 'sms' ? 'active' : ''%>">
+                        <i class="pli-smartphone-3 fs-5 me-2"></i>
+                        <span class="nav-label mininav-content ms-1">짧은 문자(SMS)</span>
+                    </a>
+                </li>
+                <% } %>
+
+                <% if (storeInfo.service.RCSLMS == 'Y' || storeInfo.service.LMS == 'Y') {%>
+                    <li class="nav-item">
+                        <a href="<%=(storeInfo.service.RCSLMS == 'Y') ? "/message/rcslms" : "/message/lms" %>" class="nav-link mininav-toggle  <%=active == 'lms' ? 'active' : ''%>">
+                            <i class="pli-smartphone-3 fs-5 me-2"></i>
+                            <span class="nav-label mininav-content ms-1">긴 문자(LMS)</span>
+                        </a>
+                    </li>
+                <% } %>
+    
+                <% if (storeInfo.service.AT == 'Y') {%>
+                    <li class="nav-item">
+                        <a href="/message/kkoAT" class="nav-link mininav-toggle <%=active == 'at' ? 'active' : ''%>">
+                            <i class="pli-speech-bubble fs-5 me-2"></i>
+                            <span class="nav-label mininav-content ms-1">알림톡</span>
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+
+        <div class="mainnav__categoriy py-3">
+            <h6 class="mainnav__caption mt-0 px-3 fw-bold">발송 관리</h6>
+            <ul class="mainnav__menu nav flex-column">
+                <li class="nav-item">
+                    <a href="/customer/info" class="nav-link mininav-toggle <%=active == 'customers_info' ? 'active' : ''%>">
+                        <i class="pli-address-book fs-5 me-2"></i>
+                        <span class="nav-label mininav-content ms-1">주소록</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/refuse/list" class="nav-link mininav-toggle <%=active == 'refuse' ? 'active' : ''%>">
+                        <i class="pli-old-telephone fs-5 me-2"></i>
+                        <span class="nav-label mininav-content ms-1">수신거부</span>
+                    </a>
+                </li>
+                <li class="nav-item has-sub">                    
+                    <a href="/history/rcslist<%-(storeInfo.service.MTS_use && storeInfo.service.MTS_use == 'Y') ? 'MTS' : '' %>" class="nav-link mininav-toggle <%=active == 'history' || active == 'historyOld' || active == 'historyMTS' || active == 'historyOldMTS' ? 'active' : ''%>">
+                        <i class="pli-book fs-5 me-2"></i>
+                        <span class="nav-label mininav-content ms-1">발송 기록</span>
+                    </a>
+                    <ul class="mininav-content nav collapse">
+                        <%
+                        if (storeInfo.service.MTS_use && storeInfo.service.MTS_use == 'Y') {
+                            %>
+                            <li class="nav-item">
+                                <a href="/history/rcslistMTS" class="nav-link <%=active == 'historyMTS' ? 'active' : ''%>">발송 기록</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/history/rcslistyearmonthMTS" class="nav-link <%=active == 'historyOldMTS' ? 'active' : ''%>">이전 발송 기록</a>
+                            </li>
+                        <%
+                        } else {
+                        %>
+                        <li class="nav-item">
+                            <a href="/history/rcslist" class="nav-link <%=active == 'history' ? 'active' : ''%>">발송 기록</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/history/rcslistyearmonth" class="nav-link <%=active == 'historyOld' ? 'active' : ''%>">이전 발송 기록</a>
+                        </li>
+                        <%
+                        }
+                        %>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <% if (storeInfo.shop_type == "U" || storeInfo.shop_type == "QU") { %>
+        <div class="mainnav__categoriy py-3">
+            <h6 class="mainnav__caption mt-0 px-3 fw-bold">모바일 관리</h6>
+            <ul class="mainnav__menu nav flex-column">
+                <li class="nav-item">
+                    <a href="/leaflet/list" class="nav-link mininav-toggle <%=active == 'leaflet' ? 'active' : ''%>">
+                        <i class="pli-apple fs-5 me-2"></i>
+                        <span class="nav-label mininav-content ms-1">알림톡화면 설정(상품)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/order/list" class="nav-link mininav-toggle <%=active == 'order' ? 'active' : ''%>">
+                        <i class="pli-shopping-bag fs-5 me-2"></i>
+                        <span class="nav-label mininav-content ms-1">주문</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/order/smsadmin" class="nav-link mininav-toggle <%=active == 'smsadmin' ? 'active' : ''%>">
+                        <i class="pli-bell fs-5 me-2"></i>
+                        <span class="nav-label mininav-content ms-1">주문 알림</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <% } %>
+
+        <div class="mainnav__categoriy py-3">
+            <h6 class="mainnav__caption mt-0 px-3 fw-bold">관리</h6>
+            <ul class="mainnav__menu nav flex-column">
+                <li class="nav-item">
+                    <a href="/cash/history" class="nav-link mininav-toggle <%=active == 'cash' ? 'active' : ''%>">
+                        <i class="pli-coins fs-5 me-2"></i>
+                        <span class="nav-label mininav-content ms-1">충전내역</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/cash/notice" class="nav-link mininav-toggle <%=active == 'cashinfo' ? 'active' : ''%>">
+                        <i class="pli-cash-register fs-5 me-2"></i>
+                        <span class="nav-label mininav-content ms-1">충전정보</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/store/info" class="nav-link mininav-toggle <%=active == 'info' ? 'active' : ''%>">
+                        <i class="pli-home fs-5 me-2"></i>
+                        <span class="nav-label mininav-content ms-1">마트정보</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="mainnav__categoriy py-3">
+            <h6 class="mainnav__caption mt-0 px-3 fw-bold">서비스 약관</h6>
+            <ul class="mainnav__menu nav flex-column">
+                <li class="nav-item">
+                    <a href="/agreement/agreement" class="nav-link mininav-toggle <%=active == 'agreement' ? 'active' : ''%>">
+                        <i class="pli-receipt-3 fs-5 me-2"></i>
+                        <span class="nav-label mininav-content ms-1">서비스 약관</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/agreement/privacy" class="nav-link mininav-toggle <%=active == 'privacy' ? 'active' : ''%>">
+                        <i class="pli-security-block fs-5 me-2"></i>
+                        <span class="nav-label mininav-content ms-1">이용자보호</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+    </ul>
+</div>
+
